@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PAC and GO Travel — Your Dream Vacation Awaits</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy:   #0d2b45;
+      --ocean:  #1a5276;
+      --teal:   #1abc9c;
+      --gold:   #c9a84c;
+      --sand:   #f5f0e8;
+      --white:  #ffffff;
+      --gray:   #5d6d7e;
+      --light:  #eaf2f8;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Lato', sans-serif;
+      color: var(--navy);
+      background: var(--white);
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 5%;
+      height: 72px;
+      background: rgba(13, 43, 69, 0.96);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(201,168,76,0.3);
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 12px; text-decoration: none;
+    }
+    .nav-logo-emblem {
+      width: 44px; height: 44px;
+      background: var(--gold);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Playfair Display', serif;
+      font-size: 18px; font-weight: 700;
+      color: var(--navy);
+    }
+    .nav-logo-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      color: var(--white);
+      line-height: 1.1;
+    }
+    .nav-logo-text span { color: var(--gold); }
+
+    .nav-links { display: flex; gap: 32px; list-style: none; }
+    .nav-links a {
+      text-decoration: none; color: rgba(255,255,255,0.85);
+      font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase;
+      font-weight: 700; transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--gold); }
+
+    .nav-cta {
+      background: var(--gold); color: var(--navy) !important;
+      padding: 8px 20px; border-radius: 4px;
+    }
+    .nav-cta:hover { background: #e0bb5f !important; color: var(--navy) !important; }
+
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+    .hamburger span { width: 24px; height: 2px; background: var(--white); border-radius: 2px; }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative; min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      text-align: center;
+      background: linear-gradient(160deg, var(--navy) 0%, #145a7c 60%, #1abc9c22 100%),
+        url('https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=1800&q=80') center/cover no-repeat;
+      background-blend-mode: multiply;
+      overflow: hidden;
+    }
+    .hero::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at center, transparent 30%, rgba(13,43,69,0.6) 100%);
+    }
+    .hero-content {
+      position: relative; z-index: 2;
+      max-width: 780px; padding: 0 24px;
+      animation: fadeUp 1.1s ease both;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .hero-eyebrow {
+      font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--gold); font-weight: 700; margin-bottom: 18px;
+    }
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.4rem, 6vw, 4.5rem);
+      line-height: 1.1; color: var(--white); margin-bottom: 22px;
+    }
+    .hero h1 em { font-style: italic; color: var(--gold); }
+    .hero p {
+      font-size: 1.15rem; color: rgba(255,255,255,0.85);
+      line-height: 1.7; max-width: 560px; margin: 0 auto 36px;
+    }
+    .hero-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      background: var(--gold); color: var(--navy);
+      padding: 14px 34px; font-weight: 700; font-size: 0.9rem;
+      text-decoration: none; border-radius: 4px; letter-spacing: 0.06em;
+      text-transform: uppercase; transition: background 0.2s, transform 0.15s;
+    }
+    .btn-primary:hover { background: #e0bb5f; transform: translateY(-2px); }
+    .btn-outline {
+      background: transparent; color: var(--white);
+      padding: 14px 34px; font-weight: 700; font-size: 0.9rem;
+      text-decoration: none; border-radius: 4px; letter-spacing: 0.06em;
+      text-transform: uppercase; border: 2px solid rgba(255,255,255,0.5);
+      transition: border-color 0.2s, transform 0.15s;
+    }
+    .btn-outline:hover { border-color: var(--gold); transform: translateY(-2px); }
+
+    .scroll-indicator {
+      position: absolute; bottom: 32px; left: 50%;
+      transform: translateX(-50%); z-index: 2;
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      color: rgba(255,255,255,0.5); font-size: 0.7rem; letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+    .scroll-indicator::after {
+      content: '';
+      width: 1px; height: 48px;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.5), transparent);
+      animation: scrollLine 2s ease infinite;
+    }
+    @keyframes scrollLine {
+      0%,100% { opacity: 0.5; transform: scaleY(1); }
+      50% { opacity: 1; transform: scaleY(0.5); }
+    }
+
+    /* ── TRUST BAR ── */
+    .trust-bar {
+      background: var(--gold);
+      padding: 14px 5%;
+      display: flex; align-items: center; justify-content: center; gap: 48px;
+      flex-wrap: wrap;
+    }
+    .trust-item {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 0.8rem; font-weight: 700; letter-spacing: 0.05em;
+      text-transform: uppercase; color: var(--navy);
+    }
+    .trust-item svg { width: 20px; height: 20px; }
+
+    /* ── SECTIONS ── */
+    section { padding: 90px 5%; }
+    .section-label {
+      font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--gold); font-weight: 700; margin-bottom: 12px;
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+      line-height: 1.2; color: var(--navy); margin-bottom: 20px;
+    }
+    .section-sub {
+      font-size: 1rem; color: var(--gray); line-height: 1.8;
+      max-width: 640px;
+    }
+
+    /* ── DIFFERENCE ── */
+    .difference {
+      background: var(--sand);
+      display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+    }
+    .difference-img {
+      border-radius: 8px; overflow: hidden;
+      position: relative;
+    }
+    .difference-img img {
+      width: 100%; height: 520px; object-fit: cover; display: block;
+    }
+    .difference-img::before {
+      content: '';
+      position: absolute; top: -16px; left: -16px;
+      width: 60%; height: 60%;
+      border: 3px solid var(--gold);
+      border-radius: 4px; z-index: -1;
+    }
+    .difference-features { margin-top: 36px; display: flex; flex-direction: column; gap: 20px; }
+    .feat-item { display: flex; gap: 16px; }
+    .feat-icon {
+      width: 42px; height: 42px; flex-shrink: 0;
+      background: var(--navy); border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .feat-icon svg { width: 22px; height: 22px; stroke: var(--gold); fill: none; stroke-width: 1.8; }
+    .feat-text h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 4px; }
+    .feat-text p { font-size: 0.88rem; color: var(--gray); line-height: 1.6; }
+
+    /* ── SPECIALTIES ── */
+    .specialties { background: var(--navy); }
+    .specialties .section-title { color: var(--white); }
+    .specialties .section-sub { color: rgba(255,255,255,0.7); }
+    .spec-grid {
+      margin-top: 56px;
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+    }
+    .spec-card {
+      position: relative; overflow: hidden; border-radius: 8px;
+      height: 280px; cursor: pointer;
+    }
+    .spec-card img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+    .spec-card:hover img { transform: scale(1.08); }
+    .spec-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(13,43,69,0.9) 0%, transparent 60%);
+      display: flex; flex-direction: column; justify-content: flex-end;
+      padding: 24px;
+    }
+    .spec-overlay h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem; color: var(--white); margin-bottom: 6px;
+    }
+    .spec-overlay p { font-size: 0.82rem; color: rgba(255,255,255,0.75); line-height: 1.5; }
+
+    /* ── QUOTE BANNER ── */
+    .quote-banner {
+      background: var(--ocean);
+      text-align: center; padding: 80px 10%;
+    }
+    .quote-banner blockquote {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.5rem, 3vw, 2.2rem);
+      font-style: italic; color: var(--white); line-height: 1.5;
+      margin-bottom: 18px;
+    }
+    .quote-banner cite {
+      font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--gold); font-style: normal;
+    }
+
+    /* ── AGENTS ── */
+    .agents { background: var(--white); }
+    .agents-header { text-align: center; margin-bottom: 60px; }
+    .agents-header .section-sub { margin: 0 auto; }
+    .agents-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 32px;
+    }
+    .agent-card {
+      border: 1px solid #e0e8f0; border-radius: 10px; overflow: hidden;
+      transition: box-shadow 0.3s, transform 0.3s;
+    }
+    .agent-card:hover { box-shadow: 0 12px 40px rgba(13,43,69,0.15); transform: translateY(-4px); }
+    .agent-photo {
+      height: 240px; overflow: hidden; background: var(--light);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .agent-photo img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+    .agent-photo-placeholder {
+      width: 90px; height: 90px; border-radius: 50%;
+      background: var(--ocean);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Playfair Display', serif; font-size: 2rem;
+      color: var(--white); font-weight: 700;
+    }
+    .agent-info { padding: 24px; }
+    .agent-info h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem; margin-bottom: 6px;
+    }
+    .agent-tag {
+      display: inline-block;
+      background: var(--light); color: var(--ocean);
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+      padding: 3px 10px; border-radius: 20px; margin-bottom: 12px;
+    }
+    .agent-tag.new-tag { background: #d4efdf; color: #1e8449; }
+    .agent-bio {
+      font-size: 0.87rem; color: var(--gray); line-height: 1.65;
+      margin-bottom: 18px;
+      display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .agent-contact {
+      display: inline-block;
+      background: var(--navy); color: var(--white);
+      font-size: 0.78rem; font-weight: 700; letter-spacing: 0.06em;
+      text-transform: uppercase; text-decoration: none;
+      padding: 9px 20px; border-radius: 4px; transition: background 0.2s;
+    }
+    .agent-contact:hover { background: var(--ocean); }
+
+    /* ── TESTIMONIALS ── */
+    .testimonials { background: var(--sand); }
+    .testimonials-header { text-align: center; margin-bottom: 56px; }
+    .test-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 28px; }
+    .test-card {
+      background: var(--white); border-radius: 10px;
+      padding: 32px; position: relative;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    }
+    .test-card::before {
+      content: '\201C';
+      position: absolute; top: 16px; left: 24px;
+      font-family: 'Playfair Display', serif;
+      font-size: 5rem; color: var(--gold); opacity: 0.4;
+      line-height: 1;
+    }
+    .test-text {
+      font-size: 0.92rem; line-height: 1.75; color: var(--gray);
+      margin-bottom: 20px; padding-top: 24px;
+    }
+    .test-author { font-weight: 700; font-size: 0.88rem; color: var(--navy); }
+    .test-stars { color: var(--gold); font-size: 0.9rem; margin-bottom: 8px; }
+
+    /* ── CTA BANNER ── */
+    .cta-banner {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--ocean) 100%);
+      text-align: center; padding: 100px 10%;
+      position: relative; overflow: hidden;
+    }
+    .cta-banner::before {
+      content: '';
+      position: absolute; top: -60px; right: -60px;
+      width: 300px; height: 300px;
+      border-radius: 50%;
+      border: 60px solid rgba(201,168,76,0.1);
+    }
+    .cta-banner h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem,4vw,3rem); color: var(--white);
+      margin-bottom: 16px;
+    }
+    .cta-banner p { font-size: 1.05rem; color: rgba(255,255,255,0.8); margin-bottom: 36px; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: #08192a; color: rgba(255,255,255,0.6);
+      padding: 60px 5% 30px;
+    }
+    .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 48px; margin-bottom: 48px; }
+    .footer-brand p { font-size: 0.87rem; line-height: 1.7; margin-top: 12px; }
+    .footer-col h4 {
+      color: var(--white); font-size: 0.8rem; text-transform: uppercase;
+      letter-spacing: 0.12em; font-weight: 700; margin-bottom: 16px;
+    }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 10px; }
+    .footer-col a {
+      color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.87rem;
+      transition: color 0.2s;
+    }
+    .footer-col a:hover { color: var(--gold); }
+    .footer-bottom {
+      border-top: 1px solid rgba(255,255,255,0.1);
+      padding-top: 24px;
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 12px;
+      font-size: 0.8rem;
+    }
+    .footer-license { color: var(--gold); }
+
+    /* ── MOBILE ── */
+    @media (max-width: 900px) {
+      .nav-links { display: none; }
+      .nav-links.open { display: flex; flex-direction: column; position: fixed; top: 72px; left: 0; right: 0; background: var(--navy); padding: 24px 5%; gap: 20px; border-bottom: 2px solid var(--gold); z-index: 99; }
+      .hamburger { display: flex; }
+      .difference { grid-template-columns: 1fr; gap: 40px; }
+      .difference-img { display: none; }
+      .spec-grid { grid-template-columns: 1fr 1fr; }
+      .test-grid { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+      .spec-grid { grid-template-columns: 1fr; }
+      .trust-bar { gap: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── NAVIGATION ── -->
+<nav id="mainNav">
+  <a href="#" class="nav-logo">
+    <div class="nav-logo-emblem">P&G</div>
+    <div class="nav-logo-text">PAC and GO <br/><span>Travel</span></div>
+  </a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#about">About</a></li>
+    <li><a href="#specialties">Specialties</a></li>
+    <li><a href="#agents">Our Agents</a></li>
+    <li><a href="#testimonials">Testimonials</a></li>
+    <li><a href="#resources">Resources</a></li>
+    <li><a href="#contact" class="nav-cta">Plan My Trip</a></li>
+  </ul>
+  <div class="hamburger" id="hamburger" onclick="toggleNav()">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="hero-content">
+    <p class="hero-eyebrow">✦ Florida Seller of Travel #40802 ✦</p>
+    <h1>Are You Ready for Your<br/><em>Next Adventure?</em></h1>
+    <p>Let our team of experienced travel specialists craft your dream vacation — from luxury cruises and all-inclusive resorts to European escapes and group getaways.</p>
+    <div class="hero-btns">
+      <a href="#contact" class="btn-primary">Start Planning Today</a>
+      <a href="#agents" class="btn-outline">Meet Our Agents</a>
+    </div>
+  </div>
+  <div class="scroll-indicator">Explore</div>
+</section>
+
+<!-- ── TRUST BAR ── -->
+<div class="trust-bar">
+  <div class="trust-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    35+ Years Experience
+  </div>
+  <div class="trust-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+    Full-Service Support
+  </div>
+  <div class="trust-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    Certified Travel Associates
+  </div>
+  <div class="trust-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    1,000+ Vacations Planned
+  </div>
+  <div class="trust-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+    CLIA Master Certified
+  </div>
+</div>
+
+<!-- ── THE PAC AND GO DIFFERENCE ── -->
+<section class="difference" id="about">
+  <div class="difference-text">
+    <p class="section-label">Why Choose Us</p>
+    <h2 class="section-title">The PAC and GO<br/>Travel Difference</h2>
+    <p class="section-sub">We're not just booking agents — we're your advocates before, during, and after your trip. Our relationship with every client is the foundation of everything we do.</p>
+    <div class="difference-features">
+      <div class="feat-item">
+        <div class="feat-icon">
+          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </div>
+        <div class="feat-text">
+          <h4>We Give Back to Our Clients</h4>
+          <p>Onboard credits, cash back, and exclusive gifts — because your loyalty deserves recognition.</p>
+        </div>
+      </div>
+      <div class="feat-item">
+        <div class="feat-icon">
+          <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.42 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.93a16 16 0 0 0 6.16 6.16l.86-.86a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 21.72 16.92z"/></svg>
+        </div>
+        <div class="feat-text">
+          <h4>Always In Your Corner</h4>
+          <p>From planning through your return — if something goes wrong while you travel, we answer.</p>
+        </div>
+      </div>
+      <div class="feat-item">
+        <div class="feat-icon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div class="feat-text">
+          <h4>Experience You Can Trust</h4>
+          <p>Our agents have sailed 130+ cruises and planned travel across all 7 continents.</p>
+        </div>
+      </div>
+      <div class="feat-item">
+        <div class="feat-icon">
+          <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div class="feat-text">
+          <h4>Group & Conference Specialists</h4>
+          <p>From family reunions to corporate retreats, we handle every detail with precision.</p>
+        </div>
+      </div>
+    </div>
+    <br/>
+    <a href="#contact" class="btn-primary" style="display:inline-block; margin-top:8px;">Connect With Our Team</a>
+  </div>
+  <div class="difference-img">
+    <img src="https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=800&q=80" alt="Luxury cruise at sea" />
+  </div>
+</section>
+
+<!-- ── SPECIALTIES ── -->
+<section class="specialties" id="specialties">
+  <div style="text-align:center; margin-bottom: 0;">
+    <p class="section-label">What We Do Best</p>
+    <h2 class="section-title" style="color:var(--white);">Every Dream Destination,<br/>Every Style of Travel</h2>
+    <p class="section-sub" style="color:rgba(255,255,255,0.7); margin:0 auto;">From Caribbean cruises to African safaris, we specialize in crafting unforgettable journeys for individuals, couples, families, and groups.</p>
+  </div>
+  <div class="spec-grid">
+    <div class="spec-card">
+      <img src="https://images.unsplash.com/photo-1548574505-5e239809ee19?w=700&q=80" alt="Cruise Ships" />
+      <div class="spec-overlay">
+        <h3>Ocean Cruises</h3>
+        <p>Caribbean, Mediterranean, Alaska & beyond — we know every major cruise line inside and out.</p>
+      </div>
+    </div>
+    <div class="spec-card">
+      <img src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=700&q=80" alt="All-Inclusive Resort" />
+      <div class="spec-overlay">
+        <h3>All-Inclusive Resorts</h3>
+        <p>Sun, sand, and everything included — we find the perfect resort for your budget and style.</p>
+      </div>
+    </div>
+    <div class="spec-card">
+      <img src="https://images.unsplash.com/photo-1491557345352-5929e343eb89?w=700&q=80" alt="Europe Travel" />
+      <div class="spec-overlay">
+        <h3>European Escapes</h3>
+        <p>River cruises, guided tours, and bespoke itineraries across the continent.</p>
+      </div>
+    </div>
+    <div class="spec-card">
+      <img src="https://images.unsplash.com/photo-1516939884455-1445c8652f83?w=700&q=80" alt="Group Travel" />
+      <div class="spec-overlay">
+        <h3>Group Packages</h3>
+        <p>Family reunions, destination weddings, corporate retreats — we handle every detail.</p>
+      </div>
+    </div>
+    <div class="spec-card">
+      <img src="https://images.unsplash.com/photo-1523805009345-7448845a9e53?w=700&q=80" alt="Viking River Cruise" />
+      <div class="spec-overlay">
+        <h3>River Cruises</h3>
+        <p>Specialists in Viking River Cruises and intimate European waterway experiences.</p>
+      </div>
+    </div>
+    <div class="spec-card">
+      <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=700&q=80" alt="African Safari" />
+      <div class="spec-overlay">
+        <h3>Safaris & Exotic Tours</h3>
+        <p>Accredited in African Safaris and Australian/New Zealand adventures.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── QUOTE BANNER ── -->
+<div class="quote-banner">
+  <blockquote>"Travel is the only thing you buy that makes you richer."</blockquote>
+  <cite>— Anonymous</cite>
+</div>
+
+<!-- ── AGENTS ── -->
+<section class="agents" id="agents">
+  <div class="agents-header">
+    <p class="section-label">The People Behind Your Journey</p>
+    <h2 class="section-title">Meet Our Travel Agents</h2>
+    <p class="section-sub">Just like the Imagineers at a well-known theme park, our team is the creative engine that brings your dream vacation to life.</p>
+  </div>
+  <div class="agents-grid">
+
+    <!-- Patty Wells -->
+    <div class="agent-card">
+      <div class="agent-photo">
+        <img src="https://images.squarespace-cdn.com/content/v1/636a9545f454d01b390e8f85/855a1918-c2bd-4451-9451-e4df18cee1c9/FullSizeRender.jpeg" alt="Patty Wells" />
+      </div>
+      <div class="agent-info">
+        <h3>Patty Wells</h3>
+        <span class="agent-tag">Co-Owner · 35 Yrs Experience</span>
+        <p class="agent-bio">After 44 years in law enforcement, Patty joined Connie to create PAC and GO Travel. She has planned 1,000+ travel packages including cruises to Europe, Australia, and New Zealand. She is known for her above-and-beyond client gifts and credits.</p>
+        <a href="contact.html?agent=Patty+Wells" class="agent-contact">Contact Patty</a>
+      </div>
+    </div>
+
+    <!-- Connie Brant -->
+    <div class="agent-card">
+      <div class="agent-photo">
+        <img src="https://images.squarespace-cdn.com/content/v1/636a9545f454d01b390e8f85/e9466861-1d39-47da-b12c-c5d243835a1f/BestMe_20160227095601-1.jpeg" alt="Connie Brant" />
+      </div>
+      <div class="agent-info">
+        <h3>Connie Brant</h3>
+        <span class="agent-tag">Co-Owner · CLIA Master</span>
+        <p class="agent-bio">Former US Airways reservation specialist for 19 years and owner of her own travel agency for 12 years. Connie has sailed 131+ cruises and holds CTA and CLIA Master certifications, with expertise in Caribbean Travel and African Safaris.</p>
+        <a href="contact.html?agent=Connie+Brant" class="agent-contact">Contact Connie</a>
+      </div>
+    </div>
+
+    <!-- Robert Traversi — NEW -->
+    <div class="agent-card">
+      <div class="agent-photo">
+        <div class="agent-photo-placeholder">RT</div>
+      </div>
+      <div class="agent-info">
+        <h3>Robert Traversi</h3>
+        <span class="agent-tag new-tag">✦ Now Booking</span>
+        <p class="agent-bio">Robert brings a passion for exceptional travel experiences and a meticulous eye for detail. Whether you're dreaming of a Caribbean cruise, an all-inclusive resort escape, or a custom international itinerary, Robert is dedicated to making every journey seamless and memorable.</p>
+        <a href="contact.html?agent=Robert+Traversi" class="agent-contact">Contact Robert</a>
+      </div>
+    </div>
+
+    <!-- Alan Klein -->
+    <div class="agent-card">
+      <div class="agent-photo">
+        <img src="https://images.squarespace-cdn.com/content/v1/636a9545f454d01b390e8f85/019c79f7-d4b6-4de0-9ad3-8724ef5a1295/Alan2.jpg" alt="Alan Klein" />
+      </div>
+      <div class="agent-info">
+        <h3>Alan Klein</h3>
+        <span class="agent-tag">90 Countries · All 50 States</span>
+        <p class="agent-bio">Alan has visited every U.S. state and 90 countries — and he wants to share that knowledge with you. He especially loves Hawaii and cruising, and would be honored to help your family explore the world.</p>
+        <a href="contact.html?agent=Alan+Klein" class="agent-contact">Contact Alan</a>
+      </div>
+    </div>
+
+    <!-- Rosemary Karnes -->
+    <div class="agent-card">
+      <div class="agent-photo">
+        <img src="https://images.squarespace-cdn.com/content/v1/636a9545f454d01b390e8f85/228cbd2f-93f1-424c-92e3-f4edad39075a/rose.jpg" alt="Rosemary Karnes" />
+      </div>
+      <div class="agent-info">
+        <h3>Rosemary Karnes</h3>
+        <span class="agent-tag">Viking Cruise Specialist</span>
+        <p class="agent-bio">With 25+ years in the travel industry as both an airline reservation agent and private agency expert, Rosemary specializes in Viking Cruising and is beloved by a loyal community of clients including retired teachers, family, and friends.</p>
+        <a href="contact.html?agent=Rosemary+Karnes" class="agent-contact">Contact Rosemary</a>
+      </div>
+    </div>
+
+    <!-- Norma Allen -->
+    <div class="agent-card">
+      <div class="agent-photo">
+        <img src="https://images.squarespace-cdn.com/content/v1/636a9545f454d01b390e8f85/1793f7fe-b6de-4d8d-8115-d8c80228f0fd/norma+2.jpg" alt="Norma Allen" />
+      </div>
+      <div class="agent-info">
+        <h3>Norma Allen</h3>
+        <span class="agent-tag">Cruise Specialist · 20 Yrs</span>
+        <p class="agent-bio">Norma is a passionate, detail-oriented travel agent with over 20 years of experience. Cruises are her specialty, but her deep knowledge spans all types of travel. Let Norma help you book your dream vacation!</p>
+        <a href="contact.html?agent=Norma+Allen" class="agent-contact">Contact Norma</a>
+      </div>
+    </div>
+
+    <!-- Other Agents -->
+    <div class="agent-card">
+      <div class="agent-photo"><div class="agent-photo-placeholder">DB</div></div>
+      <div class="agent-info">
+        <h3>Denise Berger</h3>
+        <span class="agent-tag">Travel Specialist</span>
+        <p class="agent-bio">Denise is a dedicated travel specialist with a commitment to exceptional client service. Bio coming soon.</p>
+        <a href="contact.html?agent=Denise+Berger" class="agent-contact">Contact Denise</a>
+      </div>
+    </div>
+
+    <div class="agent-card">
+      <div class="agent-photo"><div class="agent-photo-placeholder">BV</div></div>
+      <div class="agent-info">
+        <h3>Beth Vanergrift</h3>
+        <span class="agent-tag">Travel Specialist</span>
+        <p class="agent-bio">Beth brings enthusiasm and expertise to every client booking. Bio coming soon.</p>
+        <a href="contact.html?agent=Beth+Vanergrift" class="agent-contact">Contact Beth</a>
+      </div>
+    </div>
+
+    <div class="agent-card">
+      <div class="agent-photo"><div class="agent-photo-placeholder">JG</div></div>
+      <div class="agent-info">
+        <h3>Jane Goerke</h3>
+        <span class="agent-tag">Travel Specialist</span>
+        <p class="agent-bio">Jane is passionate about helping clients create travel memories that last a lifetime. Bio coming soon.</p>
+        <a href="contact.html?agent=Jane+Goerke" class="agent-contact">Contact Jane</a>
+      </div>
+    </div>
+
+    <div class="agent-card">
+      <div class="agent-photo"><div class="agent-photo-placeholder">JT</div></div>
+      <div class="agent-info">
+        <h3>Joel Trinidad</h3>
+        <span class="agent-tag">Travel Specialist</span>
+        <p class="agent-bio">Joel is ready to help you explore the world. Bio coming soon.</p>
+        <a href="contact.html?agent=Joel+Trinidad" class="agent-contact">Contact Joel</a>
+      </div>
+    </div>
+
+    <div class="agent-card">
+      <div class="agent-photo"><div class="agent-photo-placeholder">RC</div></div>
+      <div class="agent-info">
+        <h3>Rochelle Coronado</h3>
+        <span class="agent-tag">Travel Specialist</span>
+        <p class="agent-bio">Rochelle brings dedication and warmth to every client experience. Bio coming soon.</p>
+        <a href="contact.html?agent=Rochelle+Coronado" class="agent-contact">Contact Rochelle</a>
+      </div>
+    </div>
+
+    <div class="agent-card">
+      <div class="agent-photo"><div class="agent-photo-placeholder">SM</div></div>
+      <div class="agent-info">
+        <h3>Sue Muldoon</h3>
+        <span class="agent-tag">Travel Specialist</span>
+        <p class="agent-bio">Sue is passionate about crafting perfect travel itineraries for every client. Bio coming soon.</p>
+        <a href="contact.html?agent=Sue+Muldoon" class="agent-contact">Contact Sue</a>
+      </div>
+    </div>
+
+    <div class="agent-card">
+      <div class="agent-photo"><div class="agent-photo-placeholder">LO</div></div>
+      <div class="agent-info">
+        <h3>Larry Oakley</h3>
+        <span class="agent-tag">Travel Specialist</span>
+        <p class="agent-bio">Larry specializes in cruise travel and is dedicated to finding the perfect voyage for every traveler. Bio coming soon.</p>
+        <a href="contact.html?agent=Larry+Oakley" class="agent-contact">Contact Larry</a>
+      </div>
+    </div>
+
+    <div class="agent-card">
+      <div class="agent-photo"><div class="agent-photo-placeholder">AD</div></div>
+      <div class="agent-info">
+        <h3>Anissa Dean</h3>
+        <span class="agent-tag">Travel Specialist</span>
+        <p class="agent-bio">Anissa is passionate about helping clients experience life through travel. Bio coming soon.</p>
+        <a href="contact.html?agent=Anissa+Dean" class="agent-contact">Contact Anissa</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── TESTIMONIALS ── -->
+<section class="testimonials" id="testimonials">
+  <div class="testimonials-header">
+    <p class="section-label">Client Stories</p>
+    <h2 class="section-title">What Our Travelers Say</h2>
+    <p class="section-sub" style="margin:0 auto;">Don't just take our word for it — hear from the clients who've trusted us with their most precious memories.</p>
+  </div>
+  <div class="test-grid">
+    <div class="test-card">
+      <div class="test-stars">★★★★★</div>
+      <p class="test-text">Our Caribbean cruise was absolutely flawless. Patty handled every detail and even arranged a surprise onboard anniversary gift we never expected. We've booked three more trips since!</p>
+      <p class="test-author">— Maria & Tom R., Florida</p>
+    </div>
+    <div class="test-card">
+      <div class="test-stars">★★★★★</div>
+      <p class="test-text">Connie's expertise in cruise travel is unmatched. She found us the perfect itinerary and made sure we had everything we needed — even when we had a small emergency mid-cruise, she was reachable and helpful.</p>
+      <p class="test-author">— Dave K., Ohio</p>
+    </div>
+    <div class="test-card">
+      <div class="test-stars">★★★★★</div>
+      <p class="test-text">I've been using PAC and GO for our annual group trip for five years. The level of service, attention to detail, and the little extras they throw in make every trip feel like first class.</p>
+      <p class="test-author">— Sandra W., Georgia</p>
+    </div>
+  </div>
+  <div style="text-align:center; margin-top: 48px;">
+    <a href="https://www.pacandgotravel.com/testimonials" class="btn-primary" style="display:inline-block;">Read More Testimonials</a>
+  </div>
+</section>
+
+<!-- ── RESOURCES ── -->
+<section style="background: var(--light); padding: 80px 5%;" id="resources">
+  <div style="text-align:center; margin-bottom:48px;">
+    <p class="section-label">Helpful Links</p>
+    <h2 class="section-title">Travel Resources</h2>
+    <p class="section-sub" style="margin:0 auto;">Everything you need to protect and enhance your trip — curated by our team.</p>
+  </div>
+  <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:24px; max-width: 900px; margin: 0 auto;">
+    <a href="https://www.pacandgotravel.com/travel-insurance-and-shore-excursions-links" style="text-decoration:none;">
+      <div style="background:var(--white); border-radius:10px; padding:28px; text-align:center; border: 1px solid #dde; transition: box-shadow 0.2s; cursor: pointer;" onmouseover="this.style.boxShadow='0 8px 24px rgba(0,0,0,0.1)'" onmouseout="this.style.boxShadow=''">
+        <div style="font-size:2rem; margin-bottom:12px;">🛡️</div>
+        <h4 style="font-size:0.95rem; margin-bottom:8px;">Travel Insurance</h4>
+        <p style="font-size:0.82rem; color:var(--gray);">Protect your investment with our recommended insurance partners.</p>
+      </div>
+    </a>
+    <a href="https://www.pacandgotravel.com/travel-insurance-and-shore-excursions-links" style="text-decoration:none;">
+      <div style="background:var(--white); border-radius:10px; padding:28px; text-align:center; border: 1px solid #dde; transition: box-shadow 0.2s; cursor: pointer;" onmouseover="this.style.boxShadow='0 8px 24px rgba(0,0,0,0.1)'" onmouseout="this.style.boxShadow=''">
+        <div style="font-size:2rem; margin-bottom:12px;">⚓</div>
+        <h4 style="font-size:0.95rem; margin-bottom:8px;">Shore Excursions</h4>
+        <p style="font-size:0.82rem; color:var(--gray);">Book port excursions through our trusted partner links.</p>
+      </div>
+    </a>
+    <a href="contact.html" style="text-decoration:none;">
+      <div style="background:var(--white); border-radius:10px; padding:28px; text-align:center; border: 1px solid #dde; transition: box-shadow 0.2s; cursor: pointer;" onmouseover="this.style.boxShadow='0 8px 24px rgba(0,0,0,0.1)'" onmouseout="this.style.boxShadow=''">
+        <div style="font-size:2rem; margin-bottom:12px;">✉️</div>
+        <h4 style="font-size:0.95rem; margin-bottom:8px;">Contact Us</h4>
+        <p style="font-size:0.82rem; color:var(--gray);">Ready to start planning? Reach out to our team today.</p>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- ── CTA BANNER ── -->
+<section class="cta-banner" id="contact">
+  <h2>Ready to Start Planning<br/>Your Dream Vacation?</h2>
+  <p>Our travel specialists are standing by. Let's create something extraordinary together.</p>
+  <a href="contact.html" class="btn-primary" style="font-size:1rem; padding:16px 44px;">Connect With Us and Start Planning</a>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:4px;">
+        <div style="width:38px;height:38px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--navy);">P&G</div>
+        <span style="font-family:'Playfair Display',serif; font-size:1.1rem; color:var(--white);">PAC and GO Travel</span>
+      </div>
+      <p>Your trusted travel partners — helping clients explore the world with confidence, care, and a personal touch since day one.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Quick Links</h4>
+      <ul>
+        <li><a href="#about">About Us</a></li>
+        <li><a href="#specialties">Specialties</a></li>
+        <li><a href="#agents">Our Agents</a></li>
+        <li><a href="#testimonials">Testimonials</a></li>
+        <li><a href="https://www.pacandgotravel.com/travel-insurance-and-shore-excursions-links">Travel Resources</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <ul>
+        <li><a href="contact.html?agent=Patty+Wells">pacandgopatty@gmail.com</a></li>
+        <li><a href="contact.html?agent=Connie+Brant">conniejot@aol.com</a></li>
+        <li><a href="contact.html">Contact Form</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 PAC and GO Travel, LLC. All rights reserved.</span>
+    <span class="footer-license">Florida Seller of Travel #40802</span>
+  </div>
+</footer>
+
+<script>
+  function toggleNav() {
+    document.getElementById('navLinks').classList.toggle('open');
+  }
+  // Sticky nav shadow
+  window.addEventListener('scroll', () => {
+    const nav = document.getElementById('mainNav');
+    nav.style.boxShadow = window.scrollY > 20 ? '0 4px 20px rgba(0,0,0,0.3)' : 'none';
+  });
+</script>
+</body>
+</html>
