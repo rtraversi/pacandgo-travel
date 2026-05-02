@@ -1,0 +1,11 @@
+{
+  "name": "pacandgo-travel",
+  "version": "1.0.0",
+  "description": "PAC and GO Travel website build script",
+  "scripts": {
+    "build": "node build.js"
+  },
+  "dependencies": {
+    "gray-matter": "^4.0.3"
+  }
+}
