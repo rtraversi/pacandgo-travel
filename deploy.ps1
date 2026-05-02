@@ -18,8 +18,11 @@ if ($choice -ne "1" -and $choice -ne "2") {
 $commitMsg = Read-Host "What did you change?"
 if ([string]::IsNullOrWhiteSpace($commitMsg)) { $commitMsg = "Site update" }
 
+# Always pull first to avoid rejection
 Write-Host ""
-Write-Host "Pushing to test site..." -ForegroundColor Cyan
+Write-Host "Syncing with GitHub..." -ForegroundColor Cyan
+git pull origin main --rebase
+
 git add .
 git commit -m $commitMsg
 git push
@@ -37,13 +40,25 @@ if ($choice -eq "2") {
     if (-not (Test-Path "$dest\agents")) {
         New-Item -ItemType Directory -Path "$dest\agents" | Out-Null
     }
+    if (-not (Test-Path "$dest\_agents")) {
+        New-Item -ItemType Directory -Path "$dest\_agents" | Out-Null
+    }
+    if (-not (Test-Path "$dest\admin")) {
+        New-Item -ItemType Directory -Path "$dest\admin" | Out-Null
+    }
 
-    Copy-Item "$PSScriptRoot\*.html" $dest -Force
-    Copy-Item "$PSScriptRoot\*.jpg"  $dest -Force -ErrorAction SilentlyContinue
-    Copy-Item "$PSScriptRoot\*.png"  $dest -Force -ErrorAction SilentlyContinue
-    Copy-Item "$PSScriptRoot\agents\*.html" "$dest\agents\" -Force
+    Copy-Item "$PSScriptRoot\*.html"     $dest -Force
+    Copy-Item "$PSScriptRoot\*.jpg"      $dest -Force -ErrorAction SilentlyContinue
+    Copy-Item "$PSScriptRoot\*.png"      $dest -Force -ErrorAction SilentlyContinue
+    Copy-Item "$PSScriptRoot\*.toml"     $dest -Force
+    Copy-Item "$PSScriptRoot\*.json"     $dest -Force
+    Copy-Item "$PSScriptRoot\build.js"   $dest -Force
+    Copy-Item "$PSScriptRoot\agents\*.html"  "$dest\agents\" -Force
+    Copy-Item "$PSScriptRoot\_agents\*.md"   "$dest\_agents\" -Force
+    Copy-Item "$PSScriptRoot\admin\*"        "$dest\admin\" -Force
 
     Set-Location $dest
+    git pull origin main --rebase
     git add .
     git commit -m "PROMOTE: $commitMsg"
     git push
