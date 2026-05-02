@@ -31,14 +31,11 @@
       background: var(--navy);
       border-bottom: 2px solid rgba(201,168,76,0.4);
     }
-    .nav-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .nav-logo-emblem {
-      width: 40px; height: 40px; background: var(--gold); border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; color: var(--navy);
+    .nav-logo { display: flex; align-items: center; text-decoration: none; }
+    .nav-logo img {
+      height: 52px; width: auto;
+      filter: drop-shadow(0 1px 3px rgba(0,0,0,0.4));
     }
-    .nav-logo-text { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--white); line-height: 1.1; }
-    .nav-logo-text span { color: var(--gold); }
     .nav-back {
       color: rgba(255,255,255,0.75); text-decoration: none; font-size: 0.82rem;
       font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase;
@@ -271,8 +268,7 @@
 <!-- NAV -->
 <nav>
   <a href="index.html" class="nav-logo">
-    <div class="nav-logo-emblem">P&G</div>
-    <div class="nav-logo-text">PAC and GO <br/><span>Travel</span></div>
+    <img src="logo.png" alt="PAC and GO Travel" />
   </a>
   <a href="index.html" class="nav-back">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
@@ -395,8 +391,8 @@
               <option value="Joel Trinidad">Joel Trinidad — Travel Specialist</option>
               <option value="Rochelle Coronado">Rochelle Coronado — Travel Specialist</option>
               <option value="Sue Muldoon">Sue Muldoon — Travel Specialist</option>
-              <option value="Larry Oakley">Larry Oakley — Cruise Specialist</option>
-              <option value="Anissa Dean">Anissa Dean — Travel Specialist</option>
+              
+              <option value="Aniska Dean">Aniska Dean — Travel Specialist</option>
             </optgroup>
           </select>
           <span class="field-error" id="err-agent">Please select an agent or "No Preference".</span>
