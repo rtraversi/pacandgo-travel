@@ -64,21 +64,19 @@ mdFiles.forEach(mdFile => {
       const cardHtml = indexHtml.substring(startIdx + startMarker.length, endIdx);
       const after    = indexHtml.substring(endIdx);
 
-      // Find agent-photo div open and close within card
-      const photoOpen  = cardHtml.indexOf('<div class="agent-photo">');
-      const photoClose = cardHtml.indexOf('</div>', photoOpen);
+      // Find agent-photo div using regex that matches the FULL div including nested content
+      // Use a replacement that swaps everything between agent-photo open and its matching close
+      const newCard = cardHtml.replace(
+        /(<div class="agent-photo">)([\s\S]*?)(<\/div>\s*\n\s*<div class="agent-info">)/,
+        '$1\n        <img src="' + photo + '" alt="' + name + '" />\n      $3'
+      );
 
-      if (photoOpen !== -1 && photoClose !== -1) {
-        const newCard = 
-          cardHtml.substring(0, photoOpen) +
-          '<div class="agent-photo">\n        <img src="' + photo + '" alt="' + name + '" />\n      </div>' +
-          cardHtml.substring(photoClose + 6);
-
+      if (newCard !== cardHtml) {
         indexHtml    = before + newCard + after;
         indexUpdated = true;
         updates.push('Index card photo');
       } else {
-        console.log('    ! agent-photo div not found for ' + slug);
+        console.log('    ! Index card photo not matched for ' + slug);
       }
     }
   }
