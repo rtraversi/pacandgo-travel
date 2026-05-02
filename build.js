@@ -51,8 +51,8 @@ mdFiles.forEach(mdFile => {
     );
     updates.push('Photo');
 
-    // PHOTO on index.html — use the unique card markers to target exactly the right card
-    const markerKey = slug.toUpperCase().replace(/-/g, '_');
+    // PHOTO on index.html using unique card markers
+    const markerKey   = slug.toUpperCase().replace(/-/g, '_');
     const startMarker = '<!-- AGENT_CARD_' + markerKey + '_START -->';
     const endMarker   = '<!-- AGENT_CARD_' + markerKey + '_END -->';
 
@@ -60,19 +60,25 @@ mdFiles.forEach(mdFile => {
     const endIdx   = indexHtml.indexOf(endMarker);
 
     if (startIdx !== -1 && endIdx !== -1) {
-      const before  = indexHtml.substring(0, startIdx + startMarker.length);
+      const before   = indexHtml.substring(0, startIdx + startMarker.length);
       const cardHtml = indexHtml.substring(startIdx + startMarker.length, endIdx);
-      const after   = indexHtml.substring(endIdx);
+      const after    = indexHtml.substring(endIdx);
 
-      const newCard = cardHtml.replace(
-        /(<div class="agent-photo"[^>]*>)\s*(<img[^>]*>|<div class="agent-photo-placeholder">[\s\S]*?<\/div>)\s*(<\/div>)/,
-        '$1\n        <img src="' + photo + '" alt="' + name + '" />\n      $3'
-      );
+      // Find agent-photo div open and close within card
+      const photoOpen  = cardHtml.indexOf('<div class="agent-photo">');
+      const photoClose = cardHtml.indexOf('</div>', photoOpen);
 
-      if (newCard !== cardHtml) {
+      if (photoOpen !== -1 && photoClose !== -1) {
+        const newCard = 
+          cardHtml.substring(0, photoOpen) +
+          '<div class="agent-photo">\n        <img src="' + photo + '" alt="' + name + '" />\n      </div>' +
+          cardHtml.substring(photoClose + 6);
+
         indexHtml    = before + newCard + after;
         indexUpdated = true;
         updates.push('Index card photo');
+      } else {
+        console.log('    ! agent-photo div not found for ' + slug);
       }
     }
   }
