@@ -1,9 +1,3 @@
-// ─────────────────────────────────────────────────────────
-//  PAC and GO Travel — Build Script
-//  Reads _agents/*.md and injects content into agents/*.html
-//  Also updates agent card photos on index.html
-// ─────────────────────────────────────────────────────────
-
 const fs     = require('fs');
 const path   = require('path');
 const matter = require('gray-matter');
@@ -15,7 +9,7 @@ const indexFile     = path.join(__dirname, 'index.html');
 const mdFiles = fs.readdirSync(agentsDataDir).filter(f => f.endsWith('.md'));
 
 console.log('\nPAC and GO Build Script');
-console.log('─────────────────────────');
+console.log('-------------------------');
 console.log('Found ' + mdFiles.length + ' agent data file(s)\n');
 
 let indexHtml    = fs.readFileSync(indexFile, 'utf8');
@@ -57,20 +51,29 @@ mdFiles.forEach(mdFile => {
     );
     updates.push('Photo');
 
-    // PHOTO on index.html card
-    const agentPageLink = 'agents/' + slug + '.html';
-    const agentCardPattern = new RegExp(
-      '(' + agentPageLink.replace('/', '\\/') + ')' +
-      '([\\s\\S]{0,3000}?<div class="agent-photo"[^>]*>\\s*)' +
-      '(<img[^>]*>|<div class="agent-photo-placeholder">[\\s\\S]*?<\\/div>)'
-    );
-    const newIndex = indexHtml.replace(agentCardPattern, function(match, link, before) {
-      indexUpdated = true;
-      return link + before + '<img src="' + photo + '" alt="' + name + '" />';
-    });
-    if (newIndex !== indexHtml) {
-      indexHtml = newIndex;
-      updates.push('Index card photo');
+    // PHOTO on index.html — use the unique card markers to target exactly the right card
+    const markerKey = slug.toUpperCase().replace(/-/g, '_');
+    const startMarker = '<!-- AGENT_CARD_' + markerKey + '_START -->';
+    const endMarker   = '<!-- AGENT_CARD_' + markerKey + '_END -->';
+
+    const startIdx = indexHtml.indexOf(startMarker);
+    const endIdx   = indexHtml.indexOf(endMarker);
+
+    if (startIdx !== -1 && endIdx !== -1) {
+      const before  = indexHtml.substring(0, startIdx + startMarker.length);
+      const cardHtml = indexHtml.substring(startIdx + startMarker.length, endIdx);
+      const after   = indexHtml.substring(endIdx);
+
+      const newCard = cardHtml.replace(
+        /(<div class="agent-photo"[^>]*>)\s*(<img[^>]*>|<div class="agent-photo-placeholder">[\s\S]*?<\/div>)\s*(<\/div>)/,
+        '$1\n        <img src="' + photo + '" alt="' + name + '" />\n      $3'
+      );
+
+      if (newCard !== cardHtml) {
+        indexHtml    = before + newCard + after;
+        indexUpdated = true;
+        updates.push('Index card photo');
+      }
     }
   }
 
