@@ -5,7 +5,7 @@ specialties:
   - Cruises
   - All-Inclusive Resorts
   - International Travel
-  - Airline Pricing & Flights
+  - Custom Itineraries
 bio: >
   Robert Traversi is a dedicated travel specialist with a passion for helping
   clients create extraordinary vacation experiences. Whether you're dreaming of
