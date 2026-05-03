@@ -28,7 +28,6 @@ console.log('Found ' + mdFiles.length + ' agent data file(s)\n');
 
 let indexHtml    = fs.readFileSync(indexFile, 'utf8');
 let indexUpdated = false;
-const changedFiles = [];
 
 mdFiles.forEach(mdFilePath => {
   const slug     = path.basename(mdFilePath).replace('.md', '');
@@ -41,7 +40,7 @@ mdFiles.forEach(mdFilePath => {
 
   const raw  = fs.readFileSync(mdFilePath, 'utf8');
   const data = matter(raw);
-  const { name, title, bio, photo, video_url, specialties } = data.data;
+  const { name, title, bio, photo, video_url, specialties, gallery } = data.data;
 
   let html    = fs.readFileSync(htmlFile, 'utf8');
   const updates = [];
@@ -123,30 +122,53 @@ mdFiles.forEach(mdFilePath => {
     updates.push('Video');
   }
 
+  // GALLERY
+  if (gallery && gallery.length > 0) {
+    const first_name = name.split(' ')[0];
+    const galleryHtml = '<!-- GALLERY_START -->\n' +
+      '<div class="agent-gallery" style="max-width:820px;margin:0 auto 64px;padding:0 24px;">\n' +
+      '  <p style="font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:#c9a84c;font-weight:700;margin-bottom:10px;">Travel Gallery</p>\n' +
+      '  <h3 style="font-family:\'Playfair Display\',serif;font-size:1.6rem;color:#0d2b45;margin-bottom:24px;">' + first_name + '\'s Travel Photos</h3>\n' +
+      '  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;">\n' +
+      gallery.map(function(item) {
+        const src = typeof item === 'string' ? item : (item.photo || item);
+        return '    <div style="border-radius:10px;overflow:hidden;aspect-ratio:4/3;background:#eaf2f8;">\n' +
+               '      <img src="' + src + '" alt="' + name + ' travel photo" style="width:100%;height:100%;object-fit:cover;transition:transform 0.4s;" onmouseover="this.style.transform=\'scale(1.05)\'" onmouseout="this.style.transform=\'scale(1)\'" />\n' +
+               '    </div>';
+      }).join('\n') + '\n' +
+      '  </div>\n</div>\n<!-- GALLERY_END -->';
+
+    if (html.indexOf('<!-- GALLERY_START -->') !== -1) {
+      html = html.replace(/<!-- GALLERY_START -->[\s\S]*?<!-- GALLERY_END -->/, galleryHtml);
+    } else {
+      // Insert gallery before the contact form section
+      html = html.replace('<!-- CONTACT FORM -->', galleryHtml + '\n\n<!-- CONTACT FORM -->');
+    }
+    updates.push('Gallery (' + gallery.length + ' photos)');
+  }
+
   fs.writeFileSync(htmlFile, html, 'utf8');
-  changedFiles.push(htmlFile);
   console.log('  UPDATED: agents/' + slug + '.html');
   updates.forEach(u => console.log('    - ' + u + ' updated'));
 });
 
 if (indexUpdated) {
   fs.writeFileSync(indexFile, indexHtml, 'utf8');
-  changedFiles.push(indexFile);
   console.log('\n  UPDATED: index.html (agent card photos)');
 }
 
-// If running on Netlify, commit the built HTML back to GitHub
-if (process.env.NETLIFY && changedFiles.length > 0) {
-  console.log('\nRunning on Netlify - committing built files back to GitHub...');
+// Auto-commit back to GitHub when running on Netlify
+if (process.env.NETLIFY) {
+  console.log('\nRunning on Netlify - committing built files...');
   try {
     execSync('git config user.email "build@pacandgotravel.com"');
     execSync('git config user.name "PAC and GO Build Bot"');
     execSync('git add agents/*.html index.html');
-    execSync('git commit -m "Auto-build: update agent pages from CMS [skip ci]" || echo "Nothing to commit"');
+    execSync('git commit -m "Auto-build: update agent pages [skip ci]" || echo "Nothing to commit"');
     execSync('git push https://x-access-token:' + process.env.GITHUB_TOKEN + '@github.com/rtraversi/pacandgo-travel.git HEAD:main');
-    console.log('Built files committed back to GitHub!');
+    console.log('Built files pushed to GitHub!');
   } catch(e) {
-    console.log('Git commit skipped (may have nothing to commit): ' + e.message);
+    console.log('Git push note: ' + e.message);
   }
 }
 
