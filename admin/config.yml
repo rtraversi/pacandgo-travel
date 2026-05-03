@@ -5,54 +5,90 @@ backend:
 media_folder: "images/uploads"
 public_folder: "/images/uploads"
 
-# Only show these collections to editors
 collections:
-  - name: "agents"
-    label: "My Agent Page"
+
+  - name: "patty-wells"
+    label: "Patty Wells - My Page"
     folder: "_agents"
     create: false
-    slug: "{{slug}}"
+    filter:
+      field: name
+      value: Patty Wells
     editor:
       preview: false
     fields:
       - label: "Agent Name"
         name: "name"
-        widget: "string"
-        hint: "Your full name as it appears on the site"
-
+        widget: "hidden"
       - label: "Title"
         name: "title"
         widget: "string"
-        hint: "e.g. Travel Specialist, Co-Owner & Senior Travel Specialist"
-
+        hint: "e.g. Co-Owner & Senior Travel Specialist"
       - label: "Specialties"
         name: "specialties"
         widget: "list"
-        hint: "Add or remove your specialty areas (one per line)"
+        hint: "Your specialty areas - one per line"
         field:
           label: Specialty
           name: specialty
           widget: string
-
       - label: "Bio"
         name: "bio"
         widget: "markdown"
-        hint: "Write your full bio here. You can use bold, italics, and paragraph breaks."
+        hint: "Write your full bio here."
         minimal: true
-
       - label: "Profile Photo"
         name: "photo"
         widget: "image"
         required: false
-        hint: "Upload a professional headshot. JPG or PNG, at least 400x400px recommended."
-
       - label: "Introduction Video URL"
         name: "video_url"
         widget: "string"
         required: false
-        hint: "Paste a YouTube or Vimeo link here (e.g. https://www.youtube.com/watch?v=xxxxx)"
-
+        hint: "YouTube or Vimeo link"
       - label: "Email Address"
         name: "email"
         widget: "string"
-        hint: "Your contact email address"
+
+  - name: "robert-traversi"
+    label: "Robert Traversi - My Page"
+    folder: "_agents"
+    create: false
+    filter:
+      field: name
+      value: Robert Traversi
+    editor:
+      preview: false
+    fields:
+      - label: "Agent Name"
+        name: "name"
+        widget: "hidden"
+      - label: "Title"
+        name: "title"
+        widget: "string"
+        hint: "e.g. Travel Specialist"
+      - label: "Specialties"
+        name: "specialties"
+        widget: "list"
+        hint: "Your specialty areas - one per line"
+        field:
+          label: Specialty
+          name: specialty
+          widget: string
+      - label: "Bio"
+        name: "bio"
+        widget: "markdown"
+        hint: "Write your full bio here."
+        minimal: true
+      - label: "Profile Photo"
+        name: "photo"
+        widget: "image"
+        required: false
+      - label: "Introduction Video URL"
+        name: "video_url"
+        widget: "string"
+        required: false
+        hint: "YouTube or Vimeo link"
+      - label: "Email Address"
+        name: "email"
+        widget: "string"
