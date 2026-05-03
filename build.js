@@ -6,7 +6,21 @@ const agentsDataDir = path.join(__dirname, '_agents');
 const agentsHtmlDir = path.join(__dirname, 'agents');
 const indexFile     = path.join(__dirname, 'index.html');
 
-const mdFiles = fs.readdirSync(agentsDataDir).filter(f => f.endsWith('.md'));
+// Collect all .md files from _agents/ and any subfolders
+function getMdFiles(dir) {
+  let results = [];
+  fs.readdirSync(dir).forEach(f => {
+    const full = path.join(dir, f);
+    if (fs.statSync(full).isDirectory()) {
+      results = results.concat(getMdFiles(full));
+    } else if (f.endsWith('.md')) {
+      results.push(full);
+    }
+  });
+  return results;
+}
+
+const mdFiles = getMdFiles(agentsDataDir);
 
 console.log('\nPAC and GO Build Script');
 console.log('-------------------------');
@@ -15,8 +29,8 @@ console.log('Found ' + mdFiles.length + ' agent data file(s)\n');
 let indexHtml    = fs.readFileSync(indexFile, 'utf8');
 let indexUpdated = false;
 
-mdFiles.forEach(mdFile => {
-  const slug     = mdFile.replace('.md', '');
+mdFiles.forEach(mdFilePath => {
+  const slug     = path.basename(mdFilePath).replace('.md', '');
   const htmlFile = path.join(agentsHtmlDir, slug + '.html');
 
   if (!fs.existsSync(htmlFile)) {
@@ -24,7 +38,7 @@ mdFiles.forEach(mdFile => {
     return;
   }
 
-  const raw  = fs.readFileSync(path.join(agentsDataDir, mdFile), 'utf8');
+  const raw  = fs.readFileSync(mdFilePath, 'utf8');
   const data = matter(raw);
   const { name, title, bio, photo, video_url, specialties } = data.data;
 
@@ -51,7 +65,7 @@ mdFiles.forEach(mdFile => {
     );
     updates.push('Photo');
 
-    // PHOTO on index.html using unique card markers
+    // PHOTO on index.html
     const markerKey   = slug.toUpperCase().replace(/-/g, '_');
     const startMarker = '<!-- AGENT_CARD_' + markerKey + '_START -->';
     const endMarker   = '<!-- AGENT_CARD_' + markerKey + '_END -->';
@@ -64,8 +78,6 @@ mdFiles.forEach(mdFile => {
       const cardHtml = indexHtml.substring(startIdx + startMarker.length, endIdx);
       const after    = indexHtml.substring(endIdx);
 
-      // Find agent-photo div using regex that matches the FULL div including nested content
-      // Use a replacement that swaps everything between agent-photo open and its matching close
       const newCard = cardHtml.replace(
         /(<div class="agent-photo">)([\s\S]*?)(<\/div>\s*\n\s*<div class="agent-info">)/,
         '$1\n        <img src="' + photo + '" alt="' + name + '" />\n      $3'
@@ -75,8 +87,6 @@ mdFiles.forEach(mdFile => {
         indexHtml    = before + newCard + after;
         indexUpdated = true;
         updates.push('Index card photo');
-      } else {
-        console.log('    ! Index card photo not matched for ' + slug);
       }
     }
   }

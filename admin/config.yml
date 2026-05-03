@@ -9,11 +9,8 @@ collections:
 
   - name: "patty-wells"
     label: "Patty Wells - My Page"
-    folder: "_agents"
+    folder: "_agents/patty-wells"
     create: false
-    filter:
-      field: name
-      value: Patty Wells
     editor:
       preview: false
     fields:
@@ -23,11 +20,9 @@ collections:
       - label: "Title"
         name: "title"
         widget: "string"
-        hint: "e.g. Co-Owner & Senior Travel Specialist"
       - label: "Specialties"
         name: "specialties"
         widget: "list"
-        hint: "Your specialty areas - one per line"
         field:
           label: Specialty
           name: specialty
@@ -35,7 +30,6 @@ collections:
       - label: "Bio"
         name: "bio"
         widget: "markdown"
-        hint: "Write your full bio here."
         minimal: true
       - label: "Profile Photo"
         name: "photo"
@@ -52,11 +46,8 @@ collections:
 
   - name: "robert-traversi"
     label: "Robert Traversi - My Page"
-    folder: "_agents"
+    folder: "_agents/robert-traversi"
     create: false
-    filter:
-      field: name
-      value: Robert Traversi
     editor:
       preview: false
     fields:
@@ -66,11 +57,9 @@ collections:
       - label: "Title"
         name: "title"
         widget: "string"
-        hint: "e.g. Travel Specialist"
       - label: "Specialties"
         name: "specialties"
         widget: "list"
-        hint: "Your specialty areas - one per line"
         field:
           label: Specialty
           name: specialty
@@ -78,7 +67,6 @@ collections:
       - label: "Bio"
         name: "bio"
         widget: "markdown"
-        hint: "Write your full bio here."
         minimal: true
       - label: "Profile Photo"
         name: "photo"
