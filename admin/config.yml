@@ -14,6 +14,33 @@ media_library:
 
 collections:
 
+  # ── SHARED PHOTO GALLERY ──
+  - name: "gallery"
+    label: "Photo Gallery"
+    folder: "_gallery"
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    editor:
+      preview: false
+    fields:
+      - label: "Title"
+        name: "title"
+        widget: "string"
+        hint: "A short title for this photo (e.g. 'Caribbean Cruise 2024')"
+      - label: "Photo"
+        name: "photo"
+        widget: "image"
+        hint: "Upload your travel photo"
+        media_library:
+          config:
+            multiple: false
+      - label: "Date"
+        name: "date"
+        widget: "datetime"
+        required: false
+        hint: "When was this photo taken?"
+
+  # ── AGENT PAGES ──
   - name: "patty-wells"
     label: "Patty Wells - My Page"
     folder: "_agents/patty-wells"
@@ -44,10 +71,9 @@ collections:
         name: "photo"
         widget: "image"
         required: false
-        hint: "Upload a professional headshot"
+        hint: "Upload a professional headshot - your admin will deploy the update"
         media_library:
-          config:
-            multiple: false
+          allow_multiple: false
       - label: "Introduction Video URL"
         name: "video_url"
         widget: "string"
@@ -56,18 +82,6 @@ collections:
       - label: "Email Address"
         name: "email"
         widget: "string"
-      - label: "Vacation & Travel Photos"
-        name: "gallery"
-        widget: "list"
-        required: false
-        hint: "Upload your personal travel and vacation photos - these will display as a gallery on your profile page"
-        field:
-          label: "Photo"
-          name: "photo"
-          widget: "image"
-          media_library:
-            config:
-              multiple: false
 
   - name: "robert-traversi"
     label: "Robert Traversi - My Page"
@@ -99,10 +113,9 @@ collections:
         name: "photo"
         widget: "image"
         required: false
-        hint: "Upload a professional headshot"
+        hint: "Upload a professional headshot - your admin will deploy the update"
         media_library:
-          config:
-            multiple: false
+          allow_multiple: false
       - label: "Introduction Video URL"
         name: "video_url"
         widget: "string"
@@ -111,15 +124,3 @@ collections:
       - label: "Email Address"
         name: "email"
         widget: "string"
-      - label: "Vacation & Travel Photos"
-        name: "gallery"
-        widget: "list"
-        required: false
-        hint: "Upload your personal travel and vacation photos - these will display as a gallery on your profile page"
-        field:
-          label: "Photo"
-          name: "photo"
-          widget: "image"
-          media_library:
-            config:
-              multiple: false

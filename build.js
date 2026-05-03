@@ -4,11 +4,14 @@ const matter = require('gray-matter');
 const { execSync } = require('child_process');
 
 const agentsDataDir = path.join(__dirname, '_agents');
+const galleryDataDir = path.join(__dirname, '_gallery');
 const agentsHtmlDir = path.join(__dirname, 'agents');
 const indexFile     = path.join(__dirname, 'index.html');
+const galleryFile   = path.join(__dirname, 'gallery.html');
 
 function getMdFiles(dir) {
   let results = [];
+  if (!fs.existsSync(dir)) return results;
   fs.readdirSync(dir).forEach(f => {
     const full = path.join(dir, f);
     if (fs.statSync(full).isDirectory()) {
@@ -21,14 +24,17 @@ function getMdFiles(dir) {
 }
 
 const mdFiles = getMdFiles(agentsDataDir);
+const galleryMdFiles = getMdFiles(galleryDataDir);
 
 console.log('\nPAC and GO Build Script');
 console.log('-------------------------');
-console.log('Found ' + mdFiles.length + ' agent data file(s)\n');
+console.log('Found ' + mdFiles.length + ' agent data file(s)');
+console.log('Found ' + galleryMdFiles.length + ' gallery photo(s)\n');
 
 let indexHtml    = fs.readFileSync(indexFile, 'utf8');
 let indexUpdated = false;
 
+// ── BUILD AGENT PAGES ──
 mdFiles.forEach(mdFilePath => {
   const slug     = path.basename(mdFilePath).replace('.md', '');
   const htmlFile = path.join(agentsHtmlDir, slug + '.html');
@@ -40,12 +46,11 @@ mdFiles.forEach(mdFilePath => {
 
   const raw  = fs.readFileSync(mdFilePath, 'utf8');
   const data = matter(raw);
-  const { name, title, bio, photo, video_url, specialties, gallery } = data.data;
+  const { name, title, bio, photo, video_url, specialties } = data.data;
 
   let html    = fs.readFileSync(htmlFile, 'utf8');
   const updates = [];
 
-  // BIO
   if (bio) {
     const bioHtml = bio.trim().split(/\n\n+/)
       .map(p => '<p>' + p.trim().replace(/\n/g, ' ') + '</p>')
@@ -57,7 +62,6 @@ mdFiles.forEach(mdFilePath => {
     updates.push('Bio');
   }
 
-  // PHOTO on agent page
   if (photo && photo.trim() !== '') {
     html = html.replace(
       /<!-- PHOTO_START -->[\s\S]*?<!-- PHOTO_END -->/,
@@ -65,7 +69,6 @@ mdFiles.forEach(mdFilePath => {
     );
     updates.push('Photo');
 
-    // PHOTO on index.html
     const markerKey   = slug.toUpperCase().replace(/-/g, '_');
     const startMarker = '<!-- AGENT_CARD_' + markerKey + '_START -->';
     const endMarker   = '<!-- AGENT_CARD_' + markerKey + '_END -->';
@@ -88,7 +91,6 @@ mdFiles.forEach(mdFilePath => {
     }
   }
 
-  // TITLE
   if (title) {
     html = html.replace(
       /<!-- TITLE_START -->[\s\S]*?<!-- TITLE_END -->/,
@@ -97,7 +99,6 @@ mdFiles.forEach(mdFilePath => {
     updates.push('Title');
   }
 
-  // SPECIALTIES
   if (specialties && specialties.length > 0) {
     const specHtml = specialties.map(s => '<span class="specialty-tag">' + s + '</span>').join('\n');
     html = html.replace(
@@ -107,7 +108,6 @@ mdFiles.forEach(mdFilePath => {
     updates.push('Specialties');
   }
 
-  // VIDEO
   if (video_url && video_url.trim() !== '') {
     let embedUrl = video_url
       .replace('watch?v=', 'embed/')
@@ -122,31 +122,6 @@ mdFiles.forEach(mdFilePath => {
     updates.push('Video');
   }
 
-  // GALLERY
-  if (gallery && gallery.length > 0) {
-    const first_name = name.split(' ')[0];
-    const galleryHtml = '<!-- GALLERY_START -->\n' +
-      '<div class="agent-gallery" style="max-width:820px;margin:0 auto 64px;padding:0 24px;">\n' +
-      '  <p style="font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:#c9a84c;font-weight:700;margin-bottom:10px;">Travel Gallery</p>\n' +
-      '  <h3 style="font-family:\'Playfair Display\',serif;font-size:1.6rem;color:#0d2b45;margin-bottom:24px;">' + first_name + '\'s Travel Photos</h3>\n' +
-      '  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;">\n' +
-      gallery.map(function(item) {
-        const src = typeof item === 'string' ? item : (item.photo || item);
-        return '    <div style="border-radius:10px;overflow:hidden;aspect-ratio:4/3;background:#eaf2f8;">\n' +
-               '      <img src="' + src + '" alt="' + name + ' travel photo" style="width:100%;height:100%;object-fit:cover;transition:transform 0.4s;" onmouseover="this.style.transform=\'scale(1.05)\'" onmouseout="this.style.transform=\'scale(1)\'" />\n' +
-               '    </div>';
-      }).join('\n') + '\n' +
-      '  </div>\n</div>\n<!-- GALLERY_END -->';
-
-    if (html.indexOf('<!-- GALLERY_START -->') !== -1) {
-      html = html.replace(/<!-- GALLERY_START -->[\s\S]*?<!-- GALLERY_END -->/, galleryHtml);
-    } else {
-      // Insert gallery before the contact form section
-      html = html.replace('<!-- CONTACT FORM -->', galleryHtml + '\n\n<!-- CONTACT FORM -->');
-    }
-    updates.push('Gallery (' + gallery.length + ' photos)');
-  }
-
   fs.writeFileSync(htmlFile, html, 'utf8');
   console.log('  UPDATED: agents/' + slug + '.html');
   updates.forEach(u => console.log('    - ' + u + ' updated'));
@@ -157,14 +132,43 @@ if (indexUpdated) {
   console.log('\n  UPDATED: index.html (agent card photos)');
 }
 
-// Auto-commit back to GitHub when running on Netlify
+// ── BUILD GALLERY PAGE ──
+if (galleryMdFiles.length > 0) {
+  console.log('\nBuilding gallery page...');
+
+  // Sort by date descending
+  const galleryItems = galleryMdFiles.map(f => {
+    const raw = fs.readFileSync(f, 'utf8');
+    return matter(raw).data;
+  }).filter(d => d.photo).sort((a, b) => {
+    return new Date(b.date || 0) - new Date(a.date || 0);
+  });
+
+  const gridHtml = '<div class="photo-grid">\n' +
+    galleryItems.map((item, idx) => {
+      return '  <div class="photo-item" data-idx="' + idx + '">\n' +
+             '    <img src="' + item.photo + '" alt="' + (item.title || 'Travel photo') + '" loading="lazy" />\n' +
+             '  </div>';
+    }).join('\n') +
+    '\n</div>';
+
+  let galleryHtml = fs.readFileSync(galleryFile, 'utf8');
+  galleryHtml = galleryHtml.replace(
+    /<!-- GALLERY_CONTENT_START -->[\s\S]*?<!-- GALLERY_CONTENT_END -->/,
+    '<!-- GALLERY_CONTENT_START -->\n' + gridHtml + '\n<!-- GALLERY_CONTENT_END -->'
+  );
+  fs.writeFileSync(galleryFile, galleryHtml, 'utf8');
+  console.log('  UPDATED: gallery.html (' + galleryItems.length + ' photos)');
+}
+
+// ── AUTO-COMMIT ON NETLIFY ──
 if (process.env.NETLIFY) {
   console.log('\nRunning on Netlify - committing built files...');
   try {
     execSync('git config user.email "build@pacandgotravel.com"');
     execSync('git config user.name "PAC and GO Build Bot"');
-    execSync('git add agents/*.html index.html');
-    execSync('git commit -m "Auto-build: update agent pages [skip ci]" || echo "Nothing to commit"');
+    execSync('git add agents/*.html index.html gallery.html');
+    execSync('git commit -m "Auto-build: update pages from CMS [skip ci]" || echo "Nothing to commit"');
     execSync('git push https://x-access-token:' + process.env.GITHUB_TOKEN + '@github.com/rtraversi/pacandgo-travel.git HEAD:main');
     console.log('Built files pushed to GitHub!');
   } catch(e) {
