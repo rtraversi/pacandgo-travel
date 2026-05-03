@@ -22,7 +22,7 @@ bio: >-
 
 
   Whether you're planning your first cruise or your fiftieth, Robert is the kind of advisor who will pick up the phone, answer the text, and make sure your trip exceeds every expectation.
-photo: /images/uploads/me-amsterdam.jpg
+photo: /images/uploads/robandkaty-profile.jpg
 video_url: ""
 email: pacandgorob@gmail.com
 ---
