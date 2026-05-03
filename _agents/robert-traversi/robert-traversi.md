@@ -1,9 +1,6 @@
 ---
 name: Robert Traversi
 title: Travel Specialist
-email: pacandgorob@gmail.com
-photo: ""
-video_url: ""
 specialties:
   - Cruises
   - All-Inclusive Resorts
@@ -17,12 +14,11 @@ bio: >
   genuine enthusiasm to every booking.
 
 
-  Robert is committed to the PAC and GO Travel philosophy — that the
-  relationship with each client is the most important part of the job. From the
-  first conversation through your return home, Robert is focused on making your
-  travel experience seamless, memorable, and worth every moment.
+  Robert is committed to the PAC and GO Travel philosophy — that the relationship with each client is the most important part of the job. From the first conversation through your return home, Robert is focused on making your travel experience seamless, memorable, and worth every moment.
 
 
-  Bio and specialties coming soon — reach out today and let's start planning
-  your next adventure!
+  Bio and specialties coming soon — reach out today and let's start planning your next adventure!
+photo: /images/uploads/robandkaty-profile.jpg
+video_url: ""
+email: pacandgorob@gmail.com
 ---
