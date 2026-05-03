@@ -1,12 +1,12 @@
 const fs     = require('fs');
 const path   = require('path');
 const matter = require('gray-matter');
+const { execSync } = require('child_process');
 
 const agentsDataDir = path.join(__dirname, '_agents');
 const agentsHtmlDir = path.join(__dirname, 'agents');
 const indexFile     = path.join(__dirname, 'index.html');
 
-// Collect all .md files from _agents/ and any subfolders
 function getMdFiles(dir) {
   let results = [];
   fs.readdirSync(dir).forEach(f => {
@@ -28,6 +28,7 @@ console.log('Found ' + mdFiles.length + ' agent data file(s)\n');
 
 let indexHtml    = fs.readFileSync(indexFile, 'utf8');
 let indexUpdated = false;
+const changedFiles = [];
 
 mdFiles.forEach(mdFilePath => {
   const slug     = path.basename(mdFilePath).replace('.md', '');
@@ -69,7 +70,6 @@ mdFiles.forEach(mdFilePath => {
     const markerKey   = slug.toUpperCase().replace(/-/g, '_');
     const startMarker = '<!-- AGENT_CARD_' + markerKey + '_START -->';
     const endMarker   = '<!-- AGENT_CARD_' + markerKey + '_END -->';
-
     const startIdx = indexHtml.indexOf(startMarker);
     const endIdx   = indexHtml.indexOf(endMarker);
 
@@ -77,12 +77,10 @@ mdFiles.forEach(mdFilePath => {
       const before   = indexHtml.substring(0, startIdx + startMarker.length);
       const cardHtml = indexHtml.substring(startIdx + startMarker.length, endIdx);
       const after    = indexHtml.substring(endIdx);
-
-      const newCard = cardHtml.replace(
+      const newCard  = cardHtml.replace(
         /(<div class="agent-photo">)([\s\S]*?)(<\/div>\s*\n\s*<div class="agent-info">)/,
         '$1\n        <img src="' + photo + '" alt="' + name + '" />\n      $3'
       );
-
       if (newCard !== cardHtml) {
         indexHtml    = before + newCard + after;
         indexUpdated = true;
@@ -126,13 +124,30 @@ mdFiles.forEach(mdFilePath => {
   }
 
   fs.writeFileSync(htmlFile, html, 'utf8');
+  changedFiles.push(htmlFile);
   console.log('  UPDATED: agents/' + slug + '.html');
   updates.forEach(u => console.log('    - ' + u + ' updated'));
 });
 
 if (indexUpdated) {
   fs.writeFileSync(indexFile, indexHtml, 'utf8');
+  changedFiles.push(indexFile);
   console.log('\n  UPDATED: index.html (agent card photos)');
+}
+
+// If running on Netlify, commit the built HTML back to GitHub
+if (process.env.NETLIFY && changedFiles.length > 0) {
+  console.log('\nRunning on Netlify - committing built files back to GitHub...');
+  try {
+    execSync('git config user.email "build@pacandgotravel.com"');
+    execSync('git config user.name "PAC and GO Build Bot"');
+    execSync('git add agents/*.html index.html');
+    execSync('git commit -m "Auto-build: update agent pages from CMS [skip ci]" || echo "Nothing to commit"');
+    execSync('git push https://x-access-token:' + process.env.GITHUB_TOKEN + '@github.com/rtraversi/pacandgo-travel.git HEAD:main');
+    console.log('Built files committed back to GitHub!');
+  } catch(e) {
+    console.log('Git commit skipped (may have nothing to commit): ' + e.message);
+  }
 }
 
 console.log('\nBuild complete!\n');
