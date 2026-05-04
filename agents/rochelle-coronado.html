@@ -269,10 +269,7 @@
       <a href="../index.html" class="btn-home">← Back to Home</a>
     </div>
 
-    <form name="agent-rochelle-coronado" method="POST" data-netlify="true" data-netlify-honeypot="bot-field" id="agentForm" novalidate>
-      <input type="hidden" name="form-name" value="agent-rochelle-coronado" />
-      <input type="hidden" name="agent" value="Rochelle Coronado" />
-      <p class="hp-field"><label>Don't fill this out: <input name="bot-field" /></label></p>
+    <form id="agentForm" data-agent-key="rochelle-coronado" novalidate>
 
       <div class="form-row col-2">
         <div class="field">
@@ -368,10 +365,43 @@
   <a href="../index.html">PAC and GO Travel</a> · <a href="../index.html#agents">Meet All Agents</a> · Florida Seller of Travel #40802
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
-  const form = document.getElementById('agentForm');
+  const EMAILJS_PUBLIC_KEY  = 'z27LB5a5i1Xtgpt3q';
+  const EMAILJS_SERVICE_ID  = 'service_qouu00u';
+  const EMAILJS_TEMPLATE_ID = 'template_6ablo1d';
+
+  const AGENT_EMAILS = {
+    'alan-klein':        'pacandgoalan@gmail.com',
+    'anissa-dean':       'pacandgoaniska@gmail.com',
+    'beth-vanergrift':   'pacandgobeth@gmail.com',
+    'connie-brant':      'pacandgoconnie@gmail.com',
+    'dawn-roffey':       'pacandgodawn@gmail.com',
+    'denise-berger':     'pacandgodenise@gmail.com',
+    'jane-goerke':       'pacandgojane@gmail.com',
+    'joel-trinidad':     'pacandgojoel@gmail.com',
+    'larry-oakley':      'pacandgolarry@gmail.com',
+    'norma-allen':       'pacandgonorma@gmail.com',
+    'patty-wells':       'pacandgopatty@gmail.com',
+    'robert-traversi':   'pacandgorob@gmail.com',
+    'rochelle-coronado': 'pacandgorochelle@gmail.com',
+    'rosemary-karnes':   'pacandgorosemary@gmail.com',
+    'sue-muldoon':       'pacandgosue@gmail.com'
+  };
+
+  emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+
+  const form       = document.getElementById('agentForm');
   const successMsg = document.getElementById('successMsg');
-  const submitBtn = document.getElementById('submitBtn');
+  const submitBtn  = document.getElementById('submitBtn');
+
+  const phoneEl = document.getElementById('phone');
+  phoneEl?.addEventListener('input', (e) => {
+    let v = e.target.value.replace(/[^0-9]/g,'').substring(0,10);
+    if (v.length >= 6) v = '(' + v.substring(0,3) + ') ' + v.substring(3,6) + '-' + v.substring(6);
+    else if (v.length >= 3) v = '(' + v.substring(0,3) + ') ' + v.substring(3);
+    e.target.value = v;
+  });
 
   function validateField(input) {
     const errEl = document.getElementById('err-' + input.id);
@@ -386,37 +416,50 @@
     if (el) el.addEventListener('blur', () => validateField(el));
   });
 
-  form.addEventListener('submit', async (e) => {
+  form.addEventListener('submit', (e) => {
     e.preventDefault();
     let valid = true;
     ['firstName','lastName','email'].forEach(id => {
       if (!validateField(document.getElementById(id))) valid = false;
     });
-    if (!valid) { document.querySelector('.invalid')?.scrollIntoView({behavior:'smooth',block:'center'}); return; }
-    submitBtn.disabled = true; submitBtn.textContent = 'Sending…';
-    try {
-      const response = await fetch('/', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: new URLSearchParams(new FormData(form)).toString()
-      });
-      if (response.ok) {
+    if (!valid) {
+      document.querySelector('.invalid')?.scrollIntoView({behavior:'smooth', block:'center'});
+      return;
+    }
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending…';
+
+    const agentKey   = form.dataset.agentKey;
+    const agentEmail = AGENT_EMAILS[agentKey] || 'pacandgopatty@gmail.com';
+
+    const tripTypes = [...form.querySelectorAll('input[name="tripType"]:checked')]
+      .map(cb => cb.value).join(', ') || 'Not specified';
+
+    const templateParams = {
+      to_email:    agentEmail,
+      from_name:   (document.getElementById('firstName').value.trim() + ' ' + document.getElementById('lastName').value.trim()).trim(),
+      reply_to:    document.getElementById('email').value.trim(),
+      phone:       document.getElementById('phone').value.trim()       || 'Not provided',
+      message:     document.getElementById('message').value.trim()     || 'No message provided',
+      travelers:   document.getElementById('travelers').value          || 'Not specified',
+      destination: document.getElementById('destination').value.trim() || 'Not specified',
+      travel_date: document.getElementById('departDate').value         || 'Not specified',
+      budget:      document.getElementById('budget').value             || 'Not specified',
+      trip_types:  tripTypes
+    };
+
+    emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams)
+      .then(() => {
         form.style.display = 'none';
         successMsg.style.display = 'block';
         successMsg.scrollIntoView({behavior:'smooth'});
-      } else { throw new Error(); }
-    } catch {
-      submitBtn.disabled = false; submitBtn.textContent = 'Send Message ✈';
-      alert('Something went wrong. Please email us directly at pacandgorochelke@gmail.com');
-    }
-  });
-
-  const phoneEl = document.getElementById('phone');
-  phoneEl?.addEventListener('input', (e) => {
-    let v = e.target.value.replace(/\D/g,'').substring(0,10);
-    if (v.length >= 6) v = '(' + v.substring(0,3) + ') ' + v.substring(3,6) + '-' + v.substring(6);
-    else if (v.length >= 3) v = '(' + v.substring(0,3) + ') ' + v.substring(3);
-    e.target.value = v;
+      })
+      .catch((err) => {
+        console.error('EmailJS error:', err);
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Send Message ✈';
+        alert('Something went wrong. Please email us directly at ' + agentEmail);
+      });
   });
 </script>
 </body>
