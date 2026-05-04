@@ -1,0 +1,168 @@
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: "images/uploads"
+public_folder: "/images/uploads"
+
+media_library:
+  name: cloudinary
+  config:
+    cloud_name: dh811jlgd
+    api_key: 678448489964378
+    upload_preset: pacandgo-agents
+
+collections:
+
+  # ── SHARED PHOTO GALLERY ──
+  - name: "gallery"
+    label: "Photo Gallery"
+    folder: "_gallery"
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    editor:
+      preview: false
+    fields:
+      - label: "Title"
+        name: "title"
+        widget: "string"
+        hint: "A short title for this photo (e.g. 'Caribbean Cruise 2024')"
+      - label: "Photo"
+        name: "photo"
+        widget: "image"
+        hint: "Upload your travel photo"
+        media_library:
+          config:
+            multiple: false
+      - label: "Date"
+        name: "date"
+        widget: "datetime"
+        required: false
+        hint: "When was this photo taken?"
+
+  # ── AGENT PAGES ──
+  - name: "patty-wells"
+    label: "Patty Wells - My Page"
+    folder: "_agents/patty-wells"
+    create: false
+    editor:
+      preview: false
+    fields:
+      - label: "Agent Name"
+        name: "name"
+        widget: "hidden"
+      - label: "Title"
+        name: "title"
+        widget: "string"
+      - label: "Specialties"
+        name: "specialties"
+        widget: "list"
+        hint: "Your specialty areas - one per line"
+        field:
+          label: Specialty
+          name: specialty
+          widget: string
+      - label: "Bio"
+        name: "bio"
+        widget: "markdown"
+        hint: "Write your full bio here."
+        minimal: true
+      - label: "Profile Photo"
+        name: "photo"
+        widget: "image"
+        required: false
+        hint: "Upload a professional headshot - your admin will deploy the update"
+        media_library:
+          allow_multiple: false
+      - label: "Introduction Video URL"
+        name: "video_url"
+        widget: "string"
+        required: false
+        hint: "YouTube or Vimeo link"
+      - label: "Email Address"
+        name: "email"
+        widget: "string"
+
+  - name: "robert-traversi"
+    label: "Robert Traversi - My Page"
+    folder: "_agents/robert-traversi"
+    create: false
+    editor:
+      preview: false
+    fields:
+      - label: "Agent Name"
+        name: "name"
+        widget: "hidden"
+      - label: "Title"
+        name: "title"
+        widget: "string"
+      - label: "Specialties"
+        name: "specialties"
+        widget: "list"
+        hint: "Your specialty areas - one per line"
+        field:
+          label: Specialty
+          name: specialty
+          widget: string
+      - label: "Bio"
+        name: "bio"
+        widget: "markdown"
+        hint: "Write your full bio here."
+        minimal: true
+      - label: "Profile Photo"
+        name: "photo"
+        widget: "image"
+        required: false
+        hint: "Upload a professional headshot - your admin will deploy the update"
+        media_library:
+          allow_multiple: false
+      - label: "Introduction Video URL"
+        name: "video_url"
+        widget: "string"
+        required: false
+        hint: "YouTube or Vimeo link"
+      - label: "Email Address"
+        name: "email"
+        widget: "string"
+
+  - name: "dawn-roffey"
+    label: "Dawn Roffey - My Page"
+    folder: "_agents/dawn-roffey"
+    create: false
+    editor:
+      preview: false
+    fields:
+      - label: "Agent Name"
+        name: "name"
+        widget: "hidden"
+      - label: "Title"
+        name: "title"
+        widget: "string"
+      - label: "Specialties"
+        name: "specialties"
+        widget: "list"
+        hint: "Your specialty areas - one per line"
+        field:
+          label: Specialty
+          name: specialty
+          widget: string
+      - label: "Bio"
+        name: "bio"
+        widget: "markdown"
+        hint: "Write your full bio here."
+        minimal: true
+      - label: "Profile Photo"
+        name: "photo"
+        widget: "image"
+        required: false
+        hint: "Upload a professional headshot"
+        media_library:
+          allow_multiple: false
+      - label: "Introduction Video URL"
+        name: "video_url"
+        widget: "string"
+        required: false
+        hint: "YouTube or Vimeo link"
+      - label: "Email Address"
+        name: "email"
+        widget: "string"
