@@ -132,6 +132,7 @@
         <button class="sidebar-link active" onclick="showPanel('deals',this)"><span class="sidebar-icon">🏷️</span>Deals<span class="sidebar-badge" id="dealsBadge">0</span></button>
         <button class="sidebar-link" onclick="showPanel('trips',this)"><span class="sidebar-icon">🗓️</span>Upcoming Trips<span class="sidebar-badge" id="tripsBadge">0</span></button>
         <button class="sidebar-link" onclick="showPanel('blog',this)"><span class="sidebar-icon">✍️</span>Blog</button>
+        <button class="sidebar-link" onclick="showPanel('gallery',this)"><span class="sidebar-icon">🖼️</span>Gallery</button>
         <button class="sidebar-link" onclick="showPanel('reviews',this)"><span class="sidebar-icon">⭐</span>Reviews<span class="sidebar-badge" id="reviewsBadge" style="display:none"></span></button>
       </div>
       <div class="sidebar-section">
@@ -251,7 +252,8 @@
             <div class="field"><label>Category / Tag</label><input type="text" id="blogPostTag" placeholder="e.g. Europe" /></div>
             <div class="field"><label>Publish Date</label><input type="date" id="blogPostDate" /></div>
           </div>
-          <div class="fg fg1"><div class="field"><label>Short Description</label><textarea id="blogPostDesc" rows="2" placeholder="One or two sentences…"></textarea></div></div>
+          <div class="fg fg1"><div class="field"><label>Short Description (shown on blog card)</label><textarea id="blogPostDesc" rows="2" placeholder="One or two sentences…"></textarea></div></div>
+          <div class="fg fg1"><div class="field"><label>Full Post Body (optional — write the full post here instead of linking externally)</label><textarea id="blogPostBody" rows="8" placeholder="Write the full post here. Separate paragraphs with a blank line.&#10;&#10;Leave blank if linking to Substack or another platform."></textarea></div></div>
           <button class="btn btn-gold" onclick="addBlogPost()" style="margin-top:8px;">Add Post</button>
         </div>
         <div class="admin-card">
@@ -276,6 +278,34 @@
         <div class="admin-card">
           <div class="card-title">📋 All Reviews</div>
           <div class="item-list" id="reviewsList"><div style="color:rgba(255,255,255,0.3);font-size:0.85rem;">Loading…</div></div>
+        </div>
+      </div>
+
+      <!-- GALLERY PANEL -->
+      <div class="panel" id="panel-gallery">
+        <div class="panel-header"><h1>Photo Gallery</h1><p>Add photos by URL or upload a file to Supabase Storage. Clients see the gallery on the public site.</p></div>
+        <div class="admin-card">
+          <div class="card-title">➕ Add Photo</div>
+          <div class="fg">
+            <div class="field"><label>Image URL</label><input type="url" id="galleryUrl" placeholder="https://…  paste any public image URL" /></div>
+            <div class="field"><label>Category (optional)</label><input type="text" id="galleryCat" placeholder="e.g. Cruises, Europe, Disney" /></div>
+          </div>
+          <div class="fg">
+            <div class="field"><label>Caption</label><input type="text" id="galleryCaption" placeholder="Short description shown on hover" /></div>
+            <div class="field"><label>Alt Text</label><input type="text" id="galleryAlt" placeholder="Describe the image for accessibility" /></div>
+          </div>
+          <div style="margin:12px 0;padding:12px 16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;">
+            <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:10px;">— OR upload a file (requires public "gallery" bucket in Supabase Storage) —</div>
+            <input type="file" id="galleryFile" accept="image/*" style="font-size:0.82rem;color:rgba(255,255,255,0.6);" />
+          </div>
+          <div style="display:flex;gap:12px;align-items:center;">
+            <button class="btn btn-gold" onclick="addGalleryItem()">Add Photo</button>
+            <div class="spin-row" id="gallerySpinner" style="display:none;"><div class="spinner"></div>Uploading…</div>
+          </div>
+        </div>
+        <div class="admin-card">
+          <div class="card-title">🖼️ Current Gallery (<span id="galleryCount">0</span> photos)</div>
+          <div id="galleryList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-top:8px;"></div>
         </div>
       </div>
 
@@ -367,7 +397,7 @@ function showPanel(n,el){
   el.classList.add('active');
 }
 function openPage(p){window.open('../'+agent+'/'+p,'_blank');}
-function loadAll(){loadDeals();loadTrips();loadBlog();loadReviews();loadSettings();}
+function loadAll(){loadDeals();loadTrips();loadBlog();loadGallery();loadReviews();loadSettings();}
 
 // ── DEALS ───────────────────────────────────────────────────
 async function loadDeals(){
@@ -487,11 +517,14 @@ async function saveTripManual(){
 
 // ── BLOG ────────────────────────────────────────────────────
 async function addBlogPost(){
-  const title=v('blogPostTitle'),url=v('blogPostUrl');
-  if(!title||!url) return toast('Title and URL required','error');
+  const title=v('blogPostTitle');
+  const url=v('blogPostUrl');
+  const body=v('blogPostBody');
+  if(!title) return toast('Title is required','error');
+  if(!url&&!body) return toast('Enter a URL or write the post body','error');
   try{
-    await DB.post('blog_posts',{agent_id:agent,title,url,tag:v('blogPostTag'),publish_date:v('blogPostDate')||null,description:v('blogPostDesc'),active:true});
-    resetForm(['blogPostTitle','blogPostUrl','blogPostTag','blogPostDesc','blogPostDate']);
+    await DB.post('blog_posts',{agent_id:agent,title,url:url||null,tag:v('blogPostTag'),publish_date:v('blogPostDate')||null,description:v('blogPostDesc'),body:body||null,active:true});
+    resetForm(['blogPostTitle','blogPostUrl','blogPostTag','blogPostDesc','blogPostDate','blogPostBody']);
     loadBlog();toast('Post added ✓');
   }catch(e){toast('Error: '+e.message,'error');}
 }
@@ -505,7 +538,8 @@ async function loadBlog(){
       <div class="li-info"><div class="li-title">${x.title}</div>
       <div class="li-meta">${x.tag?'🏷️ '+x.tag+' · ':''}${x.publish_date?'📅 '+x.publish_date:''}</div></div>
       <div class="li-actions">
-        <a href="${x.url}" target="_blank" class="btn btn-sm btn-outline">View →</a>
+        ${x.body&&x.body.trim()?'<span class="badge badge-live">Full Post</span>':x.url?`<a href="${x.url}" target="_blank" class="btn btn-sm btn-outline">View →</a>`:'<span class="badge badge-hidden">No Content</span>'}
+        <button class="btn btn-sm btn-outline" onclick="toggleRow('blog_posts','${x.id}',${x.active})">${x.active?'Hide':'Show'}</button>
         <button class="btn btn-sm btn-danger" onclick="delRow('blog_posts','${x.id}',loadBlog)">Delete</button>
       </div></div>`).join('');
   }catch(e){toast('Load error','error');}
@@ -544,6 +578,98 @@ async function loadReviews(){
 
 async function approveReview(id){
   try{await DB.patch('reviews','id=eq.'+id,{approved:true});loadReviews();toast('Approved ✓');}
+  catch(e){toast('Error','error');}
+}
+
+// ── GALLERY ─────────────────────────────────────────────────
+async function loadGallery(){
+  try{
+    const d=await DB.get('gallery','agent_id=eq.'+agent+'&order=order_index.asc,created_at.desc');
+    document.getElementById('galleryCount').textContent=d.length;
+    const el=document.getElementById('galleryList');
+    if(!d.length){
+      el.innerHTML='<div style="color:rgba(255,255,255,0.3);font-size:0.85rem;grid-column:1/-1;padding:16px 0;">No photos yet.</div>';
+      return;
+    }
+    el.innerHTML=d.map(p=>`
+      <div style="border-radius:10px;overflow:hidden;border:1px solid rgba(201,168,76,0.2);background:rgba(255,255,255,0.04);">
+        <div style="aspect-ratio:1;overflow:hidden;background:#0a1628;position:relative;">
+          <img src="${p.image_url}" alt="${p.alt_text||''}" style="width:100%;height:100%;object-fit:cover;"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+          <div style="display:none;align-items:center;justify-content:center;height:100%;color:rgba(255,255,255,0.3);font-size:2rem;">📸</div>
+        </div>
+        <div style="padding:10px;">
+          ${p.caption?`<div style="font-size:0.78rem;color:rgba(255,255,255,0.7);margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.caption}</div>`:''}
+          ${p.category?`<div style="font-size:0.68rem;color:var(--gold);font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;">${p.category}</div>`:''}
+          <div style="display:flex;gap:6px;">
+            <span class="badge ${p.active?'badge-live':'badge-hidden'}">${p.active?'Live':'Hidden'}</span>
+            <button class="btn btn-sm btn-outline" onclick="toggleGalleryItem('${p.id}',${p.active})">${p.active?'Hide':'Show'}</button>
+            <button class="btn btn-sm btn-danger" onclick="delGalleryItem('${p.id}')">Del</button>
+          </div>
+        </div>
+      </div>`).join('');
+  }catch(e){toast('Gallery load error','error');}
+}
+
+async function addGalleryItem(){
+  const fileInput=document.getElementById('galleryFile');
+  const urlInput=v('galleryUrl');
+  let imageUrl='';
+
+  if(fileInput.files.length>0){
+    const file=fileInput.files[0];
+    const ext=file.name.split('.').pop().toLowerCase();
+    const filename=agent+'/'+Date.now()+'.'+ext;
+    document.getElementById('gallerySpinner').style.display='flex';
+    try{
+      const res=await fetch(`${SB_URL}/storage/v1/object/gallery/${filename}`,{
+        method:'POST',
+        headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':file.type,'x-upsert':'true'},
+        body:file
+      });
+      if(!res.ok){
+        const err=await res.json().catch(()=>({}));
+        throw new Error(err.error||'Upload failed — ensure a public "gallery" bucket exists in Supabase Storage');
+      }
+      imageUrl=`${SB_URL}/storage/v1/object/public/gallery/${filename}`;
+    }catch(e){
+      document.getElementById('gallerySpinner').style.display='none';
+      return toast(e.message,'error');
+    }
+    document.getElementById('gallerySpinner').style.display='none';
+  } else if(urlInput){
+    imageUrl=urlInput;
+  } else {
+    return toast('Paste an image URL or select a file','error');
+  }
+
+  try{
+    const existing=await DB.get('gallery','agent_id=eq.'+agent+'&order=order_index.desc&limit=1');
+    const nextOrder=(existing[0]?.order_index||0)+1;
+    await DB.post('gallery',{
+      agent_id:agent,
+      image_url:imageUrl,
+      caption:v('galleryCaption')||null,
+      alt_text:v('galleryAlt')||null,
+      category:v('galleryCat')||null,
+      order_index:nextOrder,
+      active:true
+    });
+    resetForm(['galleryUrl','galleryCaption','galleryAlt','galleryCat']);
+    fileInput.value='';
+    loadGallery();
+    toast('Photo added ✓');
+  }catch(e){toast('Error: '+e.message,'error');}
+}
+
+async function toggleGalleryItem(id,cur){
+  try{await DB.patch('gallery','id=eq.'+id,{active:!cur});loadGallery();toast(!cur?'Now live ✓':'Hidden');}
+  catch(e){toast('Error','error');}
+}
+
+async function delGalleryItem(id){
+  if(!confirm('Delete this photo?')) return;
+  try{await DB.del('gallery','id=eq.'+id);loadGallery();toast('Deleted ✓');}
   catch(e){toast('Error','error');}
 }
 
