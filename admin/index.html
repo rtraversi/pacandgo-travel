@@ -7,248 +7,100 @@
   <meta name="robots" content="noindex, nofollow" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Mono:wght@400;500&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
   <style>
-    :root {
-      --navy:  #0d2b45;
-      --ocean: #1a5276;
-      --gold:  #c9a84c;
-      --gold-light: #e8c97a;
-      --sand:  #f5f0e8;
-      --white: #ffffff;
-      --gray:  #5d6d7e;
-      --light: #eaf2f8;
-      --green: #1a7a4a;
-      --green-bg: #d4f0e2;
-      --red:   #c0392b;
-      --red-bg: #fde8e8;
-      --card:  #f8fafc;
-      --border: rgba(201,168,76,0.25);
-    }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Lato', sans-serif; background: #0a1628; color: var(--white); min-height: 100vh; }
-
-    /* ── LOGIN SCREEN ── */
-    #loginScreen {
-      min-height: 100vh; display: flex; align-items: center; justify-content: center;
-      background: radial-gradient(ellipse at 30% 50%, #1a3a5c 0%, #0a1628 70%);
-    }
-    .login-card {
-      background: rgba(255,255,255,0.04); border: 1px solid var(--border);
-      border-radius: 16px; padding: 48px 40px; width: 100%; max-width: 400px;
-      text-align: center;
-    }
-    .login-logo { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--gold); margin-bottom: 8px; }
-    .login-sub { font-size: 0.8rem; color: rgba(255,255,255,0.4); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 36px; }
-    .login-card label { display: block; text-align: left; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 8px; }
-    .login-card input[type="password"] {
-      width: 100%; padding: 13px 16px; background: rgba(255,255,255,0.07);
-      border: 1px solid rgba(255,255,255,0.15); border-radius: 8px;
-      color: var(--white); font-size: 1rem; font-family: 'DM Mono', monospace;
-      letter-spacing: 0.15em; outline: none; margin-bottom: 20px;
-      transition: border-color 0.2s;
-    }
-    .login-card input[type="password"]:focus { border-color: var(--gold); }
-    .login-btn {
-      width: 100%; padding: 13px; background: var(--gold); color: var(--navy);
-      border: none; border-radius: 8px; font-weight: 700; font-size: 0.9rem;
-      letter-spacing: 0.07em; text-transform: uppercase; cursor: pointer;
-      transition: background 0.2s;
-    }
-    .login-btn:hover { background: var(--gold-light); }
-    .login-error { font-size: 0.82rem; color: #ff8080; margin-top: 12px; display: none; }
-
-    /* ── ADMIN SHELL ── */
-    #adminShell { display: none; min-height: 100vh; }
-
-    .admin-topbar {
-      background: var(--navy); border-bottom: 1px solid var(--border);
-      padding: 0 32px; height: 60px;
-      display: flex; align-items: center; justify-content: space-between;
-      position: sticky; top: 0; z-index: 50;
-    }
-    .admin-brand { font-family: 'Playfair Display', serif; font-size: 1rem; color: var(--gold); }
-    .admin-brand span { color: rgba(255,255,255,0.5); font-family: 'Lato', sans-serif; font-size: 0.78rem; font-weight: 400; margin-left: 8px; }
-    .topbar-right { display: flex; align-items: center; gap: 16px; }
-    .agent-switcher {
-      background: rgba(255,255,255,0.08); border: 1px solid var(--border);
-      border-radius: 6px; padding: 6px 12px; color: var(--white);
-      font-size: 0.82rem; font-family: 'Lato', sans-serif; cursor: pointer; outline: none;
-    }
-    .logout-btn {
-      background: none; border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.5);
-      padding: 6px 14px; border-radius: 6px; font-size: 0.78rem; cursor: pointer;
-      transition: all 0.2s;
-    }
-    .logout-btn:hover { border-color: var(--red); color: #ff8080; }
-
-    .admin-layout { display: grid; grid-template-columns: 220px 1fr; min-height: calc(100vh - 60px); }
-
-    /* ── SIDEBAR ── */
-    .admin-sidebar {
-      background: rgba(255,255,255,0.02); border-right: 1px solid var(--border);
-      padding: 24px 0;
-    }
-    .sidebar-section { padding: 0 16px; margin-bottom: 24px; }
-    .sidebar-section-label {
-      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase;
-      color: rgba(255,255,255,0.3); padding: 0 8px; margin-bottom: 8px;
-    }
-    .sidebar-link {
-      display: flex; align-items: center; gap: 10px;
-      padding: 10px 12px; border-radius: 8px; cursor: pointer;
-      font-size: 0.85rem; color: rgba(255,255,255,0.6);
-      transition: all 0.2s; border: none; background: none; width: 100%; text-align: left;
-    }
-    .sidebar-link:hover { background: rgba(255,255,255,0.06); color: var(--white); }
-    .sidebar-link.active { background: rgba(201,168,76,0.12); color: var(--gold); }
-    .sidebar-icon { font-size: 1rem; width: 20px; }
-    .sidebar-badge {
-      margin-left: auto; background: var(--gold); color: var(--navy);
-      font-size: 0.65rem; font-weight: 700; padding: 2px 7px; border-radius: 10px;
-    }
-
-    /* ── MAIN CONTENT ── */
-    .admin-main { padding: 32px; overflow-y: auto; }
-    .panel { display: none; }
-    .panel.active { display: block; }
-
-    .panel-header { margin-bottom: 32px; }
-    .panel-header h1 { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--white); margin-bottom: 6px; }
-    .panel-header p { font-size: 0.88rem; color: rgba(255,255,255,0.45); }
-
-    /* ── CARDS ── */
-    .admin-card {
-      background: rgba(255,255,255,0.04); border: 1px solid var(--border);
-      border-radius: 12px; padding: 28px; margin-bottom: 24px;
-    }
-    .admin-card-title {
-      font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
-      color: var(--gold); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
-    }
-
-    /* ── TOGGLE ── */
-    .toggle-row {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 16px 20px; background: rgba(255,255,255,0.03);
-      border: 1px solid var(--border); border-radius: 10px; margin-bottom: 16px;
-    }
-    .toggle-label { font-size: 0.9rem; color: var(--white); }
-    .toggle-sublabel { font-size: 0.78rem; color: rgba(255,255,255,0.4); margin-top: 2px; }
-    .toggle {
-      position: relative; width: 48px; height: 26px; cursor: pointer;
-    }
-    .toggle input { opacity: 0; width: 0; height: 0; }
-    .toggle-track {
-      position: absolute; inset: 0; background: rgba(255,255,255,0.15);
-      border-radius: 13px; transition: background 0.2s;
-    }
-    .toggle input:checked + .toggle-track { background: var(--gold); }
-    .toggle-thumb {
-      position: absolute; top: 3px; left: 3px;
-      width: 20px; height: 20px; background: var(--white);
-      border-radius: 50%; transition: transform 0.2s;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.3);
-    }
-    .toggle input:checked ~ .toggle-thumb { transform: translateX(22px); }
-
-    /* ── FORM ELEMENTS ── */
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-    .form-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
-    .form-grid-1 { grid-template-columns: 1fr; }
-    .field { display: flex; flex-direction: column; gap: 6px; }
-    .field label {
-      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em;
-      text-transform: uppercase; color: rgba(255,255,255,0.5);
-    }
-    .field input, .field select, .field textarea {
-      padding: 11px 14px; background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.12); border-radius: 8px;
-      color: var(--white); font-size: 0.9rem; font-family: 'Lato', sans-serif;
-      outline: none; transition: border-color 0.2s;
-    }
-    .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--gold); }
-    .field input::placeholder, .field textarea::placeholder { color: rgba(255,255,255,0.25); }
-    .field select { cursor: pointer; }
-    .field select option { background: #1a2a3a; color: var(--white); }
-    .field textarea { resize: vertical; min-height: 80px; }
-
-    /* ── BUTTONS ── */
-    .btn { padding: 10px 22px; border-radius: 8px; font-weight: 700; font-size: 0.82rem; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; border: none; transition: all 0.2s; font-family: 'Lato', sans-serif; }
-    .btn-gold { background: var(--gold); color: var(--navy); }
-    .btn-gold:hover { background: var(--gold-light); }
-    .btn-gold:disabled { background: rgba(201,168,76,0.3); color: rgba(255,255,255,0.3); cursor: not-allowed; }
-    .btn-outline { background: transparent; color: rgba(255,255,255,0.6); border: 1px solid rgba(255,255,255,0.2); }
-    .btn-outline:hover { border-color: var(--gold); color: var(--gold); }
-    .btn-danger { background: transparent; color: #ff8080; border: 1px solid rgba(255,100,100,0.3); }
-    .btn-danger:hover { background: rgba(255,100,100,0.1); }
-    .btn-sm { padding: 6px 14px; font-size: 0.72rem; }
-
-    /* ── AI ENRICHMENT ── */
-    .ai-result {
-      background: rgba(201,168,76,0.08); border: 1px solid rgba(201,168,76,0.3);
-      border-radius: 10px; padding: 20px; margin: 16px 0; display: none;
-    }
-    .ai-result-label { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; }
-    .ai-result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .ai-field-preview { display: flex; flex-direction: column; gap: 3px; }
-    .ai-field-label { font-size: 0.68rem; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.06em; }
-    .ai-field-value { font-size: 0.88rem; color: var(--white); }
-    .ai-spinner { display: none; align-items: center; gap: 10px; color: rgba(255,255,255,0.5); font-size: 0.85rem; padding: 12px 0; }
-    .spinner { width: 18px; height: 18px; border: 2px solid rgba(201,168,76,0.3); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.7s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* ── DEALS LIST ── */
-    .deals-list { display: flex; flex-direction: column; gap: 12px; }
-    .deal-item {
-      background: rgba(255,255,255,0.04); border: 1px solid var(--border);
-      border-radius: 10px; padding: 16px 20px;
-      display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
-    }
-    .deal-item-info { flex: 1; }
-    .deal-item-title { font-weight: 700; color: var(--white); font-size: 0.92rem; margin-bottom: 4px; }
-    .deal-item-meta { font-size: 0.78rem; color: rgba(255,255,255,0.4); display: flex; gap: 16px; flex-wrap: wrap; }
-    .deal-item-price { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--gold); white-space: nowrap; }
-    .deal-item-actions { display: flex; gap: 8px; align-items: center; }
-    .deal-active-badge { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 8px; border-radius: 10px; }
-    .badge-live { background: rgba(26,122,74,0.2); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
-    .badge-hidden { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.3); border: 1px solid rgba(255,255,255,0.1); }
-
-    /* ── BLOG SECTION ── */
-    .blog-posts-list { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
-    .blog-post-item {
-      background: rgba(255,255,255,0.04); border: 1px solid var(--border);
-      border-radius: 10px; padding: 16px 20px;
-      display: flex; align-items: center; justify-content: space-between; gap: 16px;
-    }
-    .blog-post-info { flex: 1; }
-    .blog-post-title { font-weight: 700; color: var(--white); font-size: 0.9rem; margin-bottom: 4px; }
-    .blog-post-meta { font-size: 0.75rem; color: rgba(255,255,255,0.4); }
-
-    /* ── TOAST ── */
-    #toast {
-      position: fixed; bottom: 28px; right: 28px;
-      background: var(--navy); border: 1px solid var(--border);
-      border-radius: 10px; padding: 14px 20px;
-      font-size: 0.85rem; color: var(--white);
-      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-      transform: translateY(80px); opacity: 0;
-      transition: all 0.3s; pointer-events: none; z-index: 999;
-    }
-    #toast.show { transform: translateY(0); opacity: 1; }
-    #toast.success { border-color: rgba(74,222,128,0.4); }
-    #toast.error { border-color: rgba(255,128,128,0.4); }
-
-    /* ── RESPONSIVE ── */
-    @media (max-width: 768px) {
-      .admin-layout { grid-template-columns: 1fr; }
-      .admin-sidebar { display: none; }
-      .form-grid { grid-template-columns: 1fr; }
-      .form-grid-3 { grid-template-columns: 1fr; }
-    }
+    :root{--navy:#0d2b45;--ocean:#1a5276;--gold:#c9a84c;--gold-light:#e8c97a;--white:#fff;--gray:#5d6d7e;--border:rgba(201,168,76,0.25);}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Lato',sans-serif;background:#0a1628;color:#fff;min-height:100vh;}
+    #loginScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 30% 50%,#1a3a5c 0%,#0a1628 70%);}
+    .login-card{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:16px;padding:48px 40px;width:100%;max-width:400px;text-align:center;}
+    .login-logo{font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--gold);margin-bottom:8px;}
+    .login-sub{font-size:0.8rem;color:rgba(255,255,255,0.4);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:36px;}
+    .login-card label{display:block;text-align:left;font-size:0.75rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:8px;}
+    .login-card input[type=password]{width:100%;padding:13px 16px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:#fff;font-size:1rem;font-family:'DM Mono',monospace;letter-spacing:0.15em;outline:none;margin-bottom:20px;transition:border-color 0.2s;}
+    .login-card input[type=password]:focus{border-color:var(--gold);}
+    .login-btn{width:100%;padding:13px;background:var(--gold);color:var(--navy);border:none;border-radius:8px;font-weight:700;font-size:0.9rem;letter-spacing:0.07em;text-transform:uppercase;cursor:pointer;transition:background 0.2s;}
+    .login-btn:hover{background:var(--gold-light);}
+    .login-error{font-size:0.82rem;color:#ff8080;margin-top:12px;display:none;}
+    #adminShell{display:none;min-height:100vh;}
+    .admin-topbar{background:var(--navy);border-bottom:1px solid var(--border);padding:0 32px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+    .admin-brand{font-family:'Playfair Display',serif;font-size:1rem;color:var(--gold);}
+    .admin-brand span{color:rgba(255,255,255,0.4);font-family:'Lato',sans-serif;font-size:0.78rem;font-weight:400;margin-left:8px;}
+    .topbar-right{display:flex;align-items:center;gap:16px;}
+    .agent-switcher{background:rgba(255,255,255,0.08);border:1px solid var(--border);border-radius:6px;padding:6px 12px;color:#fff;font-size:0.82rem;font-family:'Lato',sans-serif;cursor:pointer;outline:none;}
+    .agent-switcher option{background:#1a2a3a;}
+    .logout-btn{background:none;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.5);padding:6px 14px;border-radius:6px;font-size:0.78rem;cursor:pointer;transition:all 0.2s;}
+    .logout-btn:hover{border-color:#ff8080;color:#ff8080;}
+    .admin-layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 60px);}
+    .admin-sidebar{background:rgba(255,255,255,0.02);border-right:1px solid var(--border);padding:24px 0;}
+    .sidebar-section{padding:0 16px;margin-bottom:24px;}
+    .sidebar-label{font-size:0.65rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.3);padding:0 8px;margin-bottom:8px;}
+    .sidebar-link{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;font-size:0.85rem;color:rgba(255,255,255,0.6);transition:all 0.2s;border:none;background:none;width:100%;text-align:left;}
+    .sidebar-link:hover{background:rgba(255,255,255,0.06);color:#fff;}
+    .sidebar-link.active{background:rgba(201,168,76,0.12);color:var(--gold);}
+    .sidebar-icon{font-size:1rem;width:20px;}
+    .sidebar-badge{margin-left:auto;background:var(--gold);color:var(--navy);font-size:0.65rem;font-weight:700;padding:2px 7px;border-radius:10px;}
+    .admin-main{padding:32px;overflow-y:auto;}
+    .panel{display:none;}.panel.active{display:block;}
+    .panel-header{margin-bottom:32px;}
+    .panel-header h1{font-family:'Playfair Display',serif;font-size:1.8rem;color:#fff;margin-bottom:6px;}
+    .panel-header p{font-size:0.88rem;color:rgba(255,255,255,0.45);}
+    .admin-card{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:28px;margin-bottom:24px;}
+    .card-title{font-size:0.75rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);margin-bottom:16px;}
+    .toggle-row{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:10px;margin-bottom:16px;}
+    .toggle-label{font-size:0.9rem;color:#fff;}
+    .toggle-sub{font-size:0.78rem;color:rgba(255,255,255,0.4);margin-top:2px;}
+    .toggle{position:relative;width:48px;height:26px;cursor:pointer;}
+    .toggle input{opacity:0;width:0;height:0;}
+    .toggle-track{position:absolute;inset:0;background:rgba(255,255,255,0.15);border-radius:13px;transition:background 0.2s;}
+    .toggle input:checked+.toggle-track{background:var(--gold);}
+    .toggle-thumb{position:absolute;top:3px;left:3px;width:20px;height:20px;background:#fff;border-radius:50%;transition:transform 0.2s;box-shadow:0 1px 4px rgba(0,0,0,0.3);}
+    .toggle input:checked~.toggle-thumb{transform:translateX(22px);}
+    .fg{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+    .fg3{grid-template-columns:1fr 1fr 1fr;}
+    .fg1{grid-template-columns:1fr;}
+    .field{display:flex;flex-direction:column;gap:6px;}
+    .field label{font-size:0.72rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.5);}
+    .field input,.field select,.field textarea{padding:11px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#fff;font-size:0.9rem;font-family:'Lato',sans-serif;outline:none;transition:border-color 0.2s;}
+    .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold);}
+    .field input::placeholder,.field textarea::placeholder{color:rgba(255,255,255,0.25);}
+    .field select option{background:#1a2a3a;}
+    .field textarea{resize:vertical;min-height:80px;}
+    .btn{padding:10px 22px;border-radius:8px;font-weight:700;font-size:0.82rem;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;border:none;transition:all 0.2s;font-family:'Lato',sans-serif;}
+    .btn-gold{background:var(--gold);color:var(--navy);}.btn-gold:hover{background:var(--gold-light);}
+    .btn-gold:disabled{background:rgba(201,168,76,0.3);color:rgba(255,255,255,0.3);cursor:not-allowed;}
+    .btn-outline{background:transparent;color:rgba(255,255,255,0.6);border:1px solid rgba(255,255,255,0.2);}
+    .btn-outline:hover{border-color:var(--gold);color:var(--gold);}
+    .btn-danger{background:transparent;color:#ff8080;border:1px solid rgba(255,100,100,0.3);}
+    .btn-danger:hover{background:rgba(255,100,100,0.1);}
+    .btn-sm{padding:6px 14px;font-size:0.72rem;}
+    .ai-box{background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.3);border-radius:10px;padding:20px;margin:16px 0;display:none;}
+    .ai-label{font-size:0.68rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;}
+    .ai-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    .ai-field{display:flex;flex-direction:column;gap:3px;}
+    .ai-fl{font-size:0.68rem;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.06em;}
+    .ai-fv{font-size:0.88rem;color:#fff;}
+    .spin-row{display:none;align-items:center;gap:10px;color:rgba(255,255,255,0.5);font-size:0.85rem;padding:12px 0;}
+    .spinner{width:18px;height:18px;border:2px solid rgba(201,168,76,0.3);border-top-color:var(--gold);border-radius:50%;animation:spin 0.7s linear infinite;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+    .item-list{display:flex;flex-direction:column;gap:12px;}
+    .list-item{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:10px;padding:16px 20px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;}
+    .li-info{flex:1;}
+    .li-title{font-weight:700;color:#fff;font-size:0.92rem;margin-bottom:4px;}
+    .li-meta{font-size:0.78rem;color:rgba(255,255,255,0.4);display:flex;gap:14px;flex-wrap:wrap;}
+    .li-price{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--gold);white-space:nowrap;}
+    .li-actions{display:flex;gap:8px;align-items:center;flex-shrink:0;}
+    .badge{font-size:0.65rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:3px 8px;border-radius:10px;}
+    .badge-live{background:rgba(26,122,74,0.2);color:#4ade80;border:1px solid rgba(74,222,128,0.3);}
+    .badge-hidden{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.3);border:1px solid rgba(255,255,255,0.1);}
+    .badge-pending{background:rgba(201,168,76,0.15);color:var(--gold);border:1px solid rgba(201,168,76,0.3);}
+    #toast{position:fixed;bottom:28px;right:28px;background:var(--navy);border:1px solid var(--border);border-radius:10px;padding:14px 20px;font-size:0.85rem;color:#fff;box-shadow:0 8px 32px rgba(0,0,0,0.4);transform:translateY(80px);opacity:0;transition:all 0.3s;pointer-events:none;z-index:999;}
+    #toast.show{transform:translateY(0);opacity:1;}
+    #toast.success{border-color:rgba(74,222,128,0.4);}
+    #toast.error{border-color:rgba(255,128,128,0.4);}
+    @media(max-width:768px){.admin-layout{grid-template-columns:1fr;}.admin-sidebar{display:none;}.fg,.fg3{grid-template-columns:1fr;}}
   </style>
 </head>
 <body>
 
-<!-- LOGIN -->
 <div id="loginScreen">
   <div class="login-card">
     <div class="login-logo">PAC and GO Travel</div>
@@ -260,14 +112,9 @@
   </div>
 </div>
 
-<!-- ADMIN SHELL -->
 <div id="adminShell">
-
-  <!-- TOP BAR -->
   <div class="admin-topbar">
-    <div class="admin-brand">
-      Agent+ Admin <span>PAC and GO Travel</span>
-    </div>
+    <div class="admin-brand">Agent+ Admin <span>PAC and GO Travel</span></div>
     <div class="topbar-right">
       <select class="agent-switcher" id="agentSwitcher" onchange="switchAgent(this.value)">
         <option value="robert-traversi">Robert Traversi</option>
@@ -279,280 +126,175 @@
   </div>
 
   <div class="admin-layout">
-
-    <!-- SIDEBAR -->
     <div class="admin-sidebar">
       <div class="sidebar-section">
-        <div class="sidebar-section-label">Content</div>
-        <button class="sidebar-link active" onclick="showPanel('deals', this)">
-          <span class="sidebar-icon">🏷️</span> Deals
-          <span class="sidebar-badge" id="dealsBadge">0</span>
-        </button>
-        <button class="sidebar-link" onclick="showPanel('blog', this)">
-          <span class="sidebar-icon">✍️</span> Blog
-        </button>
+        <div class="sidebar-label">Content</div>
+        <button class="sidebar-link active" onclick="showPanel('deals',this)"><span class="sidebar-icon">🏷️</span>Deals<span class="sidebar-badge" id="dealsBadge">0</span></button>
+        <button class="sidebar-link" onclick="showPanel('trips',this)"><span class="sidebar-icon">🗓️</span>Upcoming Trips<span class="sidebar-badge" id="tripsBadge">0</span></button>
+        <button class="sidebar-link" onclick="showPanel('blog',this)"><span class="sidebar-icon">✍️</span>Blog</button>
+        <button class="sidebar-link" onclick="showPanel('reviews',this)"><span class="sidebar-icon">⭐</span>Reviews<span class="sidebar-badge" id="reviewsBadge" style="display:none"></span></button>
       </div>
       <div class="sidebar-section">
-        <div class="sidebar-section-label">Settings</div>
-        <button class="sidebar-link" onclick="showPanel('settings', this)">
-          <span class="sidebar-icon">⚙️</span> Page Settings
-        </button>
+        <div class="sidebar-label">Settings</div>
+        <button class="sidebar-link" onclick="showPanel('settings',this)"><span class="sidebar-icon">⚙️</span>Page Settings</button>
       </div>
       <div class="sidebar-section">
-        <div class="sidebar-section-label">Links</div>
-        <button class="sidebar-link" onclick="openAgentPage()">
-          <span class="sidebar-icon">🔗</span> View Live Page
-        </button>
-        <button class="sidebar-link" onclick="openDealsPage()">
-          <span class="sidebar-icon">🔗</span> View Deals Page
-        </button>
+        <div class="sidebar-label">Quick Links</div>
+        <button class="sidebar-link" onclick="openPage('index.html')"><span class="sidebar-icon">🔗</span>View Agent Page</button>
+        <button class="sidebar-link" onclick="openPage('deals.html')"><span class="sidebar-icon">🔗</span>View Deals Page</button>
       </div>
     </div>
 
-    <!-- MAIN -->
     <div class="admin-main">
 
-      <!-- ── DEALS PANEL ── -->
+      <!-- DEALS PANEL -->
       <div class="panel active" id="panel-deals">
-        <div class="panel-header">
-          <h1>Deals Manager</h1>
-          <p>Add a cruise, resort, or package deal. Claude will enrich it with itinerary details automatically.</p>
-        </div>
-
-        <!-- ADD DEAL FORM -->
+        <div class="panel-header"><h1>Deals Manager</h1><p>Add a cruise, resort, or package. Claude will enrich it with itinerary details automatically.</p></div>
         <div class="admin-card">
-          <div class="admin-card-title">➕ Add New Deal</div>
-
-          <div class="form-grid form-grid-3">
-            <div class="field">
-              <label>Travel Type</label>
-              <select id="dealType">
-                <option value="cruise">🚢 Ocean Cruise</option>
-                <option value="resort">🏖️ All-Inclusive Resort</option>
-                <option value="tour">🏛️ Guided Tour</option>
-                <option value="package">✈️ Vacation Package</option>
-                <option value="river">⛵ River Cruise</option>
-              </select>
-            </div>
-            <div class="field">
-              <label>Cruise Line / Brand</label>
-              <input type="text" id="dealLine" placeholder="e.g. Royal Caribbean" />
-            </div>
-            <div class="field">
-              <label>Ship / Property / Tour Name</label>
-              <input type="text" id="dealShip" placeholder="e.g. Wonder of the Seas" />
-            </div>
+          <div class="card-title">➕ Add New Deal</div>
+          <div class="fg fg3">
+            <div class="field"><label>Travel Type</label><select id="dealType"><option value="Ocean Cruise">🚢 Ocean Cruise</option><option value="All-Inclusive">🏖️ All-Inclusive Resort</option><option value="Guided Tour">🏛️ Guided Tour</option><option value="Vacation Package">✈️ Vacation Package</option><option value="River Cruise">⛵ River Cruise</option></select></div>
+            <div class="field"><label>Cruise Line / Brand</label><input type="text" id="dealLine" placeholder="e.g. Royal Caribbean" /></div>
+            <div class="field"><label>Ship / Property / Tour</label><input type="text" id="dealShip" placeholder="e.g. Wonder of the Seas" /></div>
           </div>
-
-          <div class="form-grid">
-            <div class="field">
-              <label>Departure Date</label>
-              <input type="date" id="dealDateFrom" />
-            </div>
-            <div class="field">
-              <label>Return Date</label>
-              <input type="date" id="dealDateTo" />
-            </div>
-            <div class="field">
-              <label>Price (from, per person)</label>
-              <input type="text" id="dealPrice" placeholder="e.g. $899" />
-            </div>
-            <div class="field">
-              <label>Departure Port / Gateway City</label>
-              <input type="text" id="dealPort" placeholder="e.g. Miami, FL" />
-            </div>
+          <div class="fg">
+            <div class="field"><label>Departure Date</label><input type="date" id="dealDateFrom" /></div>
+            <div class="field"><label>Return Date</label><input type="date" id="dealDateTo" /></div>
+            <div class="field"><label>Price (from, per person)</label><input type="text" id="dealPrice" placeholder="e.g. $899" /></div>
+            <div class="field"><label>Departure Port / City</label><input type="text" id="dealPort" placeholder="e.g. Miami, FL" /></div>
           </div>
-
-          <div style="display:flex; gap:12px; margin-top:8px;">
-            <button class="btn btn-gold" id="enrichBtn" onclick="enrichDeal()">
-              ✨ Enrich with AI
-            </button>
-            <button class="btn btn-outline" onclick="saveDealManual()">
-              Save Without AI
-            </button>
+          <div style="display:flex;gap:12px;margin-top:8px;">
+            <button class="btn btn-gold" id="enrichBtn" onclick="enrichDeal()">✨ Enrich with AI</button>
+            <button class="btn btn-outline" onclick="saveDealManual()">Save Without AI</button>
           </div>
-
-          <!-- AI SPINNER -->
-          <div class="ai-spinner" id="aiSpinner">
-            <div class="spinner"></div>
-            Looking up itinerary details…
-          </div>
-
-          <!-- AI RESULT -->
-          <div class="ai-result" id="aiResult">
-            <div class="ai-result-label">✨ AI-Enriched Details — Review & Edit Before Saving</div>
-            <div class="ai-result-grid">
-              <div class="ai-field-preview">
-                <div class="ai-field-label">Itinerary Title</div>
-                <div class="ai-field-value" id="aiTitle">—</div>
-              </div>
-              <div class="ai-field-preview">
-                <div class="ai-field-label">Duration</div>
-                <div class="ai-field-value" id="aiNights">—</div>
-              </div>
-              <div class="ai-field-preview" style="grid-column: span 2;">
-                <div class="ai-field-label">Ports of Call / Highlights</div>
-                <div class="ai-field-value" id="aiPorts">—</div>
-              </div>
-              <div class="ai-field-preview" style="grid-column: span 2;">
-                <div class="ai-field-label">Description</div>
-                <div class="ai-field-value" id="aiDesc">—</div>
-              </div>
+          <div class="spin-row" id="aiSpinner"><div class="spinner"></div>Looking up itinerary details…</div>
+          <div class="ai-box" id="aiResult">
+            <div class="ai-label">✨ AI-Enriched Details — Review Before Saving</div>
+            <div class="ai-grid">
+              <div class="ai-field"><div class="ai-fl">Itinerary Title</div><div class="ai-fv" id="aiTitle">—</div></div>
+              <div class="ai-field"><div class="ai-fl">Duration</div><div class="ai-fv" id="aiNights">—</div></div>
+              <div class="ai-field" style="grid-column:span 2"><div class="ai-fl">Ports of Call</div><div class="ai-fv" id="aiPorts">—</div></div>
+              <div class="ai-field" style="grid-column:span 2"><div class="ai-fl">Description</div><div class="ai-fv" id="aiDesc">—</div></div>
             </div>
-            <div class="form-grid form-grid-1" style="margin-top:16px;">
-              <div class="field">
-                <label>Edit Description (optional)</label>
-                <textarea id="aiDescEdit" rows="3"></textarea>
-              </div>
-            </div>
-            <div style="margin-top:12px; display:flex; gap:10px;">
+            <div class="fg fg1" style="margin-top:16px;"><div class="field"><label>Edit Description (optional)</label><textarea id="aiDescEdit" rows="3"></textarea></div></div>
+            <div style="margin-top:12px;display:flex;gap:10px;">
               <button class="btn btn-gold" onclick="saveEnrichedDeal()">💾 Save This Deal</button>
               <button class="btn btn-outline" onclick="document.getElementById('aiResult').style.display='none'">Cancel</button>
             </div>
           </div>
         </div>
-
-        <!-- DEALS LIST -->
         <div class="admin-card">
-          <div class="admin-card-title">📋 Current Deals <span id="dealsCountLabel" style="color:rgba(255,255,255,0.3); font-weight:400; text-transform:none; letter-spacing:0; font-family:'Lato',sans-serif; font-size:0.8rem;"></span></div>
-          <div class="deals-list" id="dealsList">
-            <div style="color:rgba(255,255,255,0.3); font-size:0.85rem; padding:16px 0;">No deals yet. Add your first deal above.</div>
-          </div>
+          <div class="card-title">📋 Current Deals</div>
+          <div class="item-list" id="dealsList"><div style="color:rgba(255,255,255,0.3);font-size:0.85rem;padding:16px 0;">Loading…</div></div>
         </div>
       </div>
 
-      <!-- ── BLOG PANEL ── -->
+      <!-- TRIPS PANEL -->
+      <div class="panel" id="panel-trips">
+        <div class="panel-header"><h1>Upcoming Trips</h1><p>List trips you're personally taking — clients can request to join.</p></div>
+        <div class="admin-card">
+          <div class="card-title">➕ Add Upcoming Trip</div>
+          <div class="fg fg3">
+            <div class="field"><label>Type</label><select id="tripType"><option value="Ocean Cruise">🚢 Ocean Cruise</option><option value="All-Inclusive">🏖️ All-Inclusive</option><option value="Guided Tour">🏛️ Guided Tour</option><option value="River Cruise">⛵ River Cruise</option></select></div>
+            <div class="field"><label>Cruise Line / Brand</label><input type="text" id="tripLine" placeholder="e.g. Royal Caribbean" /></div>
+            <div class="field"><label>Ship / Property</label><input type="text" id="tripShip" placeholder="e.g. Wonder of the Seas" /></div>
+          </div>
+          <div class="fg">
+            <div class="field"><label>Departure Date</label><input type="date" id="tripDateFrom" /></div>
+            <div class="field"><label>Return Date</label><input type="date" id="tripDateTo" /></div>
+            <div class="field"><label>Departure Port</label><input type="text" id="tripPort" placeholder="e.g. Miami, FL" /></div>
+            <div class="field"><label>Spots Available</label><input type="number" id="tripSpots" placeholder="e.g. 4" min="1" /></div>
+          </div>
+          <div class="fg fg1"><div class="field"><label>Price (from, per person)</label><input type="text" id="tripPrice" placeholder="e.g. $1,299" /></div></div>
+          <div style="margin-top:8px;display:flex;gap:12px;">
+            <button class="btn btn-gold" id="enrichTripBtn" onclick="enrichTrip()">✨ Enrich with AI</button>
+            <button class="btn btn-outline" onclick="saveTripManual()">Save Without AI</button>
+          </div>
+          <div class="spin-row" id="aiTripSpinner"><div class="spinner"></div>Looking up trip details…</div>
+          <div class="ai-box" id="aiTripResult">
+            <div class="ai-label">✨ AI-Enriched Trip Details</div>
+            <div class="ai-grid">
+              <div class="ai-field"><div class="ai-fl">Title</div><div class="ai-fv" id="aiTripTitle">—</div></div>
+              <div class="ai-field"><div class="ai-fl">Duration</div><div class="ai-fv" id="aiTripNights">—</div></div>
+              <div class="ai-field" style="grid-column:span 2"><div class="ai-fl">Ports / Highlights</div><div class="ai-fv" id="aiTripPorts">—</div></div>
+            </div>
+            <div class="fg fg1" style="margin-top:16px;"><div class="field"><label>Description</label><textarea id="aiTripDescEdit" rows="3"></textarea></div></div>
+            <div style="margin-top:12px;display:flex;gap:10px;">
+              <button class="btn btn-gold" onclick="saveEnrichedTrip()">💾 Save Trip</button>
+              <button class="btn btn-outline" onclick="document.getElementById('aiTripResult').style.display='none'">Cancel</button>
+            </div>
+          </div>
+        </div>
+        <div class="admin-card">
+          <div class="card-title">📋 Upcoming Trips</div>
+          <div class="item-list" id="tripsList"><div style="color:rgba(255,255,255,0.3);font-size:0.85rem;padding:16px 0;">Loading…</div></div>
+        </div>
+      </div>
+
+      <!-- BLOG PANEL -->
       <div class="panel" id="panel-blog">
-        <div class="panel-header">
-          <h1>Blog Settings</h1>
-          <p>Toggle the blog on or off, and manage your post links from Substack or any platform.</p>
-        </div>
-
+        <div class="panel-header"><h1>Blog Settings</h1><p>Toggle the blog on/off and manage post links from Substack or any platform.</p></div>
         <div class="admin-card">
-          <div class="admin-card-title">📝 Blog Visibility</div>
+          <div class="card-title">📝 Blog Visibility</div>
           <div class="toggle-row">
-            <div>
-              <div class="toggle-label">Show Blog in Navigation</div>
-              <div class="toggle-sublabel">When off, the Blog link is hidden and the blog page shows a "Coming Soon" message</div>
-            </div>
-            <label class="toggle">
-              <input type="checkbox" id="blogToggle" onchange="saveBlogSettings()" />
-              <div class="toggle-track"></div>
-              <div class="toggle-thumb"></div>
-            </label>
+            <div><div class="toggle-label">Show Blog in Navigation</div><div class="toggle-sub">When off, the Blog link is hidden from nav</div></div>
+            <label class="toggle"><input type="checkbox" id="blogToggle" onchange="saveSettings()" /><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
           </div>
-
-          <div class="form-grid form-grid-1" style="margin-bottom:16px;">
-            <div class="field">
-              <label>Blog Platform URL (Substack, WordPress, etc.)</label>
-              <input type="url" id="blogPlatformUrl" placeholder="e.g. https://roberttraversi.substack.com" oninput="saveBlogSettings()" />
-            </div>
-          </div>
+          <div class="fg fg1"><div class="field"><label>Blog Platform URL (Substack, WordPress, etc.)</label><input type="url" id="blogUrl" placeholder="https://roberttraversi.substack.com" /></div></div>
+          <button class="btn btn-gold" onclick="saveSettings()" style="margin-top:8px;">Save Blog Settings</button>
         </div>
-
         <div class="admin-card">
-          <div class="admin-card-title">➕ Add Blog Post Link</div>
-          <div class="form-grid">
-            <div class="field">
-              <label>Post Title</label>
-              <input type="text" id="blogPostTitle" placeholder="e.g. Two Weeks in Italy" />
-            </div>
-            <div class="field">
-              <label>Post URL</label>
-              <input type="url" id="blogPostUrl" placeholder="https://..." />
-            </div>
-            <div class="field">
-              <label>Category / Tag</label>
-              <input type="text" id="blogPostTag" placeholder="e.g. Europe, Cruise, Disney" />
-            </div>
-            <div class="field">
-              <label>Publish Date</label>
-              <input type="date" id="blogPostDate" />
-            </div>
+          <div class="card-title">➕ Add Blog Post</div>
+          <div class="fg">
+            <div class="field"><label>Post Title</label><input type="text" id="blogPostTitle" placeholder="e.g. Two Weeks in Italy" /></div>
+            <div class="field"><label>Post URL</label><input type="url" id="blogPostUrl" placeholder="https://..." /></div>
+            <div class="field"><label>Category / Tag</label><input type="text" id="blogPostTag" placeholder="e.g. Europe" /></div>
+            <div class="field"><label>Publish Date</label><input type="date" id="blogPostDate" /></div>
           </div>
-          <div class="form-grid form-grid-1">
-            <div class="field">
-              <label>Short Description</label>
-              <textarea id="blogPostDesc" placeholder="One or two sentences about the post…" rows="2"></textarea>
-            </div>
-          </div>
+          <div class="fg fg1"><div class="field"><label>Short Description</label><textarea id="blogPostDesc" rows="2" placeholder="One or two sentences…"></textarea></div></div>
           <button class="btn btn-gold" onclick="addBlogPost()" style="margin-top:8px;">Add Post</button>
         </div>
-
         <div class="admin-card">
-          <div class="admin-card-title">📚 Published Posts</div>
-          <div class="blog-posts-list" id="blogPostsList">
-            <div style="color:rgba(255,255,255,0.3); font-size:0.85rem; padding:8px 0;">No posts yet.</div>
-          </div>
+          <div class="card-title">📚 Published Posts</div>
+          <div class="item-list" id="blogList"><div style="color:rgba(255,255,255,0.3);font-size:0.85rem;">Loading…</div></div>
         </div>
       </div>
 
-      <!-- ── SETTINGS PANEL ── -->
+      <!-- REVIEWS PANEL -->
+      <div class="panel" id="panel-reviews">
+        <div class="panel-header"><h1>Reviews</h1><p>Add and approve client testimonials.</p></div>
+        <div class="admin-card">
+          <div class="card-title">➕ Add Review</div>
+          <div class="fg">
+            <div class="field"><label>Client Name</label><input type="text" id="reviewName" placeholder="e.g. Sarah & Mike T." /></div>
+            <div class="field"><label>Trip Type / Details</label><input type="text" id="reviewTrip" placeholder="e.g. Royal Caribbean, Caribbean 2025" /></div>
+            <div class="field"><label>Stars</label><select id="reviewStars"><option value="5">★★★★★ (5)</option><option value="4">★★★★ (4)</option><option value="3">★★★ (3)</option></select></div>
+          </div>
+          <div class="fg fg1"><div class="field"><label>Review Text</label><textarea id="reviewText" rows="3" placeholder="Client's words…"></textarea></div></div>
+          <button class="btn btn-gold" onclick="addReview()" style="margin-top:8px;">Add & Approve Review</button>
+        </div>
+        <div class="admin-card">
+          <div class="card-title">📋 All Reviews</div>
+          <div class="item-list" id="reviewsList"><div style="color:rgba(255,255,255,0.3);font-size:0.85rem;">Loading…</div></div>
+        </div>
+      </div>
+
+      <!-- SETTINGS PANEL -->
       <div class="panel" id="panel-settings">
-        <div class="panel-header">
-          <h1>Page Settings</h1>
-          <p>Control which sections appear on the Agent+ mini-site.</p>
-        </div>
-
+        <div class="panel-header"><h1>Page Settings</h1><p>Control which sections appear on the Agent+ mini-site.</p></div>
         <div class="admin-card">
-          <div class="admin-card-title">🔘 Section Visibility</div>
-          <div class="toggle-row">
-            <div>
-              <div class="toggle-label">Show Deals Section</div>
-              <div class="toggle-sublabel">Displays the featured deals section on the homepage and deals.html</div>
-            </div>
-            <label class="toggle">
-              <input type="checkbox" id="toggleDeals" checked onchange="saveSettings()" />
-              <div class="toggle-track"></div>
-              <div class="toggle-thumb"></div>
-            </label>
-          </div>
-          <div class="toggle-row">
-            <div>
-              <div class="toggle-label">Show Blog Section</div>
-              <div class="toggle-sublabel">Shows blog link in nav and on homepage teaser</div>
-            </div>
-            <label class="toggle">
-              <input type="checkbox" id="toggleBlog" onchange="saveSettings()" />
-              <div class="toggle-track"></div>
-              <div class="toggle-thumb"></div>
-            </label>
-          </div>
-          <div class="toggle-row">
-            <div>
-              <div class="toggle-label">Show Reviews Section</div>
-              <div class="toggle-sublabel">Displays testimonials on homepage and reviews.html</div>
-            </div>
-            <label class="toggle">
-              <input type="checkbox" id="toggleReviews" checked onchange="saveSettings()" />
-              <div class="toggle-track"></div>
-              <div class="toggle-thumb"></div>
-            </label>
-          </div>
-          <div class="toggle-row">
-            <div>
-              <div class="toggle-label">Show Gallery Section</div>
-              <div class="toggle-sublabel">Shows photo gallery link in nav and homepage</div>
-            </div>
-            <label class="toggle">
-              <input type="checkbox" id="toggleGallery" checked onchange="saveSettings()" />
-              <div class="toggle-track"></div>
-              <div class="toggle-thumb"></div>
-            </label>
-          </div>
+          <div class="card-title">🔘 Section Visibility</div>
+          <div class="toggle-row"><div><div class="toggle-label">Show Deals Section</div><div class="toggle-sub">Displays deals page and deals nav link</div></div><label class="toggle"><input type="checkbox" id="toggleDeals" checked onchange="saveSettings()" /><div class="toggle-track"></div><div class="toggle-thumb"></div></label></div>
+          <div class="toggle-row"><div><div class="toggle-label">Show Blog Section</div><div class="toggle-sub">Shows blog link in nav and homepage teaser</div></div><label class="toggle"><input type="checkbox" id="toggleBlog" onchange="saveSettings()" /><div class="toggle-track"></div><div class="toggle-thumb"></div></label></div>
+          <div class="toggle-row"><div><div class="toggle-label">Show Reviews Section</div><div class="toggle-sub">Displays testimonials on homepage</div></div><label class="toggle"><input type="checkbox" id="toggleReviews" checked onchange="saveSettings()" /><div class="toggle-track"></div><div class="toggle-thumb"></div></label></div>
+          <div class="toggle-row"><div><div class="toggle-label">Show Gallery Section</div><div class="toggle-sub">Shows photo gallery in nav and homepage</div></div><label class="toggle"><input type="checkbox" id="toggleGallery" checked onchange="saveSettings()" /><div class="toggle-track"></div><div class="toggle-thumb"></div></label></div>
+          <button class="btn btn-gold" onclick="saveSettings()" style="margin-top:8px;">Save Settings</button>
         </div>
-
         <div class="admin-card">
-          <div class="admin-card-title">🔑 Change Password</div>
-          <div class="form-grid">
-            <div class="field">
-              <label>New Password</label>
-              <input type="password" id="newPass" placeholder="Min 8 characters" />
-            </div>
-            <div class="field">
-              <label>Confirm Password</label>
-              <input type="password" id="newPassConfirm" placeholder="Repeat password" />
-            </div>
+          <div class="card-title">🔑 Change Admin Password</div>
+          <div class="fg">
+            <div class="field"><label>New Password</label><input type="password" id="newPass" placeholder="Min 8 characters" /></div>
+            <div class="field"><label>Confirm Password</label><input type="password" id="newPassConfirm" placeholder="Repeat password" /></div>
           </div>
           <button class="btn btn-gold" onclick="changePassword()" style="margin-top:8px;">Update Password</button>
         </div>
@@ -565,386 +307,321 @@
 <div id="toast"></div>
 
 <script>
-// ── CONFIG ──────────────────────────────────────────────────
-const DEFAULT_PASSWORD = 'pacandgo2026';
-const ANTHROPIC_API    = 'https://api.anthropic.com/v1/messages';
-const CLAUDE_MODEL     = 'claude-sonnet-4-20250514';
+const SB_URL = 'https://yqyinpufmizrscdexlwr.supabase.co';
+const SB_KEY = 'sb_publishable_T_cxTPA3gwEdEP93W7hnfw_78mr6vLI';
+const CLAUDE = 'claude-sonnet-4-20250514';
+const DEFAULT_PASS = 'pacandgo2026';
 
-// ── STATE ───────────────────────────────────────────────────
-let currentAgent = 'robert-traversi';
-let enrichedData = null;
+let agent = 'robert-traversi';
+let eDeal = null, eTrip = null;
 
-// ── LOGIN ───────────────────────────────────────────────────
+// ── SUPABASE ────────────────────────────────────────────────
+async function sb(method, table, params='', body=null, prefer='return=representation') {
+  const r = await fetch(`${SB_URL}/rest/v1/${table}${params?'?'+params:''}`, {
+    method,
+    headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':prefer},
+    body: body ? JSON.stringify(body) : undefined
+  });
+  if(!r.ok) throw new Error(await r.text());
+  const t = await r.text();
+  return t ? JSON.parse(t) : [];
+}
+const DB = {
+  get:    (tbl,q)     => sb('GET',tbl,q),
+  post:   (tbl,data)  => sb('POST',tbl,'',data),
+  patch:  (tbl,q,data)=> sb('PATCH',tbl,q,data),
+  del:    (tbl,q)     => sb('DELETE',tbl,q,null,'return=minimal'),
+  upsert: (tbl,data)  => sb('POST',tbl,'',data,'resolution=merge-duplicates,return=representation')
+};
+
+// ── AUTH ────────────────────────────────────────────────────
 function doLogin() {
-  const pass = document.getElementById('loginPass').value;
-  const stored = localStorage.getItem('adminPassword') || DEFAULT_PASSWORD;
-  if (pass === stored) {
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('adminShell').style.display = 'block';
+  const p = document.getElementById('loginPass').value;
+  const s = localStorage.getItem('ap') || DEFAULT_PASS;
+  if(p===s) {
+    document.getElementById('loginScreen').style.display='none';
+    document.getElementById('adminShell').style.display='block';
     loadAll();
   } else {
-    document.getElementById('loginError').style.display = 'block';
-    document.getElementById('loginPass').value = '';
+    document.getElementById('loginError').style.display='block';
+    document.getElementById('loginPass').value='';
   }
 }
-document.getElementById('loginPass').addEventListener('keydown', e => {
-  if (e.key === 'Enter') doLogin();
-});
-
-function doLogout() {
-  document.getElementById('adminShell').style.display = 'none';
-  document.getElementById('loginScreen').style.display = 'flex';
-  document.getElementById('loginPass').value = '';
+document.getElementById('loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+function doLogout(){document.getElementById('adminShell').style.display='none';document.getElementById('loginScreen').style.display='flex';document.getElementById('loginPass').value='';}
+function changePassword(){
+  const n=document.getElementById('newPass').value,c=document.getElementById('newPassConfirm').value;
+  if(n.length<8) return toast('Min 8 characters','error');
+  if(n!==c) return toast('Passwords do not match','error');
+  localStorage.setItem('ap',n);
+  document.getElementById('newPass').value='';document.getElementById('newPassConfirm').value='';
+  toast('Password updated ✓');
 }
 
-function changePassword() {
-  const np = document.getElementById('newPass').value;
-  const nc = document.getElementById('newPassConfirm').value;
-  if (np.length < 8) return toast('Password must be at least 8 characters.', 'error');
-  if (np !== nc) return toast('Passwords do not match.', 'error');
-  localStorage.setItem('adminPassword', np);
-  document.getElementById('newPass').value = '';
-  document.getElementById('newPassConfirm').value = '';
-  toast('Password updated ✓', 'success');
-}
-
-// ── AGENT SWITCHING ─────────────────────────────────────────
-function switchAgent(agent) {
-  currentAgent = agent;
-  loadAll();
-  toast('Switched to ' + agentLabel(agent), 'success');
-}
-
-function agentLabel(slug) {
-  return { 'robert-traversi': 'Robert Traversi', 'patty-wells': 'Patty Wells', 'connie-brant': 'Connie Brant' }[slug] || slug;
-}
-
-function key(suffix) { return currentAgent + ':' + suffix; }
-
-// ── PANEL NAV ───────────────────────────────────────────────
-function showPanel(name, el) {
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
-  document.getElementById('panel-' + name).classList.add('active');
+// ── AGENT / NAV ─────────────────────────────────────────────
+function switchAgent(a){agent=a;loadAll();toast('Switched to '+{robert:'Robert Traversi',patty:'Patty Wells',connie:'Connie Brant'}[a.split('-')[0]]||a);}
+function showPanel(n,el){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-link').forEach(l=>l.classList.remove('active'));
+  document.getElementById('panel-'+n).classList.add('active');
   el.classList.add('active');
 }
-
-function openAgentPage() {
-  window.open('../' + currentAgent + '/index.html', '_blank');
-}
-function openDealsPage() {
-  window.open('../' + currentAgent + '/deals.html', '_blank');
-}
-
-// ── LOAD ALL ────────────────────────────────────────────────
-function loadAll() {
-  loadDeals();
-  loadBlogSettings();
-  loadBlogPosts();
-  loadSettings();
-}
+function openPage(p){window.open('../'+agent+'/'+p,'_blank');}
+function loadAll(){loadDeals();loadTrips();loadBlog();loadReviews();loadSettings();}
 
 // ── DEALS ───────────────────────────────────────────────────
-function getDeals() {
-  try { return JSON.parse(localStorage.getItem(key('deals')) || '[]'); } catch { return []; }
-}
-function saveDeals(deals) {
-  localStorage.setItem(key('deals'), JSON.stringify(deals));
-  loadDeals();
-}
-
-function loadDeals() {
-  const deals = getDeals();
-  const list = document.getElementById('dealsList');
-  const badge = document.getElementById('dealsBadge');
-  const count = document.getElementById('dealsCountLabel');
-  badge.textContent = deals.length;
-  count.textContent = deals.length + ' deal' + (deals.length !== 1 ? 's' : '');
-
-  if (!deals.length) {
-    list.innerHTML = '<div style="color:rgba(255,255,255,0.3); font-size:0.85rem; padding:16px 0;">No deals yet. Add your first deal above.</div>';
-    return;
-  }
-
-  list.innerHTML = deals.map((d, i) => `
-    <div class="deal-item">
-      <div class="deal-item-info">
-        <div class="deal-item-title">${d.line} — ${d.title || d.ship}</div>
-        <div class="deal-item-meta">
-          <span>📅 ${d.dates}</span>
-          <span>🚢 ${d.nights || '—'}</span>
-          <span>📍 ${d.port || '—'}</span>
-          ${d.ports ? '<span>🗺️ ' + d.ports.substring(0,60) + (d.ports.length > 60 ? '…' : '') + '</span>' : ''}
+async function loadDeals(){
+  try{
+    const d=await DB.get('deals','agent_id=eq.'+agent+'&order=created_at.desc');
+    document.getElementById('dealsBadge').textContent=d.length;
+    const el=document.getElementById('dealsList');
+    if(!d.length){el.innerHTML='<div style="color:rgba(255,255,255,0.3);font-size:0.85rem;padding:16px 0;">No deals yet.</div>';return;}
+    el.innerHTML=d.map(x=>`<div class="list-item">
+      <div class="li-info"><div class="li-title">${x.emoji||'🚢'} ${x.line} — ${x.title||x.ship}</div>
+      <div class="li-meta"><span>📅 ${x.dates||'—'}</span><span>🌙 ${x.nights||'—'}</span>${x.port?'<span>⚓ '+x.port+'</span>':''}</div></div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+        <div class="li-price">${x.price||'—'}</div>
+        <div class="li-actions">
+          <span class="badge ${x.active?'badge-live':'badge-hidden'}">${x.active?'Live':'Hidden'}</span>
+          <button class="btn btn-sm btn-outline" onclick="toggleRow('deals','${x.id}',${x.active})">${x.active?'Hide':'Show'}</button>
+          <button class="btn btn-sm btn-danger" onclick="delRow('deals','${x.id}',loadDeals)">Delete</button>
         </div>
-      </div>
-      <div style="display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
-        <div class="deal-item-price">${d.price}</div>
-        <div class="deal-item-actions">
-          <span class="deal-active-badge ${d.active ? 'badge-live' : 'badge-hidden'}">${d.active ? 'Live' : 'Hidden'}</span>
-          <button class="btn btn-sm btn-outline" onclick="toggleDealActive(${i})">${d.active ? 'Hide' : 'Show'}</button>
-          <button class="btn btn-sm btn-danger" onclick="deleteDeal(${i})">Delete</button>
+      </div></div>`).join('');
+  }catch(e){toast('Load error: '+e.message,'error');}
+}
+
+async function enrichDeal(){
+  const line=v('dealLine'),ship=v('dealShip');
+  if(!line||!ship) return toast('Enter line and ship first','error');
+  spin('aiSpinner',true);document.getElementById('aiResult').style.display='none';
+  document.getElementById('enrichBtn').disabled=true;
+  try{
+    const r=await callClaude(`Travel expert. JSON only, no markdown.\nType:${v('dealType')}, Line:${line}, Ship:${ship}, Departs:${v('dealDateFrom')||'TBD'} from ${v('dealPort')||'TBD'}, Returns:${v('dealDateTo')||'TBD'}, Nights:${nights('dealDateFrom','dealDateTo')}\n{"title":"short marketing title","nights":"X Nights","ports":"comma-separated ports","description":"2-sentence compelling description","emoji":"one emoji"}`);
+    eDeal=r;
+    set('aiTitle',r.title);set('aiNights',r.nights);set('aiPorts',r.ports);set('aiDesc',r.description);
+    document.getElementById('aiDescEdit').value=r.description||'';
+    document.getElementById('aiResult').style.display='block';
+    toast('Details enriched ✓');
+  }catch(e){toast('AI failed — save manually','error');}
+  finally{spin('aiSpinner',false);document.getElementById('enrichBtn').disabled=false;}
+}
+
+async function saveEnrichedDeal(){
+  if(!eDeal) return;
+  try{
+    await DB.post('deals',{agent_id:agent,type:v('dealType'),line:v('dealLine'),ship:v('dealShip'),port:v('dealPort'),dates:dateRange('dealDateFrom','dealDateTo'),price:v('dealPrice'),title:eDeal.title,nights:eDeal.nights,ports:eDeal.ports,description:v('aiDescEdit')||eDeal.description,emoji:eDeal.emoji||'🚢',category:v('dealType'),active:true});
+    resetForm(['dealLine','dealShip','dealPrice','dealPort','dealDateFrom','dealDateTo']);
+    document.getElementById('dealType').value='Ocean Cruise';
+    document.getElementById('aiResult').style.display='none';eDeal=null;
+    loadDeals();toast('Deal saved and live ✓');
+  }catch(e){toast('Error: '+e.message,'error');}
+}
+
+async function saveDealManual(){
+  const line=v('dealLine'),ship=v('dealShip');
+  if(!line||!ship) return toast('Enter line and ship','error');
+  try{
+    await DB.post('deals',{agent_id:agent,type:v('dealType'),line,ship,port:v('dealPort'),dates:dateRange('dealDateFrom','dealDateTo'),price:v('dealPrice'),title:ship,emoji:emoji(v('dealType')),category:v('dealType'),active:true});
+    resetForm(['dealLine','dealShip','dealPrice','dealPort','dealDateFrom','dealDateTo']);
+    loadDeals();toast('Deal saved ✓');
+  }catch(e){toast('Error: '+e.message,'error');}
+}
+
+// ── TRIPS ───────────────────────────────────────────────────
+async function loadTrips(){
+  try{
+    const d=await DB.get('trips','agent_id=eq.'+agent+'&order=departure_date.asc');
+    document.getElementById('tripsBadge').textContent=d.length;
+    const el=document.getElementById('tripsList');
+    if(!d.length){el.innerHTML='<div style="color:rgba(255,255,255,0.3);font-size:0.85rem;padding:16px 0;">No trips yet.</div>';return;}
+    el.innerHTML=d.map(x=>`<div class="list-item">
+      <div class="li-info"><div class="li-title">${x.emoji||'🚢'} ${x.line} — ${x.title||x.ship}</div>
+      <div class="li-meta"><span>📅 ${x.departure_date||'—'}</span><span>🌙 ${x.nights||'—'}</span><span>👥 ${x.spots_available||'?'} spots</span></div></div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+        <div class="li-price">${x.price||'—'}</div>
+        <div class="li-actions">
+          <span class="badge ${x.active?'badge-live':'badge-hidden'}">${x.active?'Live':'Hidden'}</span>
+          <button class="btn btn-sm btn-outline" onclick="toggleRow('trips','${x.id}',${x.active})">${x.active?'Hide':'Show'}</button>
+          <button class="btn btn-sm btn-danger" onclick="delRow('trips','${x.id}',loadTrips)">Delete</button>
         </div>
-      </div>
-    </div>
-  `).join('');
+      </div></div>`).join('');
+  }catch(e){toast('Load error: '+e.message,'error');}
 }
 
-async function enrichDeal() {
-  const type  = document.getElementById('dealType').value;
-  const line  = document.getElementById('dealLine').value.trim();
-  const ship  = document.getElementById('dealShip').value.trim();
-  const from  = document.getElementById('dealDateFrom').value;
-  const to    = document.getElementById('dealDateTo').value;
-  const price = document.getElementById('dealPrice').value.trim();
-  const port  = document.getElementById('dealPort').value.trim();
-
-  if (!line || !ship) return toast('Please enter a cruise line and ship/property name.', 'error');
-
-  const nights = calcNights(from, to);
-
-  document.getElementById('aiSpinner').style.display = 'flex';
-  document.getElementById('aiResult').style.display = 'none';
-  document.getElementById('enrichBtn').disabled = true;
-
-  const prompt = `You are a travel industry expert. Given the following travel deal details, provide enriched information in JSON format ONLY — no markdown, no explanation, just raw JSON.
-
-Deal:
-- Type: ${type}
-- Line/Brand: ${line}
-- Ship/Property/Tour: ${ship}
-- Departure: ${from || 'TBD'} from ${port || 'TBD'}
-- Return: ${to || 'TBD'}
-- Nights: ${nights || 'unknown'}
-
-Respond with this exact JSON structure:
-{
-  "title": "short marketing title e.g. '7-Night Eastern Caribbean Cruise'",
-  "nights": "e.g. '7 Nights'",
-  "ports": "comma-separated ports of call or highlights e.g. 'Cozumel, Roatán, Belize City, Costa Maya'",
-  "description": "2-sentence compelling description of this itinerary for a travel agency website. Mention key highlights, what makes it special.",
-  "category": "one of: Ocean Cruise, River Cruise, All-Inclusive, Guided Tour, Vacation Package",
-  "emoji": "one relevant emoji"
-}`;
-
-  try {
-    const res = await fetch(ANTHROPIC_API, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: CLAUDE_MODEL,
-        max_tokens: 1000,
-        messages: [{ role: 'user', content: prompt }]
-      })
-    });
-    const data = await res.json();
-    const raw = data.content?.[0]?.text || '';
-    const cleaned = raw.replace(/```json|```/g, '').trim();
-    enrichedData = JSON.parse(cleaned);
-
-    document.getElementById('aiTitle').textContent = enrichedData.title || '—';
-    document.getElementById('aiNights').textContent = enrichedData.nights || nights + ' nights' || '—';
-    document.getElementById('aiPorts').textContent = enrichedData.ports || '—';
-    document.getElementById('aiDesc').textContent = enrichedData.description || '—';
-    document.getElementById('aiDescEdit').value = enrichedData.description || '';
-    document.getElementById('aiResult').style.display = 'block';
-    toast('Itinerary details enriched ✓', 'success');
-  } catch (err) {
-    console.error(err);
-    toast('AI enrichment failed. Use "Save Without AI" instead.', 'error');
-  } finally {
-    document.getElementById('aiSpinner').style.display = 'none';
-    document.getElementById('enrichBtn').disabled = false;
-  }
+async function enrichTrip(){
+  const line=v('tripLine'),ship=v('tripShip');
+  if(!line||!ship) return toast('Enter line and ship first','error');
+  spin('aiTripSpinner',true);document.getElementById('aiTripResult').style.display='none';
+  document.getElementById('enrichTripBtn').disabled=true;
+  try{
+    const r=await callClaude(`Travel expert. JSON only.\nType:${v('tripType')}, Line:${line}, Ship:${ship}, Departs:${v('tripDateFrom')||'TBD'} from ${v('tripPort')||'TBD'}, Returns:${v('tripDateTo')||'TBD'}, Nights:${nights('tripDateFrom','tripDateTo')}\n{"title":"short title","nights":"X Nights","ports":"ports/highlights","description":"2-sentence exciting join-my-trip description","emoji":"one emoji"}`);
+    eTrip=r;
+    set('aiTripTitle',r.title);set('aiTripNights',r.nights);set('aiTripPorts',r.ports);
+    document.getElementById('aiTripDescEdit').value=r.description||'';
+    document.getElementById('aiTripResult').style.display='block';
+    toast('Details enriched ✓');
+  }catch(e){toast('AI failed — save manually','error');}
+  finally{spin('aiTripSpinner',false);document.getElementById('enrichTripBtn').disabled=false;}
 }
 
-function saveEnrichedDeal() {
-  if (!enrichedData) return;
-  const editedDesc = document.getElementById('aiDescEdit').value.trim();
-  const deals = getDeals();
-  deals.push({
-    id: Date.now(),
-    type:   document.getElementById('dealType').value,
-    line:   document.getElementById('dealLine').value.trim(),
-    ship:   document.getElementById('dealShip').value.trim(),
-    port:   document.getElementById('dealPort').value.trim(),
-    dates:  formatDateRange(document.getElementById('dealDateFrom').value, document.getElementById('dealDateTo').value),
-    price:  document.getElementById('dealPrice').value.trim(),
-    title:  enrichedData.title,
-    nights: enrichedData.nights,
-    ports:  enrichedData.ports,
-    desc:   editedDesc || enrichedData.description,
-    emoji:  enrichedData.emoji || '🚢',
-    category: enrichedData.category,
-    active: true,
-    created: new Date().toISOString()
-  });
-  saveDeals(deals);
-  resetDealForm();
-  toast('Deal saved and published ✓', 'success');
+async function saveEnrichedTrip(){
+  if(!eTrip) return;
+  try{
+    await DB.post('trips',{agent_id:agent,type:v('tripType'),line:v('tripLine'),ship:v('tripShip'),departure_date:v('tripDateFrom')||null,return_date:v('tripDateTo')||null,port:v('tripPort'),spots_available:parseInt(v('tripSpots'))||null,price:v('tripPrice'),title:eTrip.title,nights:eTrip.nights,ports:eTrip.ports,description:v('aiTripDescEdit')||eTrip.description,emoji:eTrip.emoji||'🚢',active:true});
+    resetForm(['tripLine','tripShip','tripDateFrom','tripDateTo','tripPort','tripSpots','tripPrice']);
+    document.getElementById('tripType').value='Ocean Cruise';
+    document.getElementById('aiTripResult').style.display='none';eTrip=null;
+    loadTrips();toast('Trip saved and live ✓');
+  }catch(e){toast('Error: '+e.message,'error');}
 }
 
-function saveDealManual() {
-  const line  = document.getElementById('dealLine').value.trim();
-  const ship  = document.getElementById('dealShip').value.trim();
-  if (!line || !ship) return toast('Please enter a cruise line and ship/property.', 'error');
-
-  const deals = getDeals();
-  deals.push({
-    id: Date.now(),
-    type:   document.getElementById('dealType').value,
-    line:   line,
-    ship:   ship,
-    port:   document.getElementById('dealPort').value.trim(),
-    dates:  formatDateRange(document.getElementById('dealDateFrom').value, document.getElementById('dealDateTo').value),
-    price:  document.getElementById('dealPrice').value.trim(),
-    title:  ship,
-    nights: calcNights(document.getElementById('dealDateFrom').value, document.getElementById('dealDateTo').value) + ' nights',
-    ports:  '',
-    desc:   '',
-    emoji:  typeEmoji(document.getElementById('dealType').value),
-    category: document.getElementById('dealType').value,
-    active: true,
-    created: new Date().toISOString()
-  });
-  saveDeals(deals);
-  resetDealForm();
-  toast('Deal saved ✓', 'success');
-}
-
-function deleteDeal(i) {
-  if (!confirm('Delete this deal?')) return;
-  const deals = getDeals();
-  deals.splice(i, 1);
-  saveDeals(deals);
-  toast('Deal deleted', 'success');
-}
-
-function toggleDealActive(i) {
-  const deals = getDeals();
-  deals[i].active = !deals[i].active;
-  saveDeals(deals);
-  toast(deals[i].active ? 'Deal is now live ✓' : 'Deal hidden', 'success');
-}
-
-function resetDealForm() {
-  ['dealLine','dealShip','dealPrice','dealPort'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('dealDateFrom').value = '';
-  document.getElementById('dealDateTo').value = '';
-  document.getElementById('dealType').value = 'cruise';
-  document.getElementById('aiResult').style.display = 'none';
-  enrichedData = null;
+async function saveTripManual(){
+  const line=v('tripLine'),ship=v('tripShip');
+  if(!line||!ship) return toast('Enter line and ship','error');
+  try{
+    await DB.post('trips',{agent_id:agent,type:v('tripType'),line,ship,departure_date:v('tripDateFrom')||null,return_date:v('tripDateTo')||null,port:v('tripPort'),spots_available:parseInt(v('tripSpots'))||null,price:v('tripPrice'),title:ship,emoji:emoji(v('tripType')),active:true});
+    resetForm(['tripLine','tripShip','tripDateFrom','tripDateTo','tripPort','tripSpots','tripPrice']);
+    loadTrips();toast('Trip saved ✓');
+  }catch(e){toast('Error: '+e.message,'error');}
 }
 
 // ── BLOG ────────────────────────────────────────────────────
-function saveBlogSettings() {
-  localStorage.setItem(key('blog:enabled'), document.getElementById('blogToggle').checked);
-  localStorage.setItem(key('blog:url'), document.getElementById('blogPlatformUrl').value);
+async function addBlogPost(){
+  const title=v('blogPostTitle'),url=v('blogPostUrl');
+  if(!title||!url) return toast('Title and URL required','error');
+  try{
+    await DB.post('blog_posts',{agent_id:agent,title,url,tag:v('blogPostTag'),publish_date:v('blogPostDate')||null,description:v('blogPostDesc'),active:true});
+    resetForm(['blogPostTitle','blogPostUrl','blogPostTag','blogPostDesc','blogPostDate']);
+    loadBlog();toast('Post added ✓');
+  }catch(e){toast('Error: '+e.message,'error');}
 }
 
-function loadBlogSettings() {
-  document.getElementById('blogToggle').checked = localStorage.getItem(key('blog:enabled')) === 'true';
-  document.getElementById('blogPlatformUrl').value = localStorage.getItem(key('blog:url')) || '';
+async function loadBlog(){
+  try{
+    const d=await DB.get('blog_posts','agent_id=eq.'+agent+'&order=created_at.desc');
+    const el=document.getElementById('blogList');
+    if(!d.length){el.innerHTML='<div style="color:rgba(255,255,255,0.3);font-size:0.85rem;">No posts yet.</div>';return;}
+    el.innerHTML=d.map(x=>`<div class="list-item">
+      <div class="li-info"><div class="li-title">${x.title}</div>
+      <div class="li-meta">${x.tag?'🏷️ '+x.tag+' · ':''}${x.publish_date?'📅 '+x.publish_date:''}</div></div>
+      <div class="li-actions">
+        <a href="${x.url}" target="_blank" class="btn btn-sm btn-outline">View →</a>
+        <button class="btn btn-sm btn-danger" onclick="delRow('blog_posts','${x.id}',loadBlog)">Delete</button>
+      </div></div>`).join('');
+  }catch(e){toast('Load error','error');}
 }
 
-function addBlogPost() {
-  const title = document.getElementById('blogPostTitle').value.trim();
-  const url   = document.getElementById('blogPostUrl').value.trim();
-  if (!title || !url) return toast('Title and URL are required.', 'error');
-
-  const posts = JSON.parse(localStorage.getItem(key('blog:posts')) || '[]');
-  posts.unshift({
-    id: Date.now(),
-    title,
-    url,
-    tag:   document.getElementById('blogPostTag').value.trim(),
-    date:  document.getElementById('blogPostDate').value,
-    desc:  document.getElementById('blogPostDesc').value.trim()
-  });
-  localStorage.setItem(key('blog:posts'), JSON.stringify(posts));
-  loadBlogPosts();
-  ['blogPostTitle','blogPostUrl','blogPostTag','blogPostDesc'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('blogPostDate').value = '';
-  toast('Post added ✓', 'success');
+// ── REVIEWS ─────────────────────────────────────────────────
+async function addReview(){
+  const text=v('reviewText');
+  if(!text) return toast('Review text required','error');
+  try{
+    await DB.post('reviews',{agent_id:agent,client_name:v('reviewName'),trip_type:v('reviewTrip'),stars:parseInt(v('reviewStars')),review_text:text,approved:true});
+    resetForm(['reviewName','reviewTrip','reviewText']);document.getElementById('reviewStars').value='5';
+    loadReviews();toast('Review added ✓');
+  }catch(e){toast('Error: '+e.message,'error');}
 }
 
-function loadBlogPosts() {
-  const posts = JSON.parse(localStorage.getItem(key('blog:posts')) || '[]');
-  const list = document.getElementById('blogPostsList');
-  if (!posts.length) {
-    list.innerHTML = '<div style="color:rgba(255,255,255,0.3); font-size:0.85rem; padding:8px 0;">No posts yet.</div>';
-    return;
-  }
-  list.innerHTML = posts.map((p, i) => `
-    <div class="blog-post-item">
-      <div class="blog-post-info">
-        <div class="blog-post-title">${p.title}</div>
-        <div class="blog-post-meta">${p.tag ? '🏷️ ' + p.tag + ' · ' : ''}${p.date ? '📅 ' + formatDate(p.date) : ''}</div>
-      </div>
-      <div style="display:flex; gap:8px;">
-        <a href="${p.url}" target="_blank" class="btn btn-sm btn-outline">View →</a>
-        <button class="btn btn-sm btn-danger" onclick="deleteBlogPost(${i})">Delete</button>
-      </div>
-    </div>
-  `).join('');
+async function loadReviews(){
+  try{
+    const d=await DB.get('reviews','agent_id=eq.'+agent+'&order=created_at.desc');
+    const pending=d.filter(r=>!r.approved).length;
+    const badge=document.getElementById('reviewsBadge');
+    badge.textContent=pending||'';badge.style.display=pending?'inline':'none';
+    const el=document.getElementById('reviewsList');
+    if(!d.length){el.innerHTML='<div style="color:rgba(255,255,255,0.3);font-size:0.85rem;">No reviews yet.</div>';return;}
+    el.innerHTML=d.map(x=>`<div class="list-item">
+      <div class="li-info"><div class="li-title">${'★'.repeat(x.stars||5)} ${x.client_name||'Anonymous'}</div>
+      <div class="li-meta"><span>${x.trip_type||''}</span></div>
+      <div style="font-size:0.82rem;color:rgba(255,255,255,0.6);margin-top:6px;font-style:italic;">"${(x.review_text||'').substring(0,100)}${(x.review_text||'').length>100?'…':''}"</div></div>
+      <div class="li-actions">
+        <span class="badge ${x.approved?'badge-live':'badge-pending'}">${x.approved?'Live':'Pending'}</span>
+        ${!x.approved?`<button class="btn btn-sm btn-gold" onclick="approveReview('${x.id}')">Approve</button>`:''}
+        <button class="btn btn-sm btn-danger" onclick="delRow('reviews','${x.id}',loadReviews)">Delete</button>
+      </div></div>`).join('');
+  }catch(e){toast('Load error','error');}
 }
 
-function deleteBlogPost(i) {
-  const posts = JSON.parse(localStorage.getItem(key('blog:posts')) || '[]');
-  posts.splice(i, 1);
-  localStorage.setItem(key('blog:posts'), JSON.stringify(posts));
-  loadBlogPosts();
-  toast('Post removed', 'success');
+async function approveReview(id){
+  try{await DB.patch('reviews','id=eq.'+id,{approved:true});loadReviews();toast('Approved ✓');}
+  catch(e){toast('Error','error');}
 }
 
 // ── SETTINGS ────────────────────────────────────────────────
-function saveSettings() {
-  localStorage.setItem(key('settings'), JSON.stringify({
-    deals:   document.getElementById('toggleDeals').checked,
-    blog:    document.getElementById('toggleBlog').checked,
-    reviews: document.getElementById('toggleReviews').checked,
-    gallery: document.getElementById('toggleGallery').checked
-  }));
-  toast('Settings saved ✓', 'success');
+async function saveSettings(){
+  try{
+    await DB.upsert('settings',{
+      agent_id:agent,
+      blog_enabled:!!(document.getElementById('blogToggle')?.checked||document.getElementById('toggleBlog')?.checked),
+      blog_url:v('blogUrl')||'',
+      deals_enabled:document.getElementById('toggleDeals')?.checked!==false,
+      reviews_enabled:document.getElementById('toggleReviews')?.checked!==false,
+      gallery_enabled:document.getElementById('toggleGallery')?.checked!==false,
+      updated_at:new Date().toISOString()
+    });
+    toast('Settings saved ✓');
+  }catch(e){toast('Error: '+e.message,'error');}
 }
 
-function loadSettings() {
-  const s = JSON.parse(localStorage.getItem(key('settings')) || '{}');
-  document.getElementById('toggleDeals').checked   = s.deals   !== false;
-  document.getElementById('toggleBlog').checked    = s.blog    === true;
-  document.getElementById('toggleReviews').checked = s.reviews !== false;
-  document.getElementById('toggleGallery').checked = s.gallery !== false;
+async function loadSettings(){
+  try{
+    const d=await DB.get('settings','agent_id=eq.'+agent);
+    if(!d.length) return;
+    const s=d[0];
+    const set=(id,val)=>{const el=document.getElementById(id);if(el)el.checked=val;};
+    set('toggleDeals',s.deals_enabled!==false);
+    set('toggleBlog',s.blog_enabled===true);
+    set('toggleReviews',s.reviews_enabled!==false);
+    set('toggleGallery',s.gallery_enabled!==false);
+    set('blogToggle',s.blog_enabled===true);
+    if(document.getElementById('blogUrl')) document.getElementById('blogUrl').value=s.blog_url||'';
+  }catch(e){}
 }
 
-// ── HELPERS ─────────────────────────────────────────────────
-function calcNights(from, to) {
-  if (!from || !to) return 0;
-  const d = (new Date(to) - new Date(from)) / 86400000;
-  return Math.max(0, Math.round(d));
+// ── SHARED HELPERS ───────────────────────────────────────────
+async function toggleRow(tbl,id,cur){
+  try{await DB.patch(tbl,'id=eq.'+id,{active:!cur});tbl==='deals'?loadDeals():loadTrips();toast(!cur?'Now live ✓':'Hidden');}
+  catch(e){toast('Error','error');}
+}
+async function delRow(tbl,id,cb){
+  if(!confirm('Delete this item?')) return;
+  try{await DB.del(tbl,'id=eq.'+id);cb();toast('Deleted ✓');}
+  catch(e){toast('Error','error');}
 }
 
-function formatDateRange(from, to) {
-  if (!from) return 'Dates TBD';
-  const opts = { month: 'short', day: 'numeric', year: 'numeric' };
-  const f = new Date(from + 'T12:00:00').toLocaleDateString('en-US', opts);
-  if (!to) return f;
-  const t = new Date(to + 'T12:00:00').toLocaleDateString('en-US', opts);
-  return f + ' – ' + t;
+async function callClaude(prompt){
+  const r=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({model:CLAUDE,max_tokens:800,messages:[{role:'user',content:prompt}]})
+  });
+  const d=await r.json();
+  return JSON.parse(d.content[0].text.replace(/```json|```/g,'').trim());
 }
 
-function formatDate(d) {
-  if (!d) return '';
-  return new Date(d + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+function v(id){return document.getElementById(id)?.value?.trim()||'';}
+function set(id,val){const el=document.getElementById(id);if(el)el.textContent=val||'—';}
+function spin(id,on){document.getElementById(id).style.display=on?'flex':'none';}
+function resetForm(ids){ids.forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});}
+function nights(fromId,toId){
+  const f=v(fromId),t=v(toId);
+  if(!f||!t) return 0;
+  return Math.max(0,Math.round((new Date(t)-new Date(f))/86400000));
 }
-
-function typeEmoji(type) {
-  return { cruise: '🚢', resort: '🏖️', tour: '🏛️', package: '✈️', river: '⛵' }[type] || '🌍';
+function dateRange(fromId,toId){
+  const f=v(fromId),t=v(toId);
+  if(!f) return 'Dates TBD';
+  const opts={month:'short',day:'numeric',year:'numeric'};
+  const fd=new Date(f+'T12:00:00').toLocaleDateString('en-US',opts);
+  if(!t) return fd;
+  return fd+' – '+new Date(t+'T12:00:00').toLocaleDateString('en-US',opts);
 }
-
-function toast(msg, type = 'success') {
-  const el = document.getElementById('toast');
-  el.textContent = (type === 'success' ? '✓ ' : '⚠ ') + msg;
-  el.className = 'show ' + type;
-  setTimeout(() => el.className = '', 3000);
+function emoji(type){return{'Ocean Cruise':'🚢','All-Inclusive':'🏖️','Guided Tour':'🏛️','Vacation Package':'✈️','River Cruise':'⛵'}[type]||'🌍';}
+function toast(msg,type='success'){
+  const el=document.getElementById('toast');
+  el.textContent=(type==='success'?'✓ ':'⚠ ')+msg;
+  el.className='show '+type;
+  setTimeout(()=>el.className='',3500);
 }
 </script>
 </body>

@@ -175,14 +175,18 @@
 </footer>
 
 <script>
+  const SB_URL = 'https://yqyinpufmizrscdexlwr.supabase.co';
+  const SB_KEY = 'sb_publishable_T_cxTPA3gwEdEP93W7hnfw_78mr6vLI';
   const AGENT_KEY = 'robert-traversi';
   let allDeals = [];
   let activeFilter = 'all';
 
-  function loadDeals() {
+  async function loadDeals() {
     try {
-      allDeals = JSON.parse(localStorage.getItem(AGENT_KEY + ':deals') || '[]')
-        .filter(d => d.active);
+      const res = await fetch(`${SB_URL}/rest/v1/deals?agent_id=eq.${AGENT_KEY}&active=eq.true&order=created_at.desc`, {
+        headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
+      });
+      allDeals = await res.json();
     } catch { allDeals = []; }
     buildFilters();
     renderDeals(allDeals);
