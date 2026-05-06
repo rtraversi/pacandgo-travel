@@ -465,6 +465,7 @@
 const SB_URL = 'https://yqyinpufmizrscdexlwr.supabase.co';
 const SB_KEY = 'sb_publishable_T_cxTPA3gwEdEP93W7hnfw_78mr6vLI';
 const CLAUDE = 'claude-sonnet-4-20250514';
+const ANTHROPIC_KEY = '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';
 const DEFAULT_PASS = 'pacandgo2026';
 
 let agent = 'robert-traversi';
@@ -1061,7 +1062,12 @@ async function delRow(tbl,id,cb){
 async function callClaude(prompt){
   const r=await fetch('https://api.anthropic.com/v1/messages',{
     method:'POST',
-    headers:{'Content-Type':'application/json'},
+    headers:{
+      'Content-Type':'application/json',
+      'x-api-key':ANTHROPIC_KEY,
+      'anthropic-version':'2023-06-01',
+      'anthropic-dangerous-direct-browser-access':'true'
+    },
     body:JSON.stringify({model:CLAUDE,max_tokens:800,messages:[{role:'user',content:prompt}]})
   });
   const d=await r.json();
