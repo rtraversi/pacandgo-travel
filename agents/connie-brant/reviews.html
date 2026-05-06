@@ -155,7 +155,7 @@
   <a href="gallery.html">Gallery</a>
   <a href="deals.html">Deals</a>
   <a href="reviews.html">Reviews</a>
-  <a href="index.html#contact-form">Contact Robert</a>
+  <a href="index.html#contact-form">Contact Connie</a>
 </div>
 
 <!-- COMING SOON (reviews_enabled = false) -->
@@ -168,8 +168,8 @@
   <div class="coming-soon">
     <div class="cs-icon">⭐</div>
     <h2>Reviews Coming Soon</h2>
-    <p>Robert is collecting client testimonials — check back soon to see what travelers are saying about their experience working with him.</p>
-    <a href="index.html#contact-form" class="btn-primary">Work With Robert ✈</a>
+    <p>Connie is collecting client testimonials — check back soon to see what travelers are saying about their experience working with her.</p>
+    <a href="index.html#contact-form" class="btn-primary">Work With Connie ✈</a>
   </div>
 </div>
 
@@ -178,7 +178,7 @@
   <div class="page-hero">
     <p class="eyebrow">✦ Connie Brant ✦</p>
     <h1>Client Reviews</h1>
-    <p>Real feedback from real travelers who've planned trips with Robert.</p>
+    <p>Real feedback from real travelers who've planned trips with Connie.</p>
     <div class="hero-stats" id="heroStats" style="display:none">
       <div class="hero-stat">
         <div class="hero-stat-num" id="statAvg">—</div>
@@ -206,15 +206,15 @@
 <div class="submit-section" id="submitSection" style="display:none">
   <div class="submit-inner">
     <p class="section-label">Share Your Experience</p>
-    <h2 class="section-title">Leave Robert a Review</h2>
-    <p class="section-sub">Worked with Robert on a trip? He'd love to hear how it went — and your review helps other travelers find the right advisor.</p>
+    <h2 class="section-title">Leave Connie a Review</h2>
+    <p class="section-sub">Worked with Connie on a trip? She'd love to hear how it went — and your review helps other travelers find the right advisor.</p>
 
     <div class="success-msg" id="successMsg">
       <div class="success-icon">
         <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
       </div>
       <h3>Thanks for Your Review!</h3>
-      <p>Robert will review your submission and approve it shortly. We appreciate you taking the time.</p>
+      <p>Connie will review your submission and approve it shortly. We appreciate you taking the time.</p>
     </div>
 
     <form id="reviewForm" novalidate>
@@ -243,7 +243,7 @@
       <div class="form-row col-1">
         <div class="field">
           <label for="rText">Your Review <span class="req">*</span></label>
-          <textarea id="rText" placeholder="Tell others what it was like working with Robert…" required></textarea>
+          <textarea id="rText" placeholder="Tell others what it was like working with Connie…" required></textarea>
         </div>
       </div>
       <div class="submit-area">
@@ -256,8 +256,8 @@
 
 <div class="cta-banner">
   <h2>Ready to Start Planning?</h2>
-  <p>Join the travelers who've trusted Robert with their vacation. Reach out and let's make it happen.</p>
-  <a href="index.html#contact-form" class="btn-primary">Send Robert a Message ✈</a>
+  <p>Join the travelers who've trusted Connie with their vacation. Reach out and let's make it happen.</p>
+  <a href="index.html#contact-form" class="btn-primary">Send Connie a Message ✈</a>
 </div>
 
 <footer>
@@ -331,7 +331,7 @@ function renderReviews(reviews) {
     grid.innerHTML = `<div class="empty-state">
       <div style="font-size:3rem">⭐</div>
       <h3>No Reviews Yet</h3>
-      <p style="color:rgba(255,255,255,0.5);font-size:0.88rem;margin-top:8px;">Be the first to share your experience with Robert!</p>
+      <p style="color:rgba(255,255,255,0.5);font-size:0.88rem;margin-top:8px;">Be the first to share your experience with Connie!</p>
     </div>`;
     return;
   }
@@ -390,7 +390,7 @@ document.getElementById('reviewForm').addEventListener('submit', async e => {
   } catch {
     btn.disabled = false;
     btn.textContent = 'Submit Review ⭐';
-    alert('Something went wrong. Please try again or contact Robert directly.');
+    alert('Something went wrong. Please try again or contact Connie directly.');
   }
 });
 
