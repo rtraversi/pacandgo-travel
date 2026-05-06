@@ -57,6 +57,7 @@ Get-ChildItem "$dest\*.html" | ForEach-Object {
 
     $c = $c -replace "robert-traversi",                        $slug
     $c = $c -replace "Robert Traversi",                        $name
+    $c = $c -replace "\bRobert\b",                             ($name -split ' ')[0]
     $c = $c -replace "pacandgorob@gmail\.com",                 $email
     $c = $c -replace "Travel Specialist · Cruise Expert · Adventure Seeker", $tagline
     $c = $c -replace "robandkaty-profile\.jpg",                $photo
