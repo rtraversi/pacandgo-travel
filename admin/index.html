@@ -676,7 +676,7 @@ async function delGalleryItem(id){
 // ── SETTINGS ────────────────────────────────────────────────
 async function saveSettings(){
   try{
-    await DB.upsert('settings',{
+    await sb('POST','settings','on_conflict=agent_id',{
       agent_id:agent,
       blog_enabled:!!(document.getElementById('blogToggle')?.checked||document.getElementById('toggleBlog')?.checked),
       blog_url:v('blogUrl')||'',
