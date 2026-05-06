@@ -137,6 +137,7 @@
       </div>
       <div class="sidebar-section">
         <div class="sidebar-label">Settings</div>
+        <button class="sidebar-link" onclick="showPanel('profile',this)"><span class="sidebar-icon">👤</span>Profile</button>
         <button class="sidebar-link" onclick="showPanel('settings',this)"><span class="sidebar-icon">⚙️</span>Page Settings</button>
       </div>
       <div class="sidebar-section">
@@ -310,6 +311,59 @@
         <div class="admin-card">
           <div class="card-title">🖼️ Current Gallery (<span id="galleryCount">0</span> photos)</div>
           <div id="galleryList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-top:8px;"></div>
+        </div>
+      </div>
+
+      <!-- PROFILE PANEL -->
+      <div class="panel" id="panel-profile">
+        <div class="panel-header"><h1>Profile</h1><p>Update your bio, photo, tagline, and specialty tags. Changes publish instantly to your Agent+ page.</p></div>
+        <div class="admin-card">
+          <div class="card-title">📸 Profile Photo</div>
+          <div class="fg" style="align-items:flex-end;">
+            <div class="field" style="flex:1;">
+              <label>Photo URL</label>
+              <input type="url" id="profilePhotoUrl" placeholder="https://..." oninput="previewPhoto()" />
+              <div style="font-size:0.75rem;color:rgba(255,255,255,0.35);margin-top:4px;">Paste a direct image URL (Cloudinary, Squarespace CDN, etc.)</div>
+            </div>
+            <div id="profilePhotoPreview" style="width:80px;height:80px;border-radius:50%;overflow:hidden;border:2px solid rgba(201,168,76,0.4);flex-shrink:0;background:rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:center;">
+              <span style="font-size:2rem;color:rgba(255,255,255,0.2);">👤</span>
+            </div>
+          </div>
+        </div>
+        <div class="admin-card">
+          <div class="card-title">🏷️ Tagline</div>
+          <div class="field">
+            <label>Specialty Tagline</label>
+            <input type="text" id="profileTagline" placeholder="e.g. Cruise Expert · Adventure Seeker" maxlength="120" />
+            <div style="font-size:0.75rem;color:rgba(255,255,255,0.35);margin-top:4px;">Appears under your name in the hero — keep it short and punchy.</div>
+          </div>
+        </div>
+        <div class="admin-card">
+          <div class="card-title">🏅 Specialty Tags</div>
+          <div class="field">
+            <label>Tags (comma-separated)</label>
+            <input type="text" id="profileSpecialties" placeholder="Ocean Cruises, All-Inclusive Resorts, European Travel" oninput="previewTags()" />
+            <div style="font-size:0.75rem;color:rgba(255,255,255,0.35);margin-top:4px;">These appear as the gold badge chips under your tagline.</div>
+          </div>
+          <div id="profileTagPreview" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;"></div>
+        </div>
+        <div class="admin-card">
+          <div class="card-title">📝 Bio</div>
+          <div class="field">
+            <label>Bio (separate paragraphs with a blank line)</label>
+            <textarea id="profileBio" rows="10" placeholder="Write your bio here...&#10;&#10;Use a blank line between paragraphs." style="resize:vertical;"></textarea>
+          </div>
+        </div>
+        <button class="btn btn-gold" onclick="saveProfile()" style="margin-top:4px;">Save Profile</button>
+
+        <div class="admin-card" style="margin-top:32px;border-color:rgba(201,168,76,0.2);">
+          <div class="card-title" style="color:rgba(255,255,255,0.4);">⚠️ One-time Supabase setup</div>
+          <p style="font-size:0.82rem;color:rgba(255,255,255,0.35);line-height:1.7;margin-bottom:12px;">If you haven't added profile columns to your settings table yet, run this SQL in the Supabase SQL Editor once:</p>
+          <code style="display:block;background:rgba(0,0,0,0.3);border-radius:6px;padding:12px;font-size:0.78rem;color:#e8c97a;white-space:pre;overflow-x:auto;">ALTER TABLE settings
+  ADD COLUMN IF NOT EXISTS bio       TEXT,
+  ADD COLUMN IF NOT EXISTS tagline   TEXT,
+  ADD COLUMN IF NOT EXISTS photo_url TEXT,
+  ADD COLUMN IF NOT EXISTS specialties TEXT;</code>
         </div>
       </div>
 
@@ -526,7 +580,7 @@ function showPanel(n,el){
   el.classList.add('active');
 }
 function openPage(p){window.open('../'+agent+'/'+p,'_blank');}
-function loadAll(){loadDeals();loadTrips();loadBlog();loadGallery();loadReviews();loadSettings();}
+function loadAll(){loadDeals();loadTrips();loadBlog();loadGallery();loadReviews();loadSettings();loadProfile();}
 
 // ── DEALS ───────────────────────────────────────────────────
 async function loadDeals(){
@@ -847,6 +901,49 @@ async function loadSettings(){
     set('blogToggle',s.blog_enabled===true);
     if(document.getElementById('blogUrl')) document.getElementById('blogUrl').value=s.blog_url||'';
   }catch(e){}
+}
+
+// ── PROFILE ─────────────────────────────────────────────────
+async function loadProfile(){
+  try{
+    const d=await DB.get('settings','agent_id=eq.'+agent);
+    if(!d.length) return;
+    const s=d[0];
+    const set=(id,val)=>{const el=document.getElementById(id);if(el)el.value=val||'';};
+    set('profilePhotoUrl',s.photo_url);
+    set('profileTagline',s.tagline);
+    set('profileSpecialties',s.specialties);
+    set('profileBio',s.bio);
+    previewPhoto();
+    previewTags();
+  }catch(e){}
+}
+async function saveProfile(){
+  try{
+    await sb('POST','settings','on_conflict=agent_id',{
+      agent_id:agent,
+      photo_url:document.getElementById('profilePhotoUrl')?.value||null,
+      tagline:document.getElementById('profileTagline')?.value||null,
+      specialties:document.getElementById('profileSpecialties')?.value||null,
+      bio:document.getElementById('profileBio')?.value||null,
+      updated_at:new Date().toISOString()
+    },'resolution=merge-duplicates,return=representation');
+    toast('Profile saved ✓');
+  }catch(e){toast('Error: '+e.message,'error');}
+}
+function previewPhoto(){
+  const url=document.getElementById('profilePhotoUrl')?.value;
+  const el=document.getElementById('profilePhotoPreview');
+  if(!el) return;
+  if(url){el.innerHTML=`<img src="${url}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML='<span style=font-size:2rem;color:rgba(255,255,255,0.2)>👤</span>'">`;}
+  else{el.innerHTML='<span style="font-size:2rem;color:rgba(255,255,255,0.2)">👤</span>';}
+}
+function previewTags(){
+  const val=document.getElementById('profileSpecialties')?.value||'';
+  const el=document.getElementById('profileTagPreview');
+  if(!el) return;
+  const tags=val.split(',').map(t=>t.trim()).filter(Boolean);
+  el.innerHTML=tags.map(t=>`<span style="background:rgba(201,168,76,0.15);color:#e8c97a;border:1px solid rgba(201,168,76,0.4);font-size:0.72rem;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;padding:4px 10px;border-radius:20px;">${t}</span>`).join('');
 }
 
 // ── SHARED HELPERS ───────────────────────────────────────────
