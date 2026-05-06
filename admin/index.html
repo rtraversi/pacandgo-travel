@@ -358,16 +358,26 @@
             <textarea id="profileBio" rows="10" placeholder="Write your bio here...&#10;&#10;Use a blank line between paragraphs." style="resize:vertical;"></textarea>
           </div>
         </div>
+        <div class="admin-card">
+          <div class="card-title">🏆 Credentials &amp; Highlights</div>
+          <div class="field">
+            <label>These appear as credential cards on your public page.</label>
+          </div>
+          <div id="highlightsPreview" style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;"></div>
+          <button class="btn" id="enhanceHighlightsBtn" onclick="enhanceHighlights()" style="background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;font-size:0.9rem;font-weight:600;margin-bottom:8px;">✨ Enhance with AI</button>
+          <div style="font-size:0.75rem;color:rgba(255,255,255,0.35);margin-top:4px;">Uses your bio, tagline, and specialties to generate 4–5 credential highlights. You can run this any time to refresh.</div>
+        </div>
         <button class="btn btn-gold" onclick="saveProfile()" style="margin-top:4px;">Save Profile</button>
 
         <div class="admin-card" style="margin-top:32px;border-color:rgba(201,168,76,0.2);">
           <div class="card-title" style="color:rgba(255,255,255,0.4);">⚠️ One-time Supabase setup</div>
           <p style="font-size:0.82rem;color:rgba(255,255,255,0.35);line-height:1.7;margin-bottom:12px;">If you haven't added profile columns to your settings table yet, run this SQL in the Supabase SQL Editor once:</p>
           <code style="display:block;background:rgba(0,0,0,0.3);border-radius:6px;padding:12px;font-size:0.78rem;color:#e8c97a;white-space:pre;overflow-x:auto;">ALTER TABLE settings
-  ADD COLUMN IF NOT EXISTS bio       TEXT,
-  ADD COLUMN IF NOT EXISTS tagline   TEXT,
-  ADD COLUMN IF NOT EXISTS photo_url TEXT,
-  ADD COLUMN IF NOT EXISTS specialties TEXT;</code>
+  ADD COLUMN IF NOT EXISTS bio         TEXT,
+  ADD COLUMN IF NOT EXISTS tagline     TEXT,
+  ADD COLUMN IF NOT EXISTS photo_url   TEXT,
+  ADD COLUMN IF NOT EXISTS specialties TEXT,
+  ADD COLUMN IF NOT EXISTS highlights  TEXT;</code>
         </div>
       </div>
 
@@ -948,27 +958,58 @@ async function loadProfile(){
     const d=await DB.get('settings','agent_id=eq.'+agent);
     if(!d.length) return;
     const s=d[0];
-    const set=(id,val)=>{const el=document.getElementById(id);if(el)el.value=val||'';};
-    set('profilePhotoUrl',s.photo_url);
-    set('profileTagline',s.tagline);
-    set('profileSpecialties',s.specialties);
-    set('profileBio',s.bio);
+    const setVal=(id,val)=>{const el=document.getElementById(id);if(el)el.value=val||'';};
+    setVal('profilePhotoUrl',s.photo_url);
+    setVal('profileTagline',s.tagline);
+    setVal('profileSpecialties',s.specialties);
+    setVal('profileBio',s.bio);
     previewPhoto();
     previewTags();
+    if(s.highlights) previewHighlights(JSON.parse(s.highlights));
   }catch(e){}
 }
 async function saveProfile(){
   try{
+    const hlEl=document.getElementById('highlightsPreview');
+    const hlData=hlEl?.dataset.highlights||null;
     await sb('POST','settings','on_conflict=agent_id',{
       agent_id:agent,
       photo_url:document.getElementById('profilePhotoUrl')?.value||null,
       tagline:document.getElementById('profileTagline')?.value||null,
       specialties:document.getElementById('profileSpecialties')?.value||null,
       bio:document.getElementById('profileBio')?.value||null,
+      highlights:hlData,
       updated_at:new Date().toISOString()
     },'resolution=merge-duplicates,return=representation');
     toast('Profile saved ✓');
   }catch(e){toast('Error: '+e.message,'error');}
+}
+function previewHighlights(items){
+  const el=document.getElementById('highlightsPreview');
+  if(!el||!items?.length) return;
+  el.dataset.highlights=JSON.stringify(items);
+  el.innerHTML=items.map(h=>`<div style="display:flex;align-items:flex-start;gap:10px;background:rgba(255,255,255,0.05);border-radius:8px;padding:10px 12px;"><span style="font-size:1.4rem;line-height:1;">${h.icon}</span><div><strong style="color:#e8c97a;font-size:0.85rem;">${h.title}</strong><div style="font-size:0.8rem;color:rgba(255,255,255,0.6);margin-top:2px;">${h.text}</div></div></div>`).join('');
+}
+async function enhanceHighlights(){
+  const bio=document.getElementById('profileBio')?.value?.trim();
+  const tagline=document.getElementById('profileTagline')?.value?.trim();
+  const specialties=document.getElementById('profileSpecialties')?.value?.trim();
+  if(!bio&&!tagline&&!specialties) return toast('Fill in bio, tagline, or specialties first','error');
+  const btn=document.getElementById('enhanceHighlightsBtn');
+  btn.disabled=true; btn.textContent='Generating…';
+  try{
+    const prompt=`Travel agent profile. Return JSON array only, no markdown.
+Bio: ${bio||'—'}
+Tagline: ${tagline||'—'}
+Specialties: ${specialties||'—'}
+Generate 4-5 credential highlights. Each: {"icon":"single emoji","title":"short bold label (3-5 words)","text":"one compelling sentence"}
+Return as a JSON array.`;
+    const items=await callClaude(prompt);
+    previewHighlights(items);
+    await saveProfile();
+    toast('Highlights generated & saved ✓');
+  }catch(e){toast('AI error: '+e.message,'error');}
+  finally{btn.disabled=false; btn.textContent='✨ Enhance with AI';}
 }
 function previewPhoto(){
   const url=document.getElementById('profilePhotoUrl')?.value;

@@ -548,6 +548,7 @@
   <div>
     <div class="credentials-card">
       <h3>Credentials & Highlights</h3>
+      <div id="profileHighlights">
       <div class="cred-item">
         <span class="cred-icon">✈️</span>
         <div class="cred-text">
@@ -561,6 +562,7 @@
           <strong>Licensed &amp; Certified</strong>
           ITA · CLIA #{{CLIA}} · Florida Seller of Travel #{{SOT}}
         </div>
+      </div>
       </div>
       <div style="margin-top:24px;">
         <a href="#contact-form" class="btn-primary" style="display:block; text-align:center;">Book a Consultation</a>
@@ -945,7 +947,7 @@
   const SB_KEY='sb_publishable_T_cxTPA3gwEdEP93W7hnfw_78mr6vLI';
   const AGENT='{{SLUG}}';
   try{
-    const r=await fetch(`${SB_URL}/rest/v1/settings?agent_id=eq.${AGENT}&select=photo_url,tagline,specialties,bio`,
+    const r=await fetch(`${SB_URL}/rest/v1/settings?agent_id=eq.${AGENT}&select=photo_url,tagline,specialties,bio,highlights`,
       {headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}});
     const d=await r.json();
     if(!d.length) return;
@@ -965,6 +967,13 @@
         const paras=s.bio.split(/\n\n+/).map(p=>p.trim()).filter(Boolean);
         el.innerHTML=paras.map(p=>`<p>${p}</p>`).join('');
       }
+    }
+    if(s.highlights){
+      const el=document.getElementById('profileHighlights');
+      if(el){try{
+        const items=JSON.parse(s.highlights);
+        el.innerHTML=items.map(h=>`<div class="cred-item"><span class="cred-icon">${h.icon}</span><div class="cred-text"><strong>${h.title}</strong> ${h.text}</div></div>`).join('');
+      }catch(e){}}
     }
   }catch(e){}
 })();
