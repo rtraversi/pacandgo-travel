@@ -398,8 +398,12 @@
         <div class="admin-card">
           <div class="card-title">👤 Agent Details</div>
           <div class="fg">
-            <div class="field"><label>Full Name <span style="color:#e74c3c">*</span></label><input type="text" id="newAgentName" placeholder="e.g. Patty Wells" oninput="autoSlug()" /></div>
+            <div class="field"><label>First Name <span style="color:#e74c3c">*</span></label><input type="text" id="newAgentFirst" placeholder="e.g. Patty" oninput="autoSlug()" /></div>
+            <div class="field"><label>Last Name <span style="color:#e74c3c">*</span></label><input type="text" id="newAgentLast" placeholder="e.g. Wells" oninput="autoSlug()" /></div>
+          </div>
+          <div class="fg">
             <div class="field"><label>URL Slug <span style="color:#e74c3c">*</span></label><input type="text" id="newAgentSlug" placeholder="e.g. patty-wells" /></div>
+            <div class="field" style="flex:0 0 auto;align-self:flex-end;"><div style="font-size:0.75rem;color:rgba(255,255,255,0.35);padding-bottom:10px;">Auto-generated from name</div></div>
           </div>
           <div class="fg">
             <div class="field"><label>Email Address <span style="color:#e74c3c">*</span></label><input type="email" id="newAgentEmail" placeholder="e.g. patty@email.com" /></div>
@@ -411,7 +415,7 @@
             <div class="field"><label>Profile Photo Filename</label><input type="text" id="newAgentPhoto" placeholder="patty-profile.jpg" /></div>
           </div>
           <div style="margin-top:16px;padding:14px 16px;background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.2);border-radius:8px;font-size:0.82rem;color:rgba(255,255,255,0.6);line-height:1.7;">
-            <strong style="color:var(--gold);">After running the script:</strong> edit the bio in <code>agents/slug/index.html</code>, place the profile photo in <code>images/uploads/</code>, run the Supabase SQL shown in the output, then deploy.
+            <strong style="color:var(--gold);">After running the script:</strong> run the Supabase SQL below, add the agent to the switcher above, then open the <strong>Profile</strong> panel in admin to upload a photo and fill in their bio — no file editing needed.
           </div>
           <button class="btn btn-gold" onclick="generateAgentScript()" style="margin-top:16px;">⬇ Generate &amp; Download Script</button>
         </div>
@@ -435,7 +439,8 @@
           <div class="card-title">📋 Existing Agent+ Pages</div>
           <div style="display:flex;flex-direction:column;gap:8px;font-size:0.85rem;color:rgba(255,255,255,0.7);">
             <div>🚢 <strong style="color:var(--gold);">Robert Traversi</strong> — <code>agents/robert-traversi/</code></div>
-            <div style="color:rgba(255,255,255,0.3);font-size:0.8rem;">Run the script above to add Patty Wells, Connie Brant, or any future agent.</div>
+            <div>🌺 <strong style="color:var(--gold);">Patty Wells</strong> — <code>agents/patty-wells/</code></div>
+            <div style="color:rgba(255,255,255,0.3);font-size:0.8rem;margin-top:4px;">Fill in the form above and download the script to add any future agent. The script uses <code>agents/template/</code> as its base — all personal info will be blank until filled in via the Profile panel.</div>
           </div>
         </div>
       </div>
@@ -500,60 +505,85 @@ function changePassword(){
 
 // ── ADD AGENT ───────────────────────────────────────────────
 function autoSlug(){
-  const n=document.getElementById('newAgentName').value;
-  const s=n.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+  const first=(document.getElementById('newAgentFirst').value||'').trim();
+  const last=(document.getElementById('newAgentLast').value||'').trim();
+  const full=(first+' '+last).trim();
+  const s=full.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
   document.getElementById('newAgentSlug').value=s;
 }
 function generateAgentScript(){
-  const name   =document.getElementById('newAgentName').value.trim();
+  const first  =document.getElementById('newAgentFirst').value.trim();
+  const last   =document.getElementById('newAgentLast').value.trim();
+  const full   =first+' '+last;
   const slug   =document.getElementById('newAgentSlug').value.trim();
   const email  =document.getElementById('newAgentEmail').value.trim();
   const tagline=document.getElementById('newAgentTagline').value.trim()||'Travel Specialist';
   const clia   =document.getElementById('newAgentClia').value.trim()||'456611';
   const sot    =document.getElementById('newAgentSot').value.trim()||'40802';
   const photo  =document.getElementById('newAgentPhoto').value.trim()||'agent-profile.jpg';
-  if(!name||!slug||!email) return toast('Name, slug, and email are required','error');
+  if(!first||!last||!slug||!email) return toast('First name, last name, slug, and email are required','error');
   const nl='\r\n';
   const q=s=>`"${s}"`;
+  // Build a self-contained, non-interactive script using the template folder
   let ps='Set-Location $PSScriptRoot'+nl;
-  ps+='# Generated by PAC and GO Admin - '+new Date().toLocaleDateString()+nl;
-  ps+='# New Agent: '+name+nl+nl;
-  ps+='$name    = '+q(name)+nl;
-  ps+='$slug    = '+q(slug)+nl;
-  ps+='$email   = '+q(email)+nl;
-  ps+='$tagline = '+q(tagline)+nl;
-  ps+='$clia    = '+q(clia)+nl;
-  ps+='$sot     = '+q(sot)+nl;
-  ps+='$photo   = '+q(photo)+nl+nl;
-  ps+='$src  = "$PSScriptRoot\\agents\\robert-traversi"'+nl;
+  ps+='# Generated by PAC and GO Admin — '+new Date().toLocaleDateString()+nl;
+  ps+='# New Agent: '+full+nl+nl;
+  ps+='$firstName = '+q(first)+nl;
+  ps+='$lastName  = '+q(last)+nl;
+  ps+='$fullName  = '+q(full)+nl;
+  ps+='$slug      = '+q(slug)+nl;
+  ps+='$email     = '+q(email)+nl;
+  ps+='$tagline   = '+q(tagline)+nl;
+  ps+='$clia      = '+q(clia)+nl;
+  ps+='$sot       = '+q(sot)+nl;
+  ps+='$photo     = '+q(photo)+nl+nl;
+  ps+='$src  = "$PSScriptRoot\\agents\\template"'+nl;
   ps+='$dest = "$PSScriptRoot\\agents\\$slug"'+nl+nl;
   ps+='if (Test-Path $dest) { Remove-Item $dest -Recurse -Force }'+nl;
   ps+='Write-Host "Copying template..." -ForegroundColor Cyan'+nl;
   ps+='Copy-Item $src $dest -Recurse'+nl+nl;
-  ps+='Write-Host "Replacing values..." -ForegroundColor Cyan'+nl;
+  ps+='Write-Host "Replacing tokens..." -ForegroundColor Cyan'+nl;
+  ps+='$photoVal = if ($photo -match "^https?://") { $photo } else { [System.IO.Path]::GetFileName($photo) }'+nl;
   ps+='Get-ChildItem "$dest\\*.html" | ForEach-Object {'+nl;
   ps+='    $c = Get-Content $_.FullName -Raw -Encoding UTF8'+nl;
-  ps+='    $c = $c -replace "robert-traversi",                                 $slug'+nl;
-  ps+='    $c = $c -replace "Robert Traversi",                                 $name'+nl;
-  ps+='    $c = $c -replace "pacandgorob@gmail\\.com",                         $email'+nl;
-  ps+='    $c = $c -replace "Travel Specialist · Cruise Expert · Adventure Seeker", $tagline'+nl;
-  ps+='    $c = $c -replace "robandkaty-profile\\.jpg",                        $photo'+nl;
-  ps+='    $c = $c -replace "CLIA #456611",                                    "CLIA #$clia"'+nl;
-  ps+='    $c = $c -replace "Florida Seller of Travel #40802",                 "Florida Seller of Travel #$sot"'+nl;
+  ps+='    $c = $c -replace "\\{\\{SLUG\\}\\}",   $slug'+nl;
+  ps+='    $c = $c -replace "\\{\\{FULL\\}\\}",   $fullName'+nl;
+  ps+='    $c = $c -replace "\\{\\{FIRST\\}\\}",  $firstName'+nl;
+  ps+='    $c = $c -replace "\\{\\{LAST\\}\\}",   $lastName'+nl;
+  ps+='    $c = $c -replace "\\{\\{EMAIL\\}\\}",  $email'+nl;
+  ps+='    $c = $c -replace "\\{\\{TAGLINE\\}\\}",$tagline'+nl;
+  ps+='    $c = $c -replace "\\{\\{PHOTO\\}\\}",  $photoVal'+nl;
+  ps+='    $c = $c -replace "\\{\\{CLIA\\}\\}",   $clia'+nl;
+  ps+='    $c = $c -replace "\\{\\{SOT\\}\\}",    $sot'+nl;
+  ps+='    if ($photoVal -notmatch "^https?://") {'+nl;
+  ps+='        $c = $c -replace "agent-profile\\.jpg", $photoVal'+nl;
+  ps+='    } else {'+nl;
+  ps+='        $c = $c -replace "../../images/uploads/agent-profile\\.jpg", $photoVal'+nl;
+  ps+='    }'+nl;
   ps+='    Set-Content $_.FullName $c -Encoding UTF8 -NoNewline'+nl;
   ps+='}'+nl+nl;
-  ps+='$sc = Get-Content "$PSScriptRoot\\agents\\robert-traversi.html" -Raw -Encoding UTF8'+nl;
-  ps+='$sc = $sc -replace "robert-traversi", $slug'+nl;
-  ps+='$sc = $sc -replace "Robert Traversi",  $name'+nl;
-  ps+='Set-Content "$PSScriptRoot\\agents\\$slug.html" $sc -Encoding UTF8 -NoNewline'+nl+nl;
-  ps+='Write-Host "" '+nl;
-  ps+='Write-Host "Done! agents\\$slug\\ is ready." -ForegroundColor Green'+nl;
+  ps+='$inner = "$dest\\template.html"'+nl;
+  ps+='if (Test-Path $inner) { Rename-Item $inner "$dest\\$slug.html" }'+nl+nl;
+  ps+='$shell = @"'+nl;
+  ps+='<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8" />'+nl;
+  ps+='<meta http-equiv="refresh" content="0; url=$slug/index.html" />'+nl;
+  ps+='<title>$fullName — PAC and GO Travel</title></head>'+nl;
+  ps+='<body><p>Redirecting to <a href="$slug/index.html">$($fullName)\'s page</a>…</p></body></html>'+nl;
+  ps+='"@'+nl;
+  ps+='Set-Content "$PSScriptRoot\\agents\\$slug.html" $shell -Encoding UTF8 -NoNewline'+nl+nl;
+  ps+='$deployFile = "$PSScriptRoot\\deploy.ps1"'+nl;
+  ps+='$dc = Get-Content $deployFile -Raw -Encoding UTF8'+nl;
+  ps+='$line = "    Copy-Item `"$PSScriptRoot\\agents\\$slug`" `"$dest\\agents\\`" -Recurse -Force"'+nl;
+  ps+='if ($dc -notmatch [regex]::Escape("agents\\$slug")) {'+nl;
+  ps+='    $dc = $dc -replace \'(    Copy-Item "\\$PSScriptRoot\\\\agents\\\\robert-traversi".*?-Force)\', "$1`n$line"'+nl;
+  ps+='    Set-Content $deployFile $dc -Encoding UTF8 -NoNewline'+nl;
+  ps+='}'+nl+nl;
   ps+='Write-Host ""'+nl;
+  ps+='Write-Host "Done! agents\\$slug\\ is ready." -ForegroundColor Green'+nl;
   ps+='Write-Host "Next steps:" -ForegroundColor Yellow'+nl;
-  ps+='Write-Host "  1. Edit bio in agents\\$slug\\index.html (search bio-text)"'+nl;
-  ps+='Write-Host "  2. Place photo at images\\uploads\\$photo"'+nl;
-  ps+='Write-Host "  3. Run in Supabase SQL Editor:"'+nl;
-  ps+='Write-Host "     INSERT INTO settings (agent_id) VALUES (\'$slug\');" -ForegroundColor White'+nl;
+  ps+='Write-Host "  1. Add to admin agent switcher (search agentSwitcher in admin/index.html)"'+nl;
+  ps+='Write-Host "  2. Run the Supabase SQL shown above"'+nl;
+  ps+='Write-Host "  3. Open admin > Profile to upload photo and fill in bio"'+nl;
   ps+='Write-Host "  4. Run deploy.ps1 to publish"'+nl;
   ps+='Write-Host ""'+nl;
   const filename='new-agent-'+slug+'.ps1';
@@ -562,8 +592,13 @@ function generateAgentScript(){
   a.href=URL.createObjectURL(blob);
   a.download=filename;
   a.click();
-  // Show success card
-  const sql="INSERT INTO settings (agent_id) VALUES ('"+slug+"');";
+  // Build Supabase SQL — upsert with bio/specialties/photo/tagline if provided
+  const sqlParts=[];
+  if(tagline) sqlParts.push(`tagline = '${tagline.replace(/'/g,"''")}'`);
+  if(photo && photo.match(/^https?:\/\//)) sqlParts.push(`photo_url = '${photo.replace(/'/g,"''")}'`);
+  const sql=sqlParts.length
+    ? `INSERT INTO settings (agent_id) VALUES ('${slug}') ON CONFLICT (agent_id) DO UPDATE SET ${sqlParts.join(', ')};`
+    : `INSERT INTO settings (agent_id) VALUES ('${slug}') ON CONFLICT (agent_id) DO NOTHING;`;
   document.getElementById('agentScriptFilename').textContent=filename;
   document.getElementById('agentScriptRun').textContent='.\\'+filename;
   document.getElementById('agentScriptSql').textContent=sql;

@@ -1,0 +1,266 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Featured Deals | {{FULL}} — PAC and GO Travel</title>
+  <meta name="description" content="Handpicked cruise and vacation deals from {{FULL}} — PAC and GO Travel specialist." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy:  #0d2b45; --ocean: #1a5276; --gold:  #c9a84c; --gold-light: #e8c97a;
+      --sand:  #f5f0e8; --white: #ffffff; --gray:  #5d6d7e; --light: #eaf2f8;
+      --card-bg: #f8fafc;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Lato', sans-serif; color: var(--navy); background: var(--white); }
+
+    /* NAV */
+    .top-bar { background: var(--gold); text-align: center; padding: 7px 5%; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--navy); }
+    .top-bar a { color: var(--navy); text-decoration: none; }
+    nav { position: sticky; top: 0; z-index: 100; background: var(--navy); border-bottom: 2px solid rgba(201,168,76,0.4); padding: 0 5%; height: 68px; display: flex; align-items: center; justify-content: space-between; }
+    .nav-left { display: flex; align-items: center; gap: 20px; }
+    .nav-logo img { height: 48px; width: auto; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.4)); }
+    .nav-logo { text-decoration: none; }
+    .nav-divider { width: 1px; height: 32px; background: rgba(201,168,76,0.35); }
+    .nav-agent-name { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; color: var(--gold); }
+    .nav-links { display: flex; align-items: center; gap: 4px; list-style: none; }
+    .nav-links a { color: rgba(255,255,255,0.75); text-decoration: none; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 8px 12px; border-radius: 4px; transition: color 0.2s, background 0.2s; }
+    .nav-links a:hover { color: var(--gold); background: rgba(255,255,255,0.06); }
+    .nav-links a.active { color: var(--gold); }
+    .nav-cta { background: var(--gold) !important; color: var(--navy) !important; padding: 8px 18px !important; border-radius: 4px !important; }
+    .nav-hamburger { display: none; background: none; border: none; cursor: pointer; padding: 6px; }
+    .nav-hamburger span { display: block; width: 22px; height: 2px; background: var(--white); margin: 4px 0; }
+    .mobile-menu { display: none; position: fixed; top: 68px; left: 0; right: 0; background: var(--navy); border-top: 1px solid rgba(201,168,76,0.3); padding: 16px 5%; z-index: 99; }
+    .mobile-menu.open { display: block; }
+    .mobile-menu a { display: block; color: rgba(255,255,255,0.8); text-decoration: none; font-size: 0.9rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .mobile-menu a:last-child { border-bottom: none; }
+
+    /* HERO */
+    .page-hero { background: linear-gradient(135deg, var(--navy) 0%, var(--ocean) 100%); padding: 56px 5%; text-align: center; color: var(--white); }
+    .page-hero .eyebrow { font-size: 0.68rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); font-weight: 700; margin-bottom: 12px; }
+    .page-hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(2rem, 4vw, 3rem); margin-bottom: 12px; }
+    .page-hero p { font-size: 0.97rem; color: rgba(255,255,255,0.7); max-width: 520px; margin: 0 auto; }
+
+    /* FILTERS */
+    .filters-bar { background: var(--sand); padding: 20px 5%; border-bottom: 1px solid rgba(201,168,76,0.15); }
+    .filters-inner { max-width: 1140px; margin: 0 auto; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .filter-btn { background: var(--white); border: 1px solid rgba(0,0,0,0.1); color: var(--gray); padding: 7px 16px; border-radius: 24px; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+    .filter-btn:hover, .filter-btn.active { background: var(--navy); color: var(--white); border-color: var(--navy); }
+
+    /* DEALS GRID */
+    .deals-section { max-width: 1140px; margin: 0 auto; padding: 56px 5%; }
+    .deals-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .deal-card {
+      background: var(--white); border-radius: 14px; overflow: hidden;
+      border: 1px solid rgba(201,168,76,0.2);
+      display: flex; flex-direction: column;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .deal-card:hover { transform: translateY(-4px); box-shadow: 0 16px 48px rgba(0,0,0,0.1); }
+    .deal-card-header { padding: 28px 28px 24px; background: linear-gradient(135deg, var(--navy), var(--ocean)); color: var(--white); }
+    .deal-card-emoji { font-size: 2rem; margin-bottom: 12px; display: block; }
+    .deal-tag { display: inline-block; background: rgba(201,168,76,0.25); color: var(--gold); font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; margin-bottom: 10px; }
+    .deal-card h3 { font-family: 'Playfair Display', serif; font-size: 1.2rem; margin-bottom: 6px; }
+    .deal-card-line { font-size: 0.82rem; color: rgba(255,255,255,0.6); }
+    .deal-card-body { padding: 20px 28px 28px; flex: 1; display: flex; flex-direction: column; gap: 12px; }
+    .deal-meta { display: flex; flex-direction: column; gap: 6px; }
+    .deal-meta-row { display: flex; align-items: flex-start; gap: 8px; font-size: 0.83rem; color: var(--gray); }
+    .deal-meta-icon { flex-shrink: 0; margin-top: 1px; }
+    .deal-desc { font-size: 0.85rem; color: var(--gray); line-height: 1.7; flex: 1; }
+    .deal-price-row { display: flex; align-items: baseline; gap: 6px; padding-top: 4px; border-top: 1px solid rgba(201,168,76,0.15); }
+    .deal-from { font-size: 0.72rem; color: var(--gray); text-transform: uppercase; letter-spacing: 0.05em; }
+    .deal-price { font-family: 'Playfair Display', serif; font-size: 1.7rem; font-weight: 700; color: var(--navy); }
+    .deal-pp { font-size: 0.78rem; color: var(--gray); }
+    .deal-cta { display: block; text-align: center; background: var(--gold); color: var(--navy); padding: 12px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 0.82rem; letter-spacing: 0.06em; text-transform: uppercase; transition: background 0.2s; margin-top: auto; }
+    .deal-cta:hover { background: var(--gold-light); }
+
+    /* EMPTY STATE */
+    .empty-state { text-align: center; padding: 80px 24px; grid-column: 1/-1; }
+    .empty-icon { font-size: 3rem; margin-bottom: 16px; }
+    .empty-state h3 { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--navy); margin-bottom: 8px; }
+    .empty-state p { color: var(--gray); font-size: 0.9rem; margin-bottom: 24px; }
+    .btn-primary { display: inline-block; background: var(--gold); color: var(--navy); padding: 13px 28px; border-radius: 6px; text-decoration: none; font-weight: 700; font-size: 0.88rem; letter-spacing: 0.06em; text-transform: uppercase; transition: background 0.2s; }
+    .btn-primary:hover { background: var(--gold-light); }
+
+    /* CTA BANNER */
+    .cta-banner { background: linear-gradient(135deg, var(--navy), var(--ocean)); padding: 64px 5%; text-align: center; color: var(--white); }
+    .cta-banner h2 { font-family: 'Playfair Display', serif; font-size: 2rem; margin-bottom: 12px; }
+    .cta-banner p { color: rgba(255,255,255,0.7); margin-bottom: 32px; font-size: 0.95rem; }
+
+    /* FOOTER */
+    footer { background: #08192a; border-top: 1px solid rgba(201,168,76,0.2); padding: 32px 5%; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+    .footer-left { font-size: 0.8rem; color: rgba(255,255,255,0.45); }
+    .footer-left a { color: var(--gold); text-decoration: none; }
+    .footer-right { display: flex; gap: 20px; flex-wrap: wrap; }
+    .footer-right a { font-size: 0.78rem; color: rgba(255,255,255,0.45); text-decoration: none; transition: color 0.2s; }
+    .footer-right a:hover { color: var(--gold); }
+
+    @media (max-width: 960px) {
+      .nav-links { display: none; } .nav-hamburger { display: block; }
+      .deals-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 600px) {
+      .deals-grid { grid-template-columns: 1fr; }
+      footer { flex-direction: column; text-align: center; }
+      .footer-right { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="top-bar"><a href="../../index.html">← Back to PAC and GO Travel</a></div>
+
+<nav>
+  <div class="nav-left">
+    <a href="../../index.html" class="nav-logo"><img src="../../logo.png" alt="PAC and GO Travel" /></a>
+    <div class="nav-divider"></div>
+    <span class="nav-agent-name">{{FULL}}</span>
+  </div>
+  <ul class="nav-links">
+    <li><a href="index.html">About</a></li>
+    <li><a href="specialties.html">Specialties</a></li>
+    <li><a href="blog.html">Travel Blog</a></li>
+    <li><a href="gallery.html">Gallery</a></li>
+    <li><a href="trips.html">Sail With Me</a></li>
+    <li><a href="deals.html" class="active">Deals</a></li>
+    <li><a href="reviews.html">Reviews</a></li>
+    <li><a href="index.html#contact-form" class="nav-cta">Contact</a></li>
+  </ul>
+  <button class="nav-hamburger" id="hamburger"><span></span><span></span><span></span></button>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html">About</a>
+  <a href="specialties.html">Specialties</a>
+  <a href="blog.html">Travel Blog</a>
+  <a href="gallery.html">Gallery</a>
+  <a href="trips.html">Sail With Me</a>
+  <a href="deals.html">Deals</a>
+  <a href="reviews.html">Reviews</a>
+  <a href="index.html#contact-form">Contact {{FIRST}}</a>
+</div>
+
+<div class="page-hero">
+  <p class="eyebrow">✦ {{FIRST}}'s Picks ✦</p>
+  <h1>Featured Deals</h1>
+  <p>Handpicked cruises, resorts, and packages {{FIRST}} is excited about right now. Prices change — ask quickly.</p>
+</div>
+
+<div class="filters-bar">
+  <div class="filters-inner" id="filtersBar">
+    <button class="filter-btn active" onclick="filterDeals('all', this)">All Deals</button>
+  </div>
+</div>
+
+<div class="deals-section">
+  <div class="deals-grid" id="dealsGrid">
+    <!-- populated by JS -->
+  </div>
+</div>
+
+<div class="cta-banner">
+  <h2>Don't See What You're Looking For?</h2>
+  <p>{{FIRST}} can find deals that aren't listed here. Tell them your dream trip and they'll make it happen.</p>
+  <a href="index.html#contact-form" class="btn-primary">Send {{FIRST}} a Message ✈</a>
+</div>
+
+<footer>
+  <div class="footer-left">© 2026 <a href="../../index.html">PAC and GO Travel</a> · {{FULL}}, ITA · CLIA #{{CLIA}} · Florida Seller of Travel #{{SOT}}</div>
+  <div class="footer-right">
+    <a href="index.html">About</a>
+    <a href="specialties.html">Specialties</a>
+    <a href="../../privacy.html">Privacy Policy</a>
+    <a href="index.html#contact-form">Contact</a>
+  </div>
+</footer>
+
+<script>
+  const SB_URL = 'https://yqyinpufmizrscdexlwr.supabase.co';
+  const SB_KEY = 'sb_publishable_T_cxTPA3gwEdEP93W7hnfw_78mr6vLI';
+  const AGENT_KEY = '{{SLUG}}';
+  let allDeals = [];
+  let activeFilter = 'all';
+
+  async function loadDeals() {
+    try {
+      const res = await fetch(`${SB_URL}/rest/v1/deals?agent_id=eq.${AGENT_KEY}&active=eq.true&order=created_at.desc`, {
+        headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
+      });
+      allDeals = await res.json();
+    } catch { allDeals = []; }
+    buildFilters();
+    renderDeals(allDeals);
+  }
+
+  function buildFilters() {
+    const types = [...new Set(allDeals.map(d => d.category || d.type).filter(Boolean))];
+    const bar = document.getElementById('filtersBar');
+    bar.innerHTML = '<button class="filter-btn active" onclick="filterDeals(\'all\', this)">All Deals</button>';
+    types.forEach(t => {
+      const btn = document.createElement('button');
+      btn.className = 'filter-btn';
+      btn.textContent = t;
+      btn.onclick = function() { filterDeals(t, this); };
+      bar.appendChild(btn);
+    });
+  }
+
+  function filterDeals(type, btn) {
+    activeFilter = type;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const filtered = type === 'all' ? allDeals : allDeals.filter(d => (d.category || d.type) === type);
+    renderDeals(filtered);
+  }
+
+  function renderDeals(deals) {
+    const grid = document.getElementById('dealsGrid');
+    if (!deals.length) {
+      grid.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">🏷️</div>
+          <h3>No Deals Right Now</h3>
+          <p>Check back soon — {{FIRST}} regularly adds new handpicked deals. Or reach out and they'll find something just for you.</p>
+          <a href="index.html#contact-form" class="btn-primary">Ask {{FIRST}} for a Deal →</a>
+        </div>`;
+      return;
+    }
+
+    grid.innerHTML = deals.map(d => `
+      <div class="deal-card">
+        <div class="deal-card-header">
+          <span class="deal-card-emoji">${d.emoji || '🚢'}</span>
+          <span class="deal-tag">${d.category || d.type || 'Deal'}</span>
+          <h3>${d.title || d.ship}</h3>
+          <div class="deal-card-line">${d.line}</div>
+        </div>
+        <div class="deal-card-body">
+          <div class="deal-meta">
+            ${d.dates ? `<div class="deal-meta-row"><span class="deal-meta-icon">📅</span><span>${d.dates}</span></div>` : ''}
+            ${d.nights ? `<div class="deal-meta-row"><span class="deal-meta-icon">🌙</span><span>${d.nights}</span></div>` : ''}
+            ${d.port ? `<div class="deal-meta-row"><span class="deal-meta-icon">⚓</span><span>Departs ${d.port}</span></div>` : ''}
+            ${d.ports ? `<div class="deal-meta-row"><span class="deal-meta-icon">🗺️</span><span>${d.ports}</span></div>` : ''}
+          </div>
+          ${d.desc ? `<p class="deal-desc">${d.desc}</p>` : ''}
+          <div class="deal-price-row">
+            <span class="deal-from">From</span>
+            <span class="deal-price">${d.price || 'Call for Price'}</span>
+            <span class="deal-pp">per person</span>
+          </div>
+          <a href="index.html#contact-form" class="deal-cta">Ask {{FIRST}} About This →</a>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // Nav hamburger
+  document.getElementById('hamburger').addEventListener('click', () => {
+    document.getElementById('mobileMenu').classList.toggle('open');
+  });
+
+  loadDeals();
+</script>
+</body>
+</html>
