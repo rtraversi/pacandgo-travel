@@ -140,6 +140,10 @@
         <button class="sidebar-link" onclick="showPanel('settings',this)"><span class="sidebar-icon">⚙️</span>Page Settings</button>
       </div>
       <div class="sidebar-section">
+        <div class="sidebar-label">Management</div>
+        <button class="sidebar-link" onclick="showPanel('add-agent',this)"><span class="sidebar-icon">➕</span>Add New Agent+</button>
+      </div>
+      <div class="sidebar-section">
         <div class="sidebar-label">Quick Links</div>
         <button class="sidebar-link" onclick="openPage('index.html')"><span class="sidebar-icon">🔗</span>View Agent Page</button>
         <button class="sidebar-link" onclick="openPage('deals.html')"><span class="sidebar-icon">🔗</span>View Deals Page</button>
@@ -330,6 +334,54 @@
         </div>
       </div>
 
+      <!-- ADD AGENT PANEL -->
+      <div class="panel" id="panel-add-agent">
+        <div class="panel-header"><h1>Add New Agent+</h1><p>Fill in the details below and download a ready-to-run setup script. Run it from <strong>C:\sites\pacnandgotravel\</strong> in PowerShell.</p></div>
+        <div class="admin-card">
+          <div class="card-title">👤 Agent Details</div>
+          <div class="fg">
+            <div class="field"><label>Full Name <span style="color:#e74c3c">*</span></label><input type="text" id="newAgentName" placeholder="e.g. Patty Wells" oninput="autoSlug()" /></div>
+            <div class="field"><label>URL Slug <span style="color:#e74c3c">*</span></label><input type="text" id="newAgentSlug" placeholder="e.g. patty-wells" /></div>
+          </div>
+          <div class="fg">
+            <div class="field"><label>Email Address <span style="color:#e74c3c">*</span></label><input type="email" id="newAgentEmail" placeholder="e.g. patty@email.com" /></div>
+            <div class="field"><label>Specialty Tagline</label><input type="text" id="newAgentTagline" placeholder="e.g. All-Inclusive &amp; Caribbean Expert" /></div>
+          </div>
+          <div class="fg fg3">
+            <div class="field"><label>CLIA Number</label><input type="text" id="newAgentClia" placeholder="456611" /></div>
+            <div class="field"><label>FL Seller of Travel #</label><input type="text" id="newAgentSot" placeholder="40802" /></div>
+            <div class="field"><label>Profile Photo Filename</label><input type="text" id="newAgentPhoto" placeholder="patty-profile.jpg" /></div>
+          </div>
+          <div style="margin-top:16px;padding:14px 16px;background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.2);border-radius:8px;font-size:0.82rem;color:rgba(255,255,255,0.6);line-height:1.7;">
+            <strong style="color:var(--gold);">After running the script:</strong> edit the bio in <code>agents/slug/index.html</code>, place the profile photo in <code>images/uploads/</code>, run the Supabase SQL shown in the output, then deploy.
+          </div>
+          <button class="btn btn-gold" onclick="generateAgentScript()" style="margin-top:16px;">⬇ Generate &amp; Download Script</button>
+        </div>
+
+        <!-- SUCCESS CARD — shown after script downloads -->
+        <div class="admin-card" id="agentScriptReady" style="display:none;border:1px solid rgba(39,174,96,0.4);background:rgba(39,174,96,0.07);">
+          <div class="card-title" style="color:#2ecc71;">✅ Script Ready — <span id="agentScriptFilename" style="font-family:monospace;font-weight:400;font-size:0.9rem;"></span></div>
+          <div style="font-size:0.85rem;color:rgba(255,255,255,0.75);line-height:1.9;margin-bottom:16px;">
+            <div>1. Open PowerShell in <code>C:\sites\pacnandgotravel\</code></div>
+            <div>2. Run: <code id="agentScriptRun" style="color:#2ecc71;"></code></div>
+            <div>3. Run this in <strong>Supabase SQL Editor</strong> after the script finishes:</div>
+          </div>
+          <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:12px 16px;font-family:monospace;font-size:0.85rem;color:#e8c97a;display:flex;align-items:center;justify-content:space-between;gap:12px;">
+            <span id="agentScriptSql"></span>
+            <button onclick="copyAgentSql()" style="background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.3);color:var(--gold);padding:4px 12px;border-radius:4px;cursor:pointer;font-size:0.75rem;white-space:nowrap;">Copy SQL</button>
+          </div>
+          <div style="font-size:0.8rem;color:rgba(255,255,255,0.4);margin-top:14px;">4. Edit the bio · place the profile photo · run <code>deploy.ps1</code></div>
+        </div>
+
+        <div class="admin-card">
+          <div class="card-title">📋 Existing Agent+ Pages</div>
+          <div style="display:flex;flex-direction:column;gap:8px;font-size:0.85rem;color:rgba(255,255,255,0.7);">
+            <div>🚢 <strong style="color:var(--gold);">Robert Traversi</strong> — <code>agents/robert-traversi/</code></div>
+            <div style="color:rgba(255,255,255,0.3);font-size:0.8rem;">Run the script above to add Patty Wells, Connie Brant, or any future agent.</div>
+          </div>
+        </div>
+      </div>
+
     </div><!-- /admin-main -->
   </div><!-- /admin-layout -->
 </div><!-- /adminShell -->
@@ -386,6 +438,83 @@ function changePassword(){
   localStorage.setItem('ap',n);
   document.getElementById('newPass').value='';document.getElementById('newPassConfirm').value='';
   toast('Password updated ✓');
+}
+
+// ── ADD AGENT ───────────────────────────────────────────────
+function autoSlug(){
+  const n=document.getElementById('newAgentName').value;
+  const s=n.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+  document.getElementById('newAgentSlug').value=s;
+}
+function generateAgentScript(){
+  const name   =document.getElementById('newAgentName').value.trim();
+  const slug   =document.getElementById('newAgentSlug').value.trim();
+  const email  =document.getElementById('newAgentEmail').value.trim();
+  const tagline=document.getElementById('newAgentTagline').value.trim()||'Travel Specialist';
+  const clia   =document.getElementById('newAgentClia').value.trim()||'456611';
+  const sot    =document.getElementById('newAgentSot').value.trim()||'40802';
+  const photo  =document.getElementById('newAgentPhoto').value.trim()||'agent-profile.jpg';
+  if(!name||!slug||!email) return toast('Name, slug, and email are required','error');
+  const nl='\r\n';
+  const q=s=>`"${s}"`;
+  let ps='Set-Location $PSScriptRoot'+nl;
+  ps+='# Generated by PAC and GO Admin - '+new Date().toLocaleDateString()+nl;
+  ps+='# New Agent: '+name+nl+nl;
+  ps+='$name    = '+q(name)+nl;
+  ps+='$slug    = '+q(slug)+nl;
+  ps+='$email   = '+q(email)+nl;
+  ps+='$tagline = '+q(tagline)+nl;
+  ps+='$clia    = '+q(clia)+nl;
+  ps+='$sot     = '+q(sot)+nl;
+  ps+='$photo   = '+q(photo)+nl+nl;
+  ps+='$src  = "$PSScriptRoot\\agents\\robert-traversi"'+nl;
+  ps+='$dest = "$PSScriptRoot\\agents\\$slug"'+nl+nl;
+  ps+='if (Test-Path $dest) { Remove-Item $dest -Recurse -Force }'+nl;
+  ps+='Write-Host "Copying template..." -ForegroundColor Cyan'+nl;
+  ps+='Copy-Item $src $dest -Recurse'+nl+nl;
+  ps+='Write-Host "Replacing values..." -ForegroundColor Cyan'+nl;
+  ps+='Get-ChildItem "$dest\\*.html" | ForEach-Object {'+nl;
+  ps+='    $c = Get-Content $_.FullName -Raw -Encoding UTF8'+nl;
+  ps+='    $c = $c -replace "robert-traversi",                                 $slug'+nl;
+  ps+='    $c = $c -replace "Robert Traversi",                                 $name'+nl;
+  ps+='    $c = $c -replace "pacandgorob@gmail\\.com",                         $email'+nl;
+  ps+='    $c = $c -replace "Travel Specialist · Cruise Expert · Adventure Seeker", $tagline'+nl;
+  ps+='    $c = $c -replace "robandkaty-profile\\.jpg",                        $photo'+nl;
+  ps+='    $c = $c -replace "CLIA #456611",                                    "CLIA #$clia"'+nl;
+  ps+='    $c = $c -replace "Florida Seller of Travel #40802",                 "Florida Seller of Travel #$sot"'+nl;
+  ps+='    Set-Content $_.FullName $c -Encoding UTF8 -NoNewline'+nl;
+  ps+='}'+nl+nl;
+  ps+='$sc = Get-Content "$PSScriptRoot\\agents\\robert-traversi.html" -Raw -Encoding UTF8'+nl;
+  ps+='$sc = $sc -replace "robert-traversi", $slug'+nl;
+  ps+='$sc = $sc -replace "Robert Traversi",  $name'+nl;
+  ps+='Set-Content "$PSScriptRoot\\agents\\$slug.html" $sc -Encoding UTF8 -NoNewline'+nl+nl;
+  ps+='Write-Host "" '+nl;
+  ps+='Write-Host "Done! agents\\$slug\\ is ready." -ForegroundColor Green'+nl;
+  ps+='Write-Host ""'+nl;
+  ps+='Write-Host "Next steps:" -ForegroundColor Yellow'+nl;
+  ps+='Write-Host "  1. Edit bio in agents\\$slug\\index.html (search bio-text)"'+nl;
+  ps+='Write-Host "  2. Place photo at images\\uploads\\$photo"'+nl;
+  ps+='Write-Host "  3. Run in Supabase SQL Editor:"'+nl;
+  ps+='Write-Host "     INSERT INTO settings (agent_id) VALUES (\'$slug\');" -ForegroundColor White'+nl;
+  ps+='Write-Host "  4. Run deploy.ps1 to publish"'+nl;
+  ps+='Write-Host ""'+nl;
+  const filename='new-agent-'+slug+'.ps1';
+  const blob=new Blob([ps],{type:'text/plain'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=filename;
+  a.click();
+  // Show success card
+  const sql="INSERT INTO settings (agent_id) VALUES ('"+slug+"');";
+  document.getElementById('agentScriptFilename').textContent=filename;
+  document.getElementById('agentScriptRun').textContent='.\\'+filename;
+  document.getElementById('agentScriptSql').textContent=sql;
+  document.getElementById('agentScriptReady').style.display='block';
+  document.getElementById('agentScriptReady').scrollIntoView({behavior:'smooth',block:'center'});
+}
+function copyAgentSql(){
+  const sql=document.getElementById('agentScriptSql').textContent;
+  navigator.clipboard.writeText(sql).then(()=>toast('SQL copied ✓'));
 }
 
 // ── AGENT / NAV ─────────────────────────────────────────────

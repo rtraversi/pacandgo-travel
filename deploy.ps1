@@ -18,13 +18,11 @@ if ($choice -ne "1" -and $choice -ne "2") {
 $commitMsg = Read-Host "What did you change?"
 if ([string]::IsNullOrWhiteSpace($commitMsg)) { $commitMsg = "Site update" }
 
-# Always pull first to avoid rejection
 Write-Host ""
 Write-Host "Syncing with GitHub..." -ForegroundColor Cyan
-git pull origin main --rebase
-
 git add .
 git commit -m $commitMsg
+git pull origin main --rebase
 git push
 
 Write-Host ""
@@ -54,13 +52,14 @@ if ($choice -eq "2") {
     Copy-Item "$PSScriptRoot\*.json"     $dest -Force
     Copy-Item "$PSScriptRoot\build.js"   $dest -Force
     Copy-Item "$PSScriptRoot\agents\*.html"  "$dest\agents\" -Force
+    Copy-Item "$PSScriptRoot\agents\robert-traversi" "$dest\agents\" -Recurse -Force
     Copy-Item "$PSScriptRoot\_agents\*.md"   "$dest\_agents\" -Force
     Copy-Item "$PSScriptRoot\admin\*"        "$dest\admin\" -Force
 
     Set-Location $dest
-    git pull origin main --rebase
     git add .
     git commit -m "PROMOTE: $commitMsg"
+    git pull origin main --rebase
     git push
 
     Write-Host ""
