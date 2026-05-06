@@ -685,7 +685,7 @@ async function saveSettings(){
       reviews_enabled:document.getElementById('toggleReviews')?.checked!==false,
       gallery_enabled:document.getElementById('toggleGallery')?.checked!==false,
       updated_at:new Date().toISOString()
-    });
+    },'resolution=merge-duplicates,return=representation');
     toast('Settings saved ✓');
   }catch(e){toast('Error: '+e.message,'error');}
 }
