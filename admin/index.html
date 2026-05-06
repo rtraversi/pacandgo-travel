@@ -319,14 +319,18 @@
         <div class="panel-header"><h1>Profile</h1><p>Update your bio, photo, tagline, and specialty tags. Changes publish instantly to your Agent+ page.</p></div>
         <div class="admin-card">
           <div class="card-title">📸 Profile Photo</div>
-          <div class="fg" style="align-items:flex-end;">
-            <div class="field" style="flex:1;">
-              <label>Photo URL</label>
-              <input type="url" id="profilePhotoUrl" placeholder="https://..." oninput="previewPhoto()" />
-              <div style="font-size:0.75rem;color:rgba(255,255,255,0.35);margin-top:4px;">Paste a direct image URL (Cloudinary, Squarespace CDN, etc.)</div>
+          <div style="display:flex;gap:24px;align-items:flex-start;">
+            <div id="profilePhotoPreview" style="width:110px;height:110px;border-radius:50%;overflow:hidden;border:3px solid rgba(201,168,76,0.4);flex-shrink:0;background:rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:center;">
+              <span style="font-size:2.5rem;color:rgba(255,255,255,0.2);">👤</span>
             </div>
-            <div id="profilePhotoPreview" style="width:80px;height:80px;border-radius:50%;overflow:hidden;border:2px solid rgba(201,168,76,0.4);flex-shrink:0;background:rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:center;">
-              <span style="font-size:2rem;color:rgba(255,255,255,0.2);">👤</span>
+            <div style="flex:1;display:flex;flex-direction:column;gap:12px;">
+              <input type="file" id="profilePhotoFile" accept="image/*" style="display:none;" onchange="uploadProfilePhoto()" />
+              <button class="btn btn-gold" onclick="document.getElementById('profilePhotoFile').click()" id="profileUploadBtn" style="align-self:flex-start;">Upload Photo</button>
+              <div id="profileUploadProgress" style="display:none;font-size:0.82rem;color:rgba(255,255,255,0.5);">Uploading…</div>
+              <div class="field" style="margin:0;">
+                <label style="font-size:0.72rem;">Or paste a URL directly</label>
+                <input type="url" id="profilePhotoUrl" placeholder="https://..." oninput="previewPhoto()" style="font-size:0.82rem;" />
+              </div>
             </div>
           </div>
         </div>
@@ -935,8 +939,29 @@ function previewPhoto(){
   const url=document.getElementById('profilePhotoUrl')?.value;
   const el=document.getElementById('profilePhotoPreview');
   if(!el) return;
-  if(url){el.innerHTML=`<img src="${url}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML='<span style=font-size:2rem;color:rgba(255,255,255,0.2)>👤</span>'">`;}
-  else{el.innerHTML='<span style="font-size:2rem;color:rgba(255,255,255,0.2)">👤</span>';}
+  if(url){el.innerHTML=`<img src="${url}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML='<span style=font-size:2.5rem;color:rgba(255,255,255,0.2)>👤</span>'">`;}
+  else{el.innerHTML='<span style="font-size:2.5rem;color:rgba(255,255,255,0.2)">👤</span>';}
+}
+async function uploadProfilePhoto(){
+  const file=document.getElementById('profilePhotoFile').files[0];
+  if(!file) return;
+  const btn=document.getElementById('profileUploadBtn');
+  const prog=document.getElementById('profileUploadProgress');
+  btn.disabled=true; btn.textContent='Uploading…'; prog.style.display='block';
+  try{
+    const fd=new FormData();
+    fd.append('file',file);
+    fd.append('upload_preset','pacandgo-gallery');
+    fd.append('folder','pacandgo/'+agent+'/profile');
+    const res=await fetch('https://api.cloudinary.com/v1_1/dh811jlgd/image/upload',{method:'POST',body:fd});
+    if(!res.ok) throw new Error('Upload failed');
+    const data=await res.json();
+    document.getElementById('profilePhotoUrl').value=data.secure_url;
+    previewPhoto();
+    await saveProfile();
+    toast('Photo uploaded & saved ✓');
+  }catch(e){toast('Upload failed: '+e.message,'error');}
+  finally{btn.disabled=false; btn.textContent='Upload Photo'; prog.style.display='none';}
 }
 function previewTags(){
   const val=document.getElementById('profileSpecialties')?.value||'';
