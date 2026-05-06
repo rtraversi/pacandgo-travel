@@ -622,16 +622,17 @@ async function addGalleryItem(){
     const filename=agent+'/'+Date.now()+'.'+ext;
     document.getElementById('gallerySpinner').style.display='flex';
     try{
-      const res=await fetch(`${SB_URL}/storage/v1/object/gallery/${filename}`,{
+      const formData=new FormData();
+      formData.append('file',file);
+      formData.append('upload_preset','pacandgo-gallery');
+      formData.append('folder','pacandgo/'+agent);
+      const res=await fetch('https://api.cloudinary.com/v1_1/dh811jlgd/image/upload',{
         method:'POST',
-        headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':file.type,'x-upsert':'true'},
-        body:file
+        body:formData
       });
-      if(!res.ok){
-        const err=await res.json().catch(()=>({}));
-        throw new Error(err.error||'Upload failed — ensure a public "gallery" bucket exists in Supabase Storage');
-      }
-      imageUrl=`${SB_URL}/storage/v1/object/public/gallery/${filename}`;
+      if(!res.ok) throw new Error('Cloudinary upload failed — check upload preset is set to Unsigned');
+      const cData=await res.json();
+      imageUrl=cData.secure_url;
     }catch(e){
       document.getElementById('gallerySpinner').style.display='none';
       return toast(e.message,'error');
