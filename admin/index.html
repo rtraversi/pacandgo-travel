@@ -283,9 +283,9 @@
 
       <!-- GALLERY PANEL -->
       <div class="panel" id="panel-gallery">
-        <div class="panel-header"><h1>Photo Gallery</h1><p>Add photos by URL or upload a file to Supabase Storage. Clients see the gallery on the public site.</p></div>
+        <div class="panel-header"><h1>Photo Gallery</h1><p>Add photos or videos by URL or file upload. Limit: 100 photos · 25 videos per agent.</p></div>
         <div class="admin-card">
-          <div class="card-title">➕ Add Photo</div>
+          <div class="card-title">➕ Add Photo / Video</div>
           <div class="fg">
             <div class="field"><label>Image URL</label><input type="url" id="galleryUrl" placeholder="https://…  paste any public image URL" /></div>
             <div class="field"><label>Category (optional)</label><input type="text" id="galleryCat" placeholder="e.g. Cruises, Europe, Disney" /></div>
@@ -296,10 +296,10 @@
           </div>
           <div style="margin:12px 0;padding:12px 16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;">
             <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:10px;">— OR upload a file (requires public "gallery" bucket in Supabase Storage) —</div>
-            <input type="file" id="galleryFile" accept="image/*" style="font-size:0.82rem;color:rgba(255,255,255,0.6);" />
+            <input type="file" id="galleryFile" accept="image/*,video/*" style="font-size:0.82rem;color:rgba(255,255,255,0.6);" />
           </div>
           <div style="display:flex;gap:12px;align-items:center;">
-            <button class="btn btn-gold" onclick="addGalleryItem()">Add Photo</button>
+            <button class="btn btn-gold" onclick="addGalleryItem()">Add Photo / Video</button>
             <div class="spin-row" id="gallerySpinner" style="display:none;"><div class="spinner"></div>Uploading…</div>
           </div>
         </div>
@@ -530,6 +530,8 @@ async function addBlogPost(){
 }
 
 async function loadBlog(){
+  const dateEl=document.getElementById('blogPostDate');
+  if(dateEl&&!dateEl.value) dateEl.value=new Date().toISOString().split('T')[0];
   try{
     const d=await DB.get('blog_posts','agent_id=eq.'+agent+'&order=created_at.desc');
     const el=document.getElementById('blogList');
@@ -582,10 +584,14 @@ async function approveReview(id){
 }
 
 // ── GALLERY ─────────────────────────────────────────────────
+function isVideo(url){return /\.(mp4|mov|avi|webm|mkv|m4v)$/i.test(url||'');}
+
 async function loadGallery(){
   try{
     const d=await DB.get('gallery','agent_id=eq.'+agent+'&order=order_index.asc,created_at.desc');
-    document.getElementById('galleryCount').textContent=d.length;
+    const imgs=d.filter(x=>!isVideo(x.image_url)).length;
+    const vids=d.filter(x=>isVideo(x.image_url)).length;
+    document.getElementById('galleryCount').textContent=`${imgs} photos · ${vids} videos`;
     const el=document.getElementById('galleryList');
     if(!d.length){
       el.innerHTML='<div style="color:rgba(255,255,255,0.3);font-size:0.85rem;grid-column:1/-1;padding:16px 0;">No photos yet.</div>';
@@ -616,6 +622,14 @@ async function addGalleryItem(){
   const urlInput=v('galleryUrl');
   let imageUrl='';
 
+  // enforce limits before upload
+  const all=await DB.get('gallery','agent_id=eq.'+agent+'&select=image_url');
+  const imgCount=all.filter(x=>!isVideo(x.image_url)).length;
+  const vidCount=all.filter(x=>isVideo(x.image_url)).length;
+  const newIsVideo=fileInput.files.length>0?fileInput.files[0].type.startsWith('video/'):isVideo(urlInput);
+  if(newIsVideo&&vidCount>=25) return toast('Video limit reached (25 max) — delete an existing video to add more','error');
+  if(!newIsVideo&&imgCount>=100) return toast('Photo limit reached (100 max) — delete an existing photo to add more','error');
+
   if(fileInput.files.length>0){
     const file=fileInput.files[0];
     const ext=file.name.split('.').pop().toLowerCase();
@@ -625,7 +639,8 @@ async function addGalleryItem(){
       const formData=new FormData();
       formData.append('file',file);
       formData.append('upload_preset','pacandgo-gallery');
-      formData.append('folder','pacandgo/'+agent);
+      const cat=(v('galleryCat')||'general').toLowerCase().replace(/[^a-z0-9]+/g,'-');
+      formData.append('folder','pacandgo/'+agent+'/'+cat);
       const res=await fetch('https://api.cloudinary.com/v1_1/dh811jlgd/image/upload',{
         method:'POST',
         body:formData
