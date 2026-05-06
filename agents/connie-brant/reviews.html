@@ -1,0 +1,406 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Client Reviews | Connie Brant — PAC and GO Travel</title>
+  <meta name="description" content="Real reviews from real travelers who've worked with Connie Brant, PAC and GO Travel specialist." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy: #0d2b45; --ocean: #1a5276; --gold: #c9a84c; --gold-light: #e8c97a;
+      --sand: #f5f0e8; --white: #ffffff; --gray: #5d6d7e; --light: #eaf2f8;
+      --green: #1e8449; --red: #c0392b; --card-bg: #f8fafc;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Lato', sans-serif; color: var(--navy); background: var(--white); }
+
+    /* NAV */
+    .top-bar { background: var(--gold); text-align: center; padding: 7px 5%; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--navy); }
+    .top-bar a { color: var(--navy); text-decoration: none; }
+    nav { position: sticky; top: 0; z-index: 100; background: var(--navy); border-bottom: 2px solid rgba(201,168,76,0.4); padding: 0 5%; height: 68px; display: flex; align-items: center; justify-content: space-between; }
+    .nav-left { display: flex; align-items: center; gap: 20px; }
+    .nav-logo img { height: 48px; width: auto; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.4)); }
+    .nav-logo { text-decoration: none; }
+    .nav-divider { width: 1px; height: 32px; background: rgba(201,168,76,0.35); }
+    .nav-agent-name { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; color: var(--gold); }
+    .nav-links { display: flex; align-items: center; gap: 4px; list-style: none; }
+    .nav-links a { color: rgba(255,255,255,0.75); text-decoration: none; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 8px 12px; border-radius: 4px; transition: color 0.2s, background 0.2s; }
+    .nav-links a:hover { color: var(--gold); background: rgba(255,255,255,0.06); }
+    .nav-links a.active { color: var(--gold); }
+    .nav-cta { background: var(--gold) !important; color: var(--navy) !important; padding: 8px 18px !important; border-radius: 4px !important; }
+    .nav-hamburger { display: none; background: none; border: none; cursor: pointer; padding: 6px; }
+    .nav-hamburger span { display: block; width: 22px; height: 2px; background: var(--white); margin: 4px 0; }
+    .mobile-menu { display: none; position: fixed; top: 68px; left: 0; right: 0; background: var(--navy); border-top: 1px solid rgba(201,168,76,0.3); padding: 16px 5%; z-index: 99; }
+    .mobile-menu.open { display: block; }
+    .mobile-menu a { display: block; color: rgba(255,255,255,0.8); text-decoration: none; font-size: 0.9rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .mobile-menu a:last-child { border-bottom: none; }
+
+    /* HERO */
+    .page-hero { background: linear-gradient(135deg, var(--navy) 0%, var(--ocean) 100%); padding: 56px 5%; text-align: center; color: var(--white); }
+    .page-hero .eyebrow { font-size: 0.68rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); font-weight: 700; margin-bottom: 12px; }
+    .page-hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(2rem, 4vw, 3rem); margin-bottom: 12px; }
+    .page-hero p { font-size: 0.97rem; color: rgba(255,255,255,0.7); max-width: 520px; margin: 0 auto 32px; }
+    .hero-stats { display: flex; justify-content: center; gap: 48px; flex-wrap: wrap; }
+    .hero-stat { text-align: center; }
+    .hero-stat-num { font-family: 'Playfair Display', serif; font-size: 2.4rem; font-weight: 900; color: var(--gold); line-height: 1; }
+    .hero-stat-label { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.55); margin-top: 4px; }
+
+    /* REVIEWS SECTION */
+    .reviews-section { background: linear-gradient(135deg, var(--navy), var(--ocean)); padding: 72px 5%; }
+    .reviews-inner { max-width: 1140px; margin: 0 auto; }
+    .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .review-card { background: rgba(255,255,255,0.07); border: 1px solid rgba(201,168,76,0.2); border-radius: 14px; padding: 28px; display: flex; flex-direction: column; gap: 14px; }
+    .review-stars { color: var(--gold); font-size: 1.05rem; letter-spacing: 3px; }
+    .review-text { font-size: 0.9rem; line-height: 1.8; color: rgba(255,255,255,0.82); font-style: italic; flex: 1; }
+    .review-author { font-size: 0.82rem; font-weight: 700; color: var(--gold); }
+    .review-trip { font-size: 0.75rem; color: rgba(255,255,255,0.45); margin-top: 2px; }
+
+    /* EMPTY + COMING SOON */
+    .empty-state { text-align: center; padding: 64px 24px; grid-column: 1/-1; color: rgba(255,255,255,0.6); }
+    .empty-state h3 { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--white); margin: 16px 0 8px; }
+    .coming-soon { max-width: 600px; margin: 80px auto; padding: 0 5%; text-align: center; }
+    .coming-soon .cs-icon { font-size: 4rem; margin-bottom: 24px; }
+    .coming-soon h2 { font-family: 'Playfair Display', serif; font-size: 2rem; margin-bottom: 12px; }
+    .coming-soon p { font-size: 0.97rem; color: var(--gray); line-height: 1.8; margin-bottom: 32px; }
+
+    /* SUBMIT REVIEW FORM */
+    .submit-section { background: var(--sand); padding: 72px 5%; }
+    .submit-inner { max-width: 680px; margin: 0 auto; }
+    .section-label { font-size: 0.68rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); font-weight: 700; margin-bottom: 10px; }
+    .section-title { font-family: 'Playfair Display', serif; font-size: clamp(1.6rem, 3vw, 2.1rem); color: var(--navy); margin-bottom: 8px; }
+    .section-sub { font-size: 0.92rem; color: var(--gray); margin-bottom: 36px; line-height: 1.7; }
+    .form-row { display: grid; gap: 16px; margin-bottom: 16px; }
+    .col-2 { grid-template-columns: 1fr 1fr; }
+    .col-1 { grid-template-columns: 1fr; }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { font-size: 0.76rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--navy); }
+    .field .req { color: var(--red); margin-left: 2px; }
+    input[type="text"], input[type="email"], select, textarea {
+      width: 100%; padding: 12px 16px; border: 1.5px solid #c8d6e5; border-radius: 6px;
+      font-size: 0.95rem; font-family: 'Lato', sans-serif; color: var(--navy); background: var(--white);
+      transition: border-color 0.2s, box-shadow 0.2s; appearance: none; -webkit-appearance: none;
+    }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: var(--ocean); box-shadow: 0 0 0 3px rgba(26,82,118,0.12); }
+    select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%230d2b45' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 40px; }
+    textarea { resize: vertical; min-height: 120px; }
+    .star-row { display: flex; gap: 8px; margin-top: 4px; }
+    .star-btn { font-size: 1.6rem; background: none; border: none; cursor: pointer; color: #c8d6e5; transition: color 0.15s, transform 0.1s; line-height: 1; }
+    .star-btn.selected, .star-btn:hover { color: var(--gold); transform: scale(1.15); }
+    .submit-area { text-align: center; padding-top: 12px; }
+    .submit-btn { background: var(--gold); color: var(--navy); padding: 14px 48px; font-weight: 700; font-size: 0.95rem; border: none; border-radius: 6px; cursor: pointer; letter-spacing: 0.06em; text-transform: uppercase; transition: background 0.2s, transform 0.15s; font-family: 'Lato', sans-serif; }
+    .submit-btn:hover { background: var(--gold-light); transform: translateY(-2px); }
+    .submit-btn:disabled { background: #aaa; cursor: not-allowed; transform: none; }
+    .submit-note { font-size: 0.78rem; color: var(--gray); margin-top: 12px; }
+    .success-msg { display: none; text-align: center; padding: 48px 24px; }
+    .success-icon { width: 60px; height: 60px; background: #d4efdf; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
+    .success-icon svg { width: 28px; height: 28px; stroke: var(--green); fill: none; stroke-width: 2.5; }
+    .success-msg h3 { font-family: 'Playfair Display', serif; font-size: 1.6rem; margin-bottom: 8px; }
+    .success-msg p { color: var(--gray); font-size: 0.9rem; }
+
+    /* CTA + FOOTER */
+    .cta-banner { background: linear-gradient(135deg, var(--navy), var(--ocean)); padding: 64px 5%; text-align: center; color: var(--white); }
+    .cta-banner h2 { font-family: 'Playfair Display', serif; font-size: 2rem; margin-bottom: 12px; }
+    .cta-banner p { color: rgba(255,255,255,0.7); margin-bottom: 32px; font-size: 0.95rem; }
+    .btn-primary { display: inline-block; background: var(--gold); color: var(--navy); padding: 13px 28px; border-radius: 6px; text-decoration: none; font-weight: 700; font-size: 0.88rem; letter-spacing: 0.06em; text-transform: uppercase; transition: background 0.2s; }
+    .btn-primary:hover { background: var(--gold-light); }
+    footer { background: #08192a; border-top: 1px solid rgba(201,168,76,0.2); padding: 32px 5%; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+    .footer-left { font-size: 0.8rem; color: rgba(255,255,255,0.45); }
+    .footer-left a { color: var(--gold); text-decoration: none; }
+    .footer-right { display: flex; gap: 20px; flex-wrap: wrap; }
+    .footer-right a { font-size: 0.78rem; color: rgba(255,255,255,0.45); text-decoration: none; transition: color 0.2s; }
+    .footer-right a:hover { color: var(--gold); }
+
+    @media (max-width: 960px) {
+      .nav-links { display: none; } .nav-hamburger { display: block; }
+      .reviews-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 600px) {
+      .reviews-grid { grid-template-columns: 1fr; }
+      .col-2 { grid-template-columns: 1fr; }
+      .hero-stats { gap: 28px; }
+      footer { flex-direction: column; text-align: center; }
+      .footer-right { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="top-bar"><a href="../../index.html">← Back to PAC and GO Travel</a></div>
+
+<nav>
+  <div class="nav-left">
+    <a href="../../index.html" class="nav-logo"><img src="../../logo.png" alt="PAC and GO Travel" /></a>
+    <div class="nav-divider"></div>
+    <span class="nav-agent-name">Connie Brant</span>
+  </div>
+  <ul class="nav-links">
+    <li><a href="index.html">About</a></li>
+    <li><a href="specialties.html">Specialties</a></li>
+    <li><a href="blog.html">Travel Blog</a></li>
+    <li><a href="gallery.html">Gallery</a></li>
+    <li><a href="trips.html">Sail With Me</a></li>
+    <li><a href="deals.html">Deals</a></li>
+    <li><a href="reviews.html" class="active">Reviews</a></li>
+    <li><a href="index.html#contact-form" class="nav-cta">Contact</a></li>
+  </ul>
+  <button class="nav-hamburger" id="hamburger"><span></span><span></span><span></span></button>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html">About</a>
+  <a href="specialties.html">Specialties</a>
+  <a href="blog.html">Travel Blog</a>
+  <a href="gallery.html">Gallery</a>
+  <a href="deals.html">Deals</a>
+  <a href="reviews.html">Reviews</a>
+  <a href="index.html#contact-form">Contact Robert</a>
+</div>
+
+<!-- COMING SOON (reviews_enabled = false) -->
+<div id="comingSoon" style="display:none">
+  <div class="page-hero">
+    <p class="eyebrow">✦ Connie Brant ✦</p>
+    <h1>Client Reviews</h1>
+    <p>Real feedback from real travelers.</p>
+  </div>
+  <div class="coming-soon">
+    <div class="cs-icon">⭐</div>
+    <h2>Reviews Coming Soon</h2>
+    <p>Robert is collecting client testimonials — check back soon to see what travelers are saying about their experience working with him.</p>
+    <a href="index.html#contact-form" class="btn-primary">Work With Robert ✈</a>
+  </div>
+</div>
+
+<!-- REVIEWS CONTENT -->
+<div id="reviewsContent" style="display:none">
+  <div class="page-hero">
+    <p class="eyebrow">✦ Connie Brant ✦</p>
+    <h1>Client Reviews</h1>
+    <p>Real feedback from real travelers who've planned trips with Robert.</p>
+    <div class="hero-stats" id="heroStats" style="display:none">
+      <div class="hero-stat">
+        <div class="hero-stat-num" id="statAvg">—</div>
+        <div class="hero-stat-label">Average Rating</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num" id="statCount">—</div>
+        <div class="hero-stat-label">Reviews</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">100%</div>
+        <div class="hero-stat-label">5-Star Reviews</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="reviews-section">
+    <div class="reviews-inner">
+      <div class="reviews-grid" id="reviewsGrid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SUBMIT A REVIEW (always visible) -->
+<div class="submit-section" id="submitSection" style="display:none">
+  <div class="submit-inner">
+    <p class="section-label">Share Your Experience</p>
+    <h2 class="section-title">Leave Robert a Review</h2>
+    <p class="section-sub">Worked with Robert on a trip? He'd love to hear how it went — and your review helps other travelers find the right advisor.</p>
+
+    <div class="success-msg" id="successMsg">
+      <div class="success-icon">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <h3>Thanks for Your Review!</h3>
+      <p>Robert will review your submission and approve it shortly. We appreciate you taking the time.</p>
+    </div>
+
+    <form id="reviewForm" novalidate>
+      <div class="form-row col-2">
+        <div class="field">
+          <label for="rName">Your Name <span class="req">*</span></label>
+          <input type="text" id="rName" placeholder="Jane & Mike S." required />
+        </div>
+        <div class="field">
+          <label for="rTrip">Trip / Destination</label>
+          <input type="text" id="rTrip" placeholder="e.g. Royal Caribbean, Caribbean 2025" />
+        </div>
+      </div>
+      <div class="form-row col-1">
+        <div class="field">
+          <label>Your Rating <span class="req">*</span></label>
+          <div class="star-row" id="starRow">
+            <button type="button" class="star-btn" data-val="1">★</button>
+            <button type="button" class="star-btn" data-val="2">★</button>
+            <button type="button" class="star-btn" data-val="3">★</button>
+            <button type="button" class="star-btn" data-val="4">★</button>
+            <button type="button" class="star-btn" data-val="5">★</button>
+          </div>
+        </div>
+      </div>
+      <div class="form-row col-1">
+        <div class="field">
+          <label for="rText">Your Review <span class="req">*</span></label>
+          <textarea id="rText" placeholder="Tell others what it was like working with Robert…" required></textarea>
+        </div>
+      </div>
+      <div class="submit-area">
+        <button type="submit" class="submit-btn" id="submitBtn">Submit Review ⭐</button>
+        <p class="submit-note">Reviews are approved before publishing. Your email is never shared.</p>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="cta-banner">
+  <h2>Ready to Start Planning?</h2>
+  <p>Join the travelers who've trusted Robert with their vacation. Reach out and let's make it happen.</p>
+  <a href="index.html#contact-form" class="btn-primary">Send Robert a Message ✈</a>
+</div>
+
+<footer>
+  <div class="footer-left">© 2026 <a href="../../index.html">PAC and GO Travel</a> · Connie Brant, ITA · CLIA #456611 · Florida Seller of Travel #40802</div>
+  <div class="footer-right">
+    <a href="index.html">About</a>
+    <a href="specialties.html">Specialties</a>
+    <a href="deals.html">Deals</a>
+    <a href="../../privacy.html">Privacy Policy</a>
+    <a href="index.html#contact-form">Contact</a>
+  </div>
+</footer>
+
+<script>
+const SB_URL = 'https://yqyinpufmizrscdexlwr.supabase.co';
+const SB_KEY = 'sb_publishable_T_cxTPA3gwEdEP93W7hnfw_78mr6vLI';
+const AGENT  = 'connie-brant';
+
+let selectedStars = 0;
+
+async function sbGet(path) {
+  const r = await fetch(SB_URL + path, { headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY } });
+  return r.json();
+}
+async function sbPost(table, body) {
+  const r = await fetch(`${SB_URL}/rest/v1/${table}`, {
+    method: 'POST',
+    headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+    body: JSON.stringify(body)
+  });
+  if (!r.ok) throw new Error(await r.text());
+}
+
+function stars(n) { return '★'.repeat(n) + '☆'.repeat(5 - n); }
+
+async function init() {
+  try {
+    const [settings, reviews] = await Promise.all([
+      sbGet('/rest/v1/settings?agent_id=eq.' + AGENT),
+      sbGet('/rest/v1/reviews?agent_id=eq.' + AGENT + '&approved=eq.true&order=created_at.desc')
+    ]);
+
+    if (settings[0]?.reviews_enabled === false) {
+      document.getElementById('comingSoon').style.display = 'block';
+      return;
+    }
+
+    document.getElementById('reviewsContent').style.display = 'block';
+    document.getElementById('submitSection').style.display = 'block';
+
+    if (reviews.length) {
+      const avg = (reviews.reduce((s, r) => s + (r.stars || 5), 0) / reviews.length).toFixed(1);
+      const pct5 = Math.round(reviews.filter(r => (r.stars || 5) === 5).length / reviews.length * 100);
+      document.getElementById('statAvg').textContent = avg + ' ★';
+      document.getElementById('statCount').textContent = reviews.length;
+      document.querySelector('.hero-stat:last-child .hero-stat-num').textContent = pct5 + '%';
+      document.getElementById('heroStats').style.display = 'flex';
+    }
+
+    renderReviews(reviews);
+  } catch {
+    document.getElementById('reviewsContent').style.display = 'block';
+    document.getElementById('submitSection').style.display = 'block';
+    renderReviews([]);
+  }
+}
+
+function renderReviews(reviews) {
+  const grid = document.getElementById('reviewsGrid');
+  if (!reviews.length) {
+    grid.innerHTML = `<div class="empty-state">
+      <div style="font-size:3rem">⭐</div>
+      <h3>No Reviews Yet</h3>
+      <p style="color:rgba(255,255,255,0.5);font-size:0.88rem;margin-top:8px;">Be the first to share your experience with Robert!</p>
+    </div>`;
+    return;
+  }
+  grid.innerHTML = reviews.map(r => `
+    <div class="review-card">
+      <div class="review-stars">${'★'.repeat(r.stars || 5)}</div>
+      <p class="review-text">"${r.review_text}"</p>
+      <div>
+        <div class="review-author">— ${r.client_name || 'Anonymous'}</div>
+        ${r.trip_type ? `<div class="review-trip">${r.trip_type}</div>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ── Star rating widget ── */
+const starBtns = document.querySelectorAll('.star-btn');
+starBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    selectedStars = parseInt(btn.dataset.val);
+    starBtns.forEach(b => b.classList.toggle('selected', parseInt(b.dataset.val) <= selectedStars));
+  });
+  btn.addEventListener('mouseenter', () => {
+    const val = parseInt(btn.dataset.val);
+    starBtns.forEach(b => b.classList.toggle('selected', parseInt(b.dataset.val) <= val));
+  });
+  btn.addEventListener('mouseleave', () => {
+    starBtns.forEach(b => b.classList.toggle('selected', parseInt(b.dataset.val) <= selectedStars));
+  });
+});
+
+/* ── Submit form ── */
+document.getElementById('reviewForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const name = document.getElementById('rName').value.trim();
+  const text = document.getElementById('rText').value.trim();
+  if (!name) return alert('Please enter your name.');
+  if (!selectedStars) return alert('Please select a star rating.');
+  if (!text) return alert('Please write your review.');
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Submitting…';
+
+  try {
+    await sbPost('reviews', {
+      agent_id: AGENT,
+      client_name: name,
+      trip_type: document.getElementById('rTrip').value.trim() || null,
+      stars: selectedStars,
+      review_text: text,
+      approved: false
+    });
+    document.getElementById('reviewForm').style.display = 'none';
+    document.getElementById('successMsg').style.display = 'block';
+  } catch {
+    btn.disabled = false;
+    btn.textContent = 'Submit Review ⭐';
+    alert('Something went wrong. Please try again or contact Robert directly.');
+  }
+});
+
+/* ── Nav ── */
+document.getElementById('hamburger').addEventListener('click', () =>
+  document.getElementById('mobileMenu').classList.toggle('open'));
+document.querySelectorAll('.mobile-menu a').forEach(a =>
+  a.addEventListener('click', () => document.getElementById('mobileMenu').classList.remove('open')));
+
+init();
+</script>
+</body>
+</html>

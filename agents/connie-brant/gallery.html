@@ -1,0 +1,343 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Photo Gallery | Connie Brant — PAC and GO Travel</title>
+  <meta name="description" content="Photos from Connie Brant's travels — 70+ cruises, 58+ countries, and counting." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy: #0d2b45; --ocean: #1a5276; --gold: #c9a84c; --gold-light: #e8c97a;
+      --sand: #f5f0e8; --white: #ffffff; --gray: #5d6d7e;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Lato', sans-serif; color: var(--navy); background: var(--white); }
+
+    /* NAV */
+    .top-bar { background: var(--gold); text-align: center; padding: 7px 5%; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--navy); }
+    .top-bar a { color: var(--navy); text-decoration: none; }
+    nav { position: sticky; top: 0; z-index: 100; background: var(--navy); border-bottom: 2px solid rgba(201,168,76,0.4); padding: 0 5%; height: 68px; display: flex; align-items: center; justify-content: space-between; }
+    .nav-left { display: flex; align-items: center; gap: 20px; }
+    .nav-logo img { height: 48px; width: auto; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.4)); }
+    .nav-logo { text-decoration: none; }
+    .nav-divider { width: 1px; height: 32px; background: rgba(201,168,76,0.35); }
+    .nav-agent-name { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; color: var(--gold); }
+    .nav-links { display: flex; align-items: center; gap: 4px; list-style: none; }
+    .nav-links a { color: rgba(255,255,255,0.75); text-decoration: none; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 8px 12px; border-radius: 4px; transition: color 0.2s, background 0.2s; }
+    .nav-links a:hover { color: var(--gold); background: rgba(255,255,255,0.06); }
+    .nav-links a.active { color: var(--gold); }
+    .nav-cta { background: var(--gold) !important; color: var(--navy) !important; padding: 8px 18px !important; border-radius: 4px !important; }
+    .nav-hamburger { display: none; background: none; border: none; cursor: pointer; padding: 6px; }
+    .nav-hamburger span { display: block; width: 22px; height: 2px; background: var(--white); margin: 4px 0; }
+    .mobile-menu { display: none; position: fixed; top: 68px; left: 0; right: 0; background: var(--navy); border-top: 1px solid rgba(201,168,76,0.3); padding: 16px 5%; z-index: 99; }
+    .mobile-menu.open { display: block; }
+    .mobile-menu a { display: block; color: rgba(255,255,255,0.8); text-decoration: none; font-size: 0.9rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .mobile-menu a:last-child { border-bottom: none; }
+
+    /* HERO */
+    .page-hero { background: linear-gradient(135deg, var(--navy) 0%, var(--ocean) 100%); padding: 56px 5%; text-align: center; color: var(--white); }
+    .page-hero .eyebrow { font-size: 0.68rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); font-weight: 700; margin-bottom: 12px; }
+    .page-hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(2rem, 4vw, 3rem); margin-bottom: 12px; }
+    .page-hero p { font-size: 0.97rem; color: rgba(255,255,255,0.7); max-width: 520px; margin: 0 auto; }
+
+    /* FILTER BAR */
+    .filters-bar { background: var(--sand); padding: 20px 5%; border-bottom: 1px solid rgba(201,168,76,0.15); }
+    .filters-inner { max-width: 1280px; margin: 0 auto; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .filter-btn { background: var(--white); border: 1px solid rgba(0,0,0,0.1); color: var(--gray); padding: 7px 16px; border-radius: 24px; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+    .filter-btn:hover, .filter-btn.active { background: var(--navy); color: var(--white); border-color: var(--navy); }
+
+    /* GALLERY GRID */
+    .gallery-section { max-width: 1280px; margin: 0 auto; padding: 48px 5%; }
+    .gallery-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .gallery-item { position: relative; aspect-ratio: 1; overflow: hidden; border-radius: 10px; cursor: pointer; background: linear-gradient(135deg, var(--navy), var(--ocean)); }
+    .gallery-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.3s ease; }
+    .gallery-item:hover img { transform: scale(1.06); }
+    .gallery-caption { position: absolute; inset: 0; background: linear-gradient(to top, rgba(13,43,69,0.85) 0%, transparent 50%); opacity: 0; transition: opacity 0.25s; display: flex; align-items: flex-end; padding: 16px; }
+    .gallery-item:hover .gallery-caption { opacity: 1; }
+    .gallery-caption-text { font-size: 0.82rem; color: var(--white); font-weight: 600; line-height: 1.4; }
+    .gallery-placeholder { display: flex; align-items: center; justify-content: center; font-size: 2rem; color: rgba(201,168,76,0.4); }
+
+    /* EMPTY + COMING SOON */
+    .empty-state { text-align: center; padding: 80px 24px; grid-column: 1/-1; }
+    .empty-state .ei { font-size: 3rem; margin-bottom: 16px; }
+    .empty-state h3 { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--navy); margin-bottom: 8px; }
+    .empty-state p { color: var(--gray); font-size: 0.9rem; }
+    .coming-soon { max-width: 600px; margin: 80px auto; padding: 0 5%; text-align: center; }
+    .coming-soon .cs-icon { font-size: 4rem; margin-bottom: 24px; }
+    .coming-soon h2 { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--navy); margin-bottom: 12px; }
+    .coming-soon p { font-size: 0.97rem; color: var(--gray); line-height: 1.8; margin-bottom: 32px; }
+
+    /* LIGHTBOX */
+    .lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.93); z-index: 500; align-items: center; justify-content: center; padding: 20px; }
+    .lightbox.open { display: flex; }
+    .lightbox-inner { position: relative; max-width: 1100px; width: 100%; max-height: 90vh; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+    .lightbox-img { max-width: 100%; max-height: 80vh; object-fit: contain; border-radius: 8px; box-shadow: 0 24px 80px rgba(0,0,0,0.6); }
+    .lightbox-caption { font-size: 0.9rem; color: rgba(255,255,255,0.7); text-align: center; max-width: 600px; }
+    .lightbox-category { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); margin-bottom: 4px; }
+    .lb-close { position: fixed; top: 20px; right: 24px; background: rgba(255,255,255,0.12); border: none; color: var(--white); width: 44px; height: 44px; border-radius: 50%; font-size: 1.3rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; z-index: 10; }
+    .lb-close:hover { background: rgba(255,255,255,0.24); }
+    .lb-nav { position: fixed; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.12); border: none; color: var(--white); width: 52px; height: 52px; border-radius: 50%; font-size: 1.4rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; z-index: 10; }
+    .lb-nav:hover { background: rgba(255,255,255,0.24); }
+    .lb-prev { left: 16px; }
+    .lb-next { right: 16px; }
+    .lb-counter { font-size: 0.78rem; color: rgba(255,255,255,0.45); letter-spacing: 0.08em; }
+
+    /* CTA + FOOTER */
+    .cta-banner { background: linear-gradient(135deg, var(--navy), var(--ocean)); padding: 64px 5%; text-align: center; color: var(--white); }
+    .cta-banner h2 { font-family: 'Playfair Display', serif; font-size: 2rem; margin-bottom: 12px; }
+    .cta-banner p { color: rgba(255,255,255,0.7); margin-bottom: 32px; font-size: 0.95rem; }
+    .btn-primary { display: inline-block; background: var(--gold); color: var(--navy); padding: 13px 28px; border-radius: 6px; text-decoration: none; font-weight: 700; font-size: 0.88rem; letter-spacing: 0.06em; text-transform: uppercase; transition: background 0.2s; }
+    .btn-primary:hover { background: var(--gold-light); }
+    footer { background: #08192a; border-top: 1px solid rgba(201,168,76,0.2); padding: 32px 5%; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+    .footer-left { font-size: 0.8rem; color: rgba(255,255,255,0.45); }
+    .footer-left a { color: var(--gold); text-decoration: none; }
+    .footer-right { display: flex; gap: 20px; flex-wrap: wrap; }
+    .footer-right a { font-size: 0.78rem; color: rgba(255,255,255,0.45); text-decoration: none; transition: color 0.2s; }
+    .footer-right a:hover { color: var(--gold); }
+
+    @media (max-width: 960px) {
+      .nav-links { display: none; } .nav-hamburger { display: block; }
+      .gallery-grid { grid-template-columns: repeat(3, 1fr); }
+      .lb-prev { left: 8px; } .lb-next { right: 8px; }
+    }
+    @media (max-width: 600px) {
+      .gallery-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+      footer { flex-direction: column; text-align: center; }
+      .footer-right { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="top-bar"><a href="../../index.html">← Back to PAC and GO Travel</a></div>
+
+<nav>
+  <div class="nav-left">
+    <a href="../../index.html" class="nav-logo"><img src="../../logo.png" alt="PAC and GO Travel" /></a>
+    <div class="nav-divider"></div>
+    <span class="nav-agent-name">Connie Brant</span>
+  </div>
+  <ul class="nav-links">
+    <li><a href="index.html">About</a></li>
+    <li><a href="specialties.html">Specialties</a></li>
+    <li><a href="blog.html">Travel Blog</a></li>
+    <li><a href="gallery.html" class="active">Gallery</a></li>
+    <li><a href="trips.html">Sail With Me</a></li>
+    <li><a href="deals.html">Deals</a></li>
+    <li><a href="reviews.html">Reviews</a></li>
+    <li><a href="index.html#contact-form" class="nav-cta">Contact</a></li>
+  </ul>
+  <button class="nav-hamburger" id="hamburger"><span></span><span></span><span></span></button>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html">About</a>
+  <a href="specialties.html">Specialties</a>
+  <a href="blog.html">Travel Blog</a>
+  <a href="gallery.html">Gallery</a>
+  <a href="trips.html">Sail With Me</a>
+  <a href="deals.html">Deals</a>
+  <a href="reviews.html">Reviews</a>
+  <a href="index.html#contact-form">Contact Robert</a>
+</div>
+
+<!-- COMING SOON -->
+<div id="comingSoon" style="display:none">
+  <div class="page-hero">
+    <p class="eyebrow">✦ Connie Brant ✦</p>
+    <h1>Travel Gallery</h1>
+    <p>Photos from the road.</p>
+  </div>
+  <div class="coming-soon">
+    <div class="cs-icon">📸</div>
+    <h2>Gallery Coming Soon</h2>
+    <p>Robert is curating photos from his travels — 70+ cruises, 58+ countries, and some incredible memories. Check back soon.</p>
+    <a href="index.html#contact-form" class="btn-primary">Work With Robert ✈</a>
+  </div>
+</div>
+
+<!-- GALLERY CONTENT -->
+<div id="galleryContent" style="display:none">
+  <div class="page-hero">
+    <p class="eyebrow">✦ Connie Brant ✦</p>
+    <h1>Travel Gallery</h1>
+    <p>A glimpse at the destinations, ships, and moments behind 70+ cruises and 58+ countries.</p>
+  </div>
+
+  <div class="filters-bar" id="filtersWrap" style="display:none">
+    <div class="filters-inner" id="filtersBar">
+      <button class="filter-btn active" onclick="filterGallery('all',this)">All Photos</button>
+    </div>
+  </div>
+
+  <div class="gallery-section">
+    <div class="gallery-grid" id="galleryGrid"></div>
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox">
+  <button class="lb-close" id="lbClose">✕</button>
+  <button class="lb-nav lb-prev" id="lbPrev">‹</button>
+  <button class="lb-nav lb-next" id="lbNext">›</button>
+  <div class="lightbox-inner">
+    <img class="lightbox-img" id="lbImg" src="" alt="" />
+    <div>
+      <div class="lightbox-category" id="lbCategory"></div>
+      <div class="lightbox-caption" id="lbCaption"></div>
+      <div class="lb-counter" id="lbCounter"></div>
+    </div>
+  </div>
+</div>
+
+<div class="cta-banner">
+  <h2>Want to See These Places Yourself?</h2>
+  <p>Robert has been there — and he can help you plan the same trip, or something even better.</p>
+  <a href="index.html#contact-form" class="btn-primary">Send Robert a Message ✈</a>
+</div>
+
+<footer>
+  <div class="footer-left">© 2026 <a href="../../index.html">PAC and GO Travel</a> · Connie Brant, ITA · CLIA #456611 · Florida Seller of Travel #40802</div>
+  <div class="footer-right">
+    <a href="index.html">About</a>
+    <a href="specialties.html">Specialties</a>
+    <a href="deals.html">Deals</a>
+    <a href="../../privacy.html">Privacy Policy</a>
+    <a href="index.html#contact-form">Contact</a>
+  </div>
+</footer>
+
+<script>
+const SB_URL = 'https://yqyinpufmizrscdexlwr.supabase.co';
+const SB_KEY = 'sb_publishable_T_cxTPA3gwEdEP93W7hnfw_78mr6vLI';
+const AGENT  = 'connie-brant';
+
+let allPhotos = [];
+let lbIndex   = 0;
+let lbPhotos  = [];
+
+async function sbGet(path) {
+  const r = await fetch(SB_URL + path, { headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY } });
+  return r.json();
+}
+
+async function init() {
+  try {
+    const [settings, photos] = await Promise.all([
+      sbGet('/rest/v1/settings?agent_id=eq.' + AGENT),
+      sbGet('/rest/v1/gallery?agent_id=eq.' + AGENT + '&active=eq.true&order=order_index.asc,created_at.desc')
+    ]);
+
+    const galleryEnabled = settings[0]?.gallery_enabled !== false;
+    if (!galleryEnabled || !photos.length) {
+      document.getElementById('comingSoon').style.display = 'block';
+      return;
+    }
+
+    allPhotos = photos;
+    document.getElementById('galleryContent').style.display = 'block';
+
+    const categories = [...new Set(photos.map(p => p.category).filter(Boolean))];
+    if (categories.length > 1) {
+      buildFilters(categories);
+      document.getElementById('filtersWrap').style.display = 'block';
+    }
+
+    renderGallery(photos);
+  } catch {
+    document.getElementById('comingSoon').style.display = 'block';
+  }
+}
+
+function buildFilters(categories) {
+  const bar = document.getElementById('filtersBar');
+  bar.innerHTML = '<button class="filter-btn active" onclick="filterGallery(\'all\',this)">All Photos</button>';
+  categories.forEach(c => {
+    const b = document.createElement('button');
+    b.className = 'filter-btn';
+    b.textContent = c;
+    b.onclick = function() { filterGallery(c, this); };
+    bar.appendChild(b);
+  });
+}
+
+function filterGallery(cat, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const filtered = cat === 'all' ? allPhotos : allPhotos.filter(p => p.category === cat);
+  renderGallery(filtered);
+}
+
+function renderGallery(photos) {
+  lbPhotos = photos;
+  const grid = document.getElementById('galleryGrid');
+  if (!photos.length) {
+    grid.innerHTML = `<div class="empty-state">
+      <div class="ei">📸</div>
+      <h3>No Photos in This Category</h3>
+      <p>Try a different filter.</p>
+    </div>`;
+    return;
+  }
+  grid.innerHTML = photos.map((p, i) => `
+    <div class="gallery-item" onclick="openLightbox(${i})">
+      <img src="${p.image_url}" alt="${p.alt_text || p.caption || 'Travel photo'}" loading="lazy"
+           onerror="this.style.display='none';this.parentElement.classList.add('gallery-placeholder');this.parentElement.innerHTML+='📸';" />
+      <div class="gallery-caption">
+        <div class="gallery-caption-text">${p.caption || ''}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openLightbox(idx) {
+  lbIndex = idx;
+  updateLightbox();
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function updateLightbox() {
+  const p = lbPhotos[lbIndex];
+  document.getElementById('lbImg').src       = p.image_url;
+  document.getElementById('lbImg').alt       = p.alt_text || p.caption || '';
+  document.getElementById('lbCaption').textContent  = p.caption || '';
+  document.getElementById('lbCategory').textContent = p.category || '';
+  document.getElementById('lbCounter').textContent  = `${lbIndex + 1} / ${lbPhotos.length}`;
+}
+
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.getElementById('lbClose').addEventListener('click', closeLightbox);
+document.getElementById('lbPrev').addEventListener('click', () => {
+  lbIndex = (lbIndex - 1 + lbPhotos.length) % lbPhotos.length;
+  updateLightbox();
+});
+document.getElementById('lbNext').addEventListener('click', () => {
+  lbIndex = (lbIndex + 1) % lbPhotos.length;
+  updateLightbox();
+});
+document.getElementById('lightbox').addEventListener('click', e => {
+  if (e.target === document.getElementById('lightbox')) closeLightbox();
+});
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('lightbox').classList.contains('open')) return;
+  if (e.key === 'Escape')       closeLightbox();
+  if (e.key === 'ArrowLeft')  { lbIndex = (lbIndex - 1 + lbPhotos.length) % lbPhotos.length; updateLightbox(); }
+  if (e.key === 'ArrowRight') { lbIndex = (lbIndex + 1) % lbPhotos.length; updateLightbox(); }
+});
+
+document.getElementById('hamburger').addEventListener('click', () =>
+  document.getElementById('mobileMenu').classList.toggle('open'));
+document.querySelectorAll('.mobile-menu a').forEach(a =>
+  a.addEventListener('click', () => document.getElementById('mobileMenu').classList.remove('open')));
+
+init();
+</script>
+</body>
+</html>

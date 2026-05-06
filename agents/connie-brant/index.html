@@ -1,0 +1,1002 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Connie Brant — Travel Specialist | PAC and GO Travel</title>
+  <meta name="description" content="Connie Brant is a PAC and GO Travel specialist with 70+ cruises and 58+ countries. Cruise, all-inclusive, international, and Disney travel expert." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy:  #0d2b45;
+      --ocean: #1a5276;
+      --gold:  #c9a84c;
+      --gold-light: #e8c97a;
+      --sand:  #f5f0e8;
+      --white: #ffffff;
+      --gray:  #5d6d7e;
+      --light: #eaf2f8;
+      --green: #1e8449;
+      --red:   #c0392b;
+      --card-bg: #f8fafc;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Lato', sans-serif; color: var(--navy); background: var(--white); }
+
+    /* ── TOP NAV ─────────────────────────────────────────── */
+    .top-bar {
+      background: var(--gold);
+      text-align: center; padding: 7px 5%;
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--navy);
+    }
+    .top-bar a { color: var(--navy); text-decoration: none; }
+    .top-bar a:hover { text-decoration: underline; }
+
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--navy);
+      border-bottom: 2px solid rgba(201,168,76,0.4);
+      padding: 0 5%; height: 68px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-left { display: flex; align-items: center; gap: 20px; }
+    .nav-logo { display: flex; align-items: center; text-decoration: none; }
+    .nav-logo img { height: 48px; width: auto; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.4)); }
+    .nav-divider {
+      width: 1px; height: 32px;
+      background: rgba(201,168,76,0.35);
+    }
+    .nav-agent-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem; font-weight: 700;
+      color: var(--gold); letter-spacing: 0.02em;
+    }
+    .nav-links {
+      display: flex; align-items: center; gap: 4px;
+      list-style: none;
+    }
+    .nav-links a {
+      color: rgba(255,255,255,0.75); text-decoration: none;
+      font-size: 0.78rem; font-weight: 700; letter-spacing: 0.06em;
+      text-transform: uppercase; padding: 8px 12px; border-radius: 4px;
+      transition: color 0.2s, background 0.2s;
+    }
+    .nav-links a:hover { color: var(--gold); background: rgba(255,255,255,0.06); }
+    .nav-links a.active { color: var(--gold); }
+    .nav-cta {
+      background: var(--gold); color: var(--navy) !important;
+      padding: 8px 18px !important; border-radius: 4px !important;
+    }
+    .nav-cta:hover { background: var(--gold-light) !important; color: var(--navy) !important; }
+
+    .nav-hamburger {
+      display: none; background: none; border: none;
+      cursor: pointer; padding: 6px;
+    }
+    .nav-hamburger span {
+      display: block; width: 22px; height: 2px;
+      background: var(--white); margin: 4px 0;
+      transition: all 0.3s;
+    }
+    .mobile-menu {
+      display: none; position: fixed; top: 68px; left: 0; right: 0;
+      background: var(--navy); border-top: 1px solid rgba(201,168,76,0.3);
+      padding: 16px 5%; z-index: 99;
+    }
+    .mobile-menu.open { display: block; }
+    .mobile-menu a {
+      display: block; color: rgba(255,255,255,0.8); text-decoration: none;
+      font-size: 0.9rem; font-weight: 700; letter-spacing: 0.06em;
+      text-transform: uppercase; padding: 14px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      transition: color 0.2s;
+    }
+    .mobile-menu a:hover { color: var(--gold); }
+    .mobile-menu a:last-child { border-bottom: none; }
+
+    /* ── HERO ─────────────────────────────────────────────── */
+    .hero-bg {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--ocean) 100%);
+    }
+    .hero {
+      max-width: 1140px; margin: 0 auto;
+      padding: 72px 5% 64px;
+      display: grid; grid-template-columns: 300px 1fr; gap: 64px; align-items: center;
+    }
+    .hero-photo {
+      position: relative;
+    }
+    .hero-photo img {
+      width: 100%; aspect-ratio: 1; object-fit: cover; object-position: center 20%;
+      border-radius: 16px;
+      border: 4px solid rgba(201,168,76,0.5);
+      box-shadow: 0 24px 64px rgba(0,0,0,0.35);
+    }
+    .premium-badge {
+      position: absolute; top: -14px; right: -14px;
+      background: var(--gold); color: var(--navy);
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; padding: 6px 12px; border-radius: 20px;
+      box-shadow: 0 4px 12px rgba(201,168,76,0.4);
+    }
+    .hero-text { color: var(--white); }
+    .hero-eyebrow {
+      font-size: 0.68rem; letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--gold); font-weight: 700; margin-bottom: 12px;
+    }
+    .hero-text h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.4rem, 4.5vw, 3.4rem);
+      line-height: 1.1; margin-bottom: 8px;
+    }
+    .hero-title {
+      font-size: 1rem; color: rgba(255,255,255,0.65); margin-bottom: 28px;
+    }
+    .specialties-wrap { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 32px; }
+    .specialty-tag {
+      background: rgba(201,168,76,0.15); color: var(--gold);
+      border: 1px solid rgba(201,168,76,0.4);
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.07em;
+      text-transform: uppercase; padding: 5px 14px; border-radius: 20px;
+    }
+    .hero-stats {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+      margin-bottom: 36px;
+      padding: 24px; border-radius: 12px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(201,168,76,0.2);
+    }
+    .stat { text-align: center; }
+    .stat-number {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.2rem; font-weight: 900;
+      color: var(--gold); line-height: 1;
+    }
+    .stat-label {
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.07em;
+      text-transform: uppercase; color: rgba(255,255,255,0.6);
+      margin-top: 4px;
+    }
+    .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+    .btn-primary {
+      display: inline-block; background: var(--gold); color: var(--navy);
+      padding: 13px 28px; border-radius: 6px; text-decoration: none;
+      font-weight: 700; font-size: 0.88rem; letter-spacing: 0.06em;
+      text-transform: uppercase; transition: background 0.2s, transform 0.15s;
+    }
+    .btn-primary:hover { background: var(--gold-light); transform: translateY(-2px); }
+    .btn-outline {
+      display: inline-block; background: transparent; color: var(--white);
+      padding: 13px 28px; border-radius: 6px; text-decoration: none;
+      font-weight: 700; font-size: 0.88rem; letter-spacing: 0.06em;
+      text-transform: uppercase; border: 2px solid rgba(255,255,255,0.3);
+      transition: border-color 0.2s, color 0.2s, transform 0.15s;
+    }
+    .btn-outline:hover { border-color: var(--gold); color: var(--gold); transform: translateY(-2px); }
+
+    /* ── SECTION COMMONS ─────────────────────────────────── */
+    .section-label {
+      font-size: 0.68rem; letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--gold); font-weight: 700; margin-bottom: 10px;
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.7rem, 3vw, 2.3rem);
+      color: var(--navy); margin-bottom: 8px;
+    }
+    .section-subtitle { font-size: 0.95rem; color: var(--gray); margin-bottom: 40px; }
+    .section-header { margin-bottom: 44px; }
+    .section-header.centered { text-align: center; }
+
+    /* ── ABOUT / BIO ─────────────────────────────────────── */
+    .about-section {
+      max-width: 1140px; margin: 0 auto;
+      padding: 80px 5%; display: grid;
+      grid-template-columns: 1fr 380px; gap: 72px; align-items: start;
+    }
+    .bio-text p {
+      font-size: 0.97rem; line-height: 1.9; color: var(--gray);
+      margin-bottom: 18px;
+    }
+    .credentials-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(201,168,76,0.25);
+      border-radius: 14px; padding: 32px;
+      position: sticky; top: 90px;
+    }
+    .credentials-card h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem; color: var(--navy); margin-bottom: 20px;
+      padding-bottom: 12px; border-bottom: 2px solid rgba(201,168,76,0.25);
+    }
+    .cred-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      margin-bottom: 16px;
+    }
+    .cred-icon { font-size: 1.2rem; margin-top: 2px; flex-shrink: 0; }
+    .cred-text { font-size: 0.88rem; color: var(--gray); line-height: 1.5; }
+    .cred-text strong { color: var(--navy); display: block; font-size: 0.82rem;
+      letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 2px; }
+
+    /* ── SPECIALTY PREVIEW ───────────────────────────────── */
+    .specialties-section {
+      background: var(--sand); padding: 80px 5%;
+    }
+    .specialties-inner { max-width: 1140px; margin: 0 auto; }
+    .specialty-cards {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;
+    }
+    .specialty-card {
+      background: var(--white); border-radius: 12px;
+      border: 1px solid rgba(201,168,76,0.2);
+      padding: 28px 24px; text-decoration: none; color: var(--navy);
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .specialty-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.1);
+      border-color: var(--gold);
+    }
+    .specialty-card-icon { font-size: 2rem; }
+    .specialty-card h3 { font-family: 'Playfair Display', serif; font-size: 1.1rem; }
+    .specialty-card p { font-size: 0.85rem; color: var(--gray); line-height: 1.6; flex: 1; }
+    .specialty-card-link {
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 0.07em;
+      text-transform: uppercase; color: var(--gold);
+    }
+
+    /* ── RECENT TRIPS TEASER ─────────────────────────────── */
+    .trips-section { padding: 80px 5%; }
+    .trips-inner { max-width: 1140px; margin: 0 auto; }
+    .trip-cards {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+    }
+    .trip-card {
+      border-radius: 12px; overflow: hidden;
+      border: 1px solid rgba(0,0,0,0.08);
+      text-decoration: none; color: var(--navy);
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: flex; flex-direction: column;
+    }
+    .trip-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(0,0,0,0.1); }
+    .trip-card-img {
+      height: 200px; background: linear-gradient(135deg, var(--navy), var(--ocean));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 3rem;
+    }
+    .trip-card-body { padding: 20px 24px 24px; flex: 1; display: flex; flex-direction: column; gap: 8px; }
+    .trip-card-tag {
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--gold);
+    }
+    .trip-card h3 { font-family: 'Playfair Display', serif; font-size: 1.05rem; }
+    .trip-card p { font-size: 0.85rem; color: var(--gray); line-height: 1.6; flex: 1; }
+    .trip-card-read {
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 0.07em;
+      text-transform: uppercase; color: var(--gold); margin-top: 8px;
+    }
+
+    /* ── TESTIMONIALS ────────────────────────────────────── */
+    .reviews-section {
+      background: linear-gradient(135deg, var(--navy), var(--ocean));
+      padding: 80px 5%;
+    }
+    .reviews-inner { max-width: 1140px; margin: 0 auto; }
+    .reviews-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+    }
+    .review-card {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(201,168,76,0.2);
+      border-radius: 12px; padding: 28px;
+    }
+    .review-stars { color: var(--gold); font-size: 1rem; letter-spacing: 2px; margin-bottom: 14px; }
+    .review-text {
+      font-size: 0.9rem; line-height: 1.75; color: rgba(255,255,255,0.8);
+      font-style: italic; margin-bottom: 20px;
+    }
+    .review-author { font-size: 0.8rem; font-weight: 700; color: var(--gold); }
+    .review-trip { font-size: 0.75rem; color: rgba(255,255,255,0.5); margin-top: 2px; }
+
+    /* ── DEALS TEASER ────────────────────────────────────── */
+    .deals-section { background: var(--sand); padding: 80px 5%; }
+    .deals-inner { max-width: 1140px; margin: 0 auto; }
+    .deals-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .deal-card {
+      background: var(--white); border-radius: 12px; padding: 28px;
+      border: 1px solid rgba(201,168,76,0.2);
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .deal-tag {
+      display: inline-block; background: var(--gold); color: var(--navy);
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; padding: 4px 10px; border-radius: 20px;
+      align-self: flex-start;
+    }
+    .deal-card h3 { font-family: 'Playfair Display', serif; font-size: 1.1rem; }
+    .deal-card p { font-size: 0.85rem; color: var(--gray); line-height: 1.6; flex: 1; }
+    .deal-price {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem; font-weight: 700; color: var(--navy);
+    }
+    .deal-price span { font-size: 0.85rem; font-weight: 400; color: var(--gray); }
+    .deal-cta {
+      display: inline-block; background: var(--navy); color: var(--white);
+      padding: 10px 20px; border-radius: 6px; text-decoration: none;
+      font-size: 0.78rem; font-weight: 700; letter-spacing: 0.06em;
+      text-transform: uppercase; transition: background 0.2s;
+      align-self: flex-start; margin-top: 4px;
+    }
+    .deal-cta:hover { background: var(--ocean); }
+
+    /* ── CONTACT FORM ────────────────────────────────────── */
+    .form-section { background: var(--white); padding: 80px 5%; }
+    .form-inner { max-width: 720px; margin: 0 auto; }
+    .form-header { text-align: center; margin-bottom: 48px; }
+    .form-header p { font-size: 0.95rem; color: var(--gray); margin-top: 10px; }
+    .form-row { display: grid; gap: 20px; margin-bottom: 20px; }
+    .col-2 { grid-template-columns: 1fr 1fr; }
+    .col-1 { grid-template-columns: 1fr; }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    label {
+      font-size: 0.78rem; font-weight: 700; letter-spacing: 0.05em;
+      text-transform: uppercase; color: var(--navy);
+    }
+    label .req { color: var(--red); margin-left: 2px; }
+    input[type="text"], input[type="email"], input[type="tel"],
+    input[type="date"], select, textarea {
+      width: 100%; padding: 12px 16px;
+      border: 1.5px solid #c8d6e5; border-radius: 6px;
+      font-size: 0.95rem; font-family: 'Lato', sans-serif;
+      color: var(--navy); background: var(--white);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      appearance: none; -webkit-appearance: none;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none; border-color: var(--ocean);
+      box-shadow: 0 0 0 3px rgba(26,82,118,0.12);
+    }
+    input.invalid, select.invalid, textarea.invalid { border-color: var(--red); }
+    .field-error { font-size: 0.78rem; color: var(--red); display: none; }
+    .field-error.show { display: block; }
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%230d2b45' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 14px center; padding-right: 40px;
+    }
+    textarea { resize: vertical; min-height: 120px; }
+    .trip-types { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+    .trip-type-option { position: relative; }
+    .trip-type-option input { position: absolute; opacity: 0; width: 0; height: 0; }
+    .trip-type-label {
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      padding: 14px 8px; border: 2px solid #c8d6e5; border-radius: 8px;
+      cursor: pointer; text-align: center; user-select: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .trip-type-label:hover { border-color: var(--ocean); background: var(--light); }
+    .trip-type-option input:checked + .trip-type-label { border-color: var(--gold); background: #fdf8ee; }
+    .trip-type-icon { font-size: 1.5rem; }
+    .trip-type-name { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+    .submit-area { text-align: center; padding-top: 16px; }
+    .submit-btn {
+      background: var(--gold); color: var(--navy);
+      padding: 15px 52px; font-weight: 700; font-size: 1rem;
+      border: none; border-radius: 6px; cursor: pointer;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      transition: background 0.2s, transform 0.15s;
+      font-family: 'Lato', sans-serif;
+    }
+    .submit-btn:hover { background: var(--gold-light); transform: translateY(-2px); }
+    .submit-btn:disabled { background: #aaa; cursor: not-allowed; transform: none; }
+    .submit-note { font-size: 0.78rem; color: var(--gray); margin-top: 14px; }
+    .success-message {
+      display: none; text-align: center; padding: 48px 24px;
+      animation: fadeUp 0.6s ease both;
+    }
+    @keyframes fadeUp { from { opacity:0; transform: translateY(20px); } to { opacity:1; transform: translateY(0); } }
+    .success-icon {
+      width: 64px; height: 64px; background: #d4efdf; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;
+    }
+    .success-icon svg { width: 32px; height: 32px; stroke: var(--green); fill: none; stroke-width: 2; }
+    .success-message h2 { font-family: 'Playfair Display', serif; font-size: 1.8rem; margin-bottom: 10px; }
+    .success-message p { color: var(--gray); margin-bottom: 24px; }
+    .btn-home {
+      display: inline-block; background: var(--navy); color: var(--white);
+      padding: 12px 30px; border-radius: 6px; text-decoration: none;
+      font-weight: 700; font-size: 0.85rem; letter-spacing: 0.06em; text-transform: uppercase;
+    }
+
+    /* ── FOOTER ──────────────────────────────────────────── */
+    footer {
+      background: #08192a;
+      border-top: 1px solid rgba(201,168,76,0.2);
+      padding: 32px 5%;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 16px;
+    }
+    .footer-left { font-size: 0.8rem; color: rgba(255,255,255,0.45); }
+    .footer-left a { color: var(--gold); text-decoration: none; }
+    .footer-right {
+      display: flex; gap: 20px;
+    }
+    .footer-right a {
+      font-size: 0.78rem; color: rgba(255,255,255,0.45);
+      text-decoration: none; transition: color 0.2s;
+    }
+    .footer-right a:hover { color: var(--gold); }
+
+    /* ── RESPONSIVE ──────────────────────────────────────── */
+    @media (max-width: 960px) {
+      .nav-links { display: none; }
+      .nav-hamburger { display: block; }
+      .hero { grid-template-columns: 1fr; gap: 40px; padding: 56px 5% 48px; }
+      .hero-photo { max-width: 260px; margin: 0 auto; }
+      .hero-stats { grid-template-columns: repeat(3,1fr); }
+      .about-section { grid-template-columns: 1fr; }
+      .credentials-card { position: static; }
+      .specialty-cards { grid-template-columns: repeat(2,1fr); }
+      .trip-cards { grid-template-columns: repeat(2,1fr); }
+      .reviews-grid { grid-template-columns: 1fr; }
+      .deals-grid { grid-template-columns: repeat(2,1fr); }
+    }
+    @media (max-width: 600px) {
+      .hero-stats { grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+      .stat-number { font-size: 1.6rem; }
+      .specialty-cards { grid-template-columns: 1fr 1fr; }
+      .trip-cards { grid-template-columns: 1fr; }
+      .deals-grid { grid-template-columns: 1fr; }
+      .col-2 { grid-template-columns: 1fr; }
+      .trip-types { grid-template-columns: repeat(2,1fr); }
+      footer { flex-direction: column; text-align: center; }
+      .footer-right { justify-content: center; flex-wrap: wrap; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <a href="../../index.html">← Back to PAC and GO Travel</a>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-left">
+    <a href="../../index.html" class="nav-logo">
+      <img src="../../logo.png" alt="PAC and GO Travel" />
+    </a>
+    <div class="nav-divider"></div>
+    <span class="nav-agent-name">Connie Brant</span>
+  </div>
+  <ul class="nav-links">
+    <li><a href="index.html" class="active">About</a></li>
+    <li><a href="specialties.html">Specialties</a></li>
+    <li><a href="blog.html">Travel Blog</a></li>
+    <li><a href="gallery.html">Gallery</a></li>
+    <li><a href="trips.html">Sail With Me</a></li>
+    <li><a href="deals.html">Deals</a></li>
+    <li><a href="reviews.html">Reviews</a></li>
+    <li><a href="#contact-form" class="nav-cta">Contact</a></li>
+  </ul>
+  <button class="nav-hamburger" id="hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html">About</a>
+  <a href="specialties.html">Specialties</a>
+  <a href="blog.html">Travel Blog</a>
+  <a href="gallery.html">Gallery</a>
+  <a href="trips.html">Sail With Me</a>
+  <a href="deals.html">Deals</a>
+  <a href="reviews.html">Reviews</a>
+  <a href="#contact-form">Contact Robert</a>
+</div>
+
+<!-- HERO -->
+<div class="hero-bg">
+  <div class="hero">
+    <div class="hero-photo">
+      <img id="profilePhoto" src="../../images/uploads/agent-profile.jpg" alt="Connie Brant" />
+      <span class="premium-badge">⭐ Agent+</span>
+    </div>
+    <div class="hero-text">
+      <p class="hero-eyebrow">✦ PAC and GO Travel Agent ✦</p>
+      <h1>Connie Brant</h1>
+      <p class="hero-title" id="profileTagline">Travel Specialist · Cruise Expert · Adventure Seeker</p>
+      <div class="specialties-wrap" id="profileSpecialties">
+        <span class="specialty-tag">Ocean Cruises</span>
+        <span class="specialty-tag">All-Inclusive Resorts</span>
+        <span class="specialty-tag">International Travel</span>
+        <span class="specialty-tag">Custom Itineraries</span>
+        <span class="specialty-tag">Disney Vacations</span>
+        <span class="specialty-tag">European Travel</span>
+      </div>
+      <div class="hero-stats">
+        <div class="stat">
+          <div class="stat-number">70+</div>
+          <div class="stat-label">Cruises Sailed</div>
+        </div>
+        <div class="stat">
+          <div class="stat-number">58+</div>
+          <div class="stat-label">Countries Visited</div>
+        </div>
+        <div class="stat">
+          <div class="stat-number">6</div>
+          <div class="stat-label">Continents Explored</div>
+        </div>
+      </div>
+      <div class="hero-btns">
+        <a href="#contact-form" class="btn-primary">Send Robert a Message ✈</a>
+        <a href="specialties.html" class="btn-outline">View Specialties →</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT / BIO -->
+<div class="about-section">
+  <div class="bio-text">
+    <p class="section-label">About Robert</p>
+    <h2 class="section-title">Meet Connie Brant</h2>
+    <div id="profileBioBody">
+    <p>With over 70 cruises under his belt and visits to more than 58 countries across six continents, Robert brings a level of firsthand expertise that simply can't be learned from a brochure. For the past decade, he and his wife Katy have made the world their playground — flying to far-flung destinations just to experience them firsthand, meeting up with fellow frequent travelers along the way, and turning every trip into a masterclass in what great travel looks and feels like.</p>
+    <p>Robert's specialty is cruising — and his credentials speak for themselves. He and Katy are on track to achieve Royal Caribbean's coveted Pinnacle Club status in September 2026, the cruise line's highest loyalty tier, reserved for their most dedicated and experienced sailors. He has deep expertise across Royal Caribbean, Celebrity Cruises, and MSC, and has sailed on more ships, in more destinations, than most people will visit in a lifetime.</p>
+    <p>Beyond the ocean, Robert has a deep love of international travel — particularly Europe. Italy holds a special place in his heart, and he'll passionately argue that Amsterdam and Prague are two of the most underrated cities on the continent. Disney vacations are another passion, and he brings the same meticulous planning approach to the Magic Kingdom that he does to a 13-night transatlantic sailing.</p>
+    <p>As a travel advisor with Pac and Go Travel, Robert's approach is simple: treat every client's vacation the way he treats his own — with care, attention to detail, and an obsession with getting it right. With only two years in the advisor seat but a lifetime of travel experience behind him, he combines the enthusiasm of someone who genuinely loves what they do with the knowledge of someone who has truly been there.</p>
+    <p>Whether you're planning your first cruise or your fiftieth, Robert is the kind of advisor who will pick up the phone, answer the text, and make sure your trip exceeds every expectation.</p>
+    </div>
+  </div>
+  <div>
+    <div class="credentials-card">
+      <h3>Credentials & Highlights</h3>
+      <div class="cred-item">
+        <span class="cred-icon">🚢</span>
+        <div class="cred-text">
+          <strong>Cruise Expertise</strong>
+          Royal Caribbean, Celebrity, MSC — 70+ sailings across all major lines
+        </div>
+      </div>
+      <div class="cred-item">
+        <span class="cred-icon">👑</span>
+        <div class="cred-text">
+          <strong>Royal Caribbean Pinnacle Club</strong>
+          On track for the highest loyalty tier — Sept 2026
+        </div>
+      </div>
+      <div class="cred-item">
+        <span class="cred-icon">🌍</span>
+        <div class="cred-text">
+          <strong>58+ Countries</strong>
+          Six continents, 10+ years of personal travel
+        </div>
+      </div>
+      <div class="cred-item">
+        <span class="cred-icon">🏢</span>
+        <div class="cred-text">
+          <strong>PAC and Go Travel</strong>
+          ITA · CLIA #456611 · Florida Seller of Travel #40802
+        </div>
+      </div>
+      <div class="cred-item">
+        <span class="cred-icon">🎯</span>
+        <div class="cred-text">
+          <strong>Specializations</strong>
+          Cruises, Europe, All-Inclusive, Disney, Custom Itineraries
+        </div>
+      </div>
+      <div style="margin-top:24px;">
+        <a href="#contact-form" class="btn-primary" style="display:block; text-align:center;">Book a Consultation</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SPECIALTIES PREVIEW -->
+<div class="specialties-section">
+  <div class="specialties-inner">
+    <div class="section-header centered">
+      <p class="section-label">What Robert Does Best</p>
+      <h2 class="section-title">Specialties</h2>
+      <p class="section-subtitle">From ocean cruises to Disney magic — Robert has been there and can get you there too.</p>
+    </div>
+    <div class="specialty-cards">
+      <a href="specialties.html#cruises" class="specialty-card">
+        <div class="specialty-card-icon">🚢</div>
+        <h3>Ocean Cruises</h3>
+        <p>Royal Caribbean, Celebrity, MSC and beyond. Robert has sailed 70+ cruises and knows every ship, route, and cabin type worth booking.</p>
+        <span class="specialty-card-link">Explore Cruises →</span>
+      </a>
+      <a href="specialties.html#allinclusive" class="specialty-card">
+        <div class="specialty-card-icon">🏖️</div>
+        <h3>All-Inclusive Resorts</h3>
+        <p>Mexico, Caribbean, Europe — the best resorts at the best prices. Robert knows which properties actually deliver on their promise.</p>
+        <span class="specialty-card-link">Explore Resorts →</span>
+      </a>
+      <a href="specialties.html#europe" class="specialty-card">
+        <div class="specialty-card-icon">🏰</div>
+        <h3>European Travel</h3>
+        <p>Italy, Amsterdam, Prague, and beyond. Robert's personal passion for Europe means your trip will be full of insider knowledge.</p>
+        <span class="specialty-card-link">Explore Europe →</span>
+      </a>
+      <a href="specialties.html#disney" class="specialty-card">
+        <div class="specialty-card-icon">🏰</div>
+        <h3>Disney Vacations</h3>
+        <p>Walt Disney World, Disneyland, and Disney Cruise Line. The same meticulous planning Robert brings to every trip — applied to the magic.</p>
+        <span class="specialty-card-link">Explore Disney →</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- RECENT TRIPS TEASER -->
+<div class="trips-section">
+  <div class="trips-inner">
+    <div class="section-header">
+      <p class="section-label">From the Travel Blog</p>
+      <h2 class="section-title">Recent Adventures</h2>
+      <p class="section-subtitle">Real trips, real experiences — straight from Robert's travels.</p>
+    </div>
+    <div class="trip-cards">
+      <a href="blog.html" class="trip-card">
+        <div class="trip-card-img">🚢</div>
+        <div class="trip-card-body">
+          <span class="trip-card-tag">Ocean Cruise</span>
+          <h3>Transatlantic on Royal Caribbean</h3>
+          <p>13 nights, two continents, one unforgettable sailing. Robert shares what you need to know before booking a repositioning cruise.</p>
+          <span class="trip-card-read">Read More →</span>
+        </div>
+      </a>
+      <a href="blog.html" class="trip-card">
+        <div class="trip-card-img">🍕</div>
+        <div class="trip-card-body">
+          <span class="trip-card-tag">Europe</span>
+          <h3>Two Weeks in Italy</h3>
+          <p>Rome, Florence, Venice, and the Amalfi Coast. The complete guide to Italy the way Robert and Katy do it — with zero regrets.</p>
+          <span class="trip-card-read">Read More →</span>
+        </div>
+      </a>
+      <a href="blog.html" class="trip-card">
+        <div class="trip-card-img">🏰</div>
+        <div class="trip-card-body">
+          <span class="trip-card-tag">Disney</span>
+          <h3>Disney World in 4 Days</h3>
+          <p>It sounds impossible — but with the right planning it's done. Robert breaks down the strategy that lets you see it all without losing your mind.</p>
+          <span class="trip-card-read">Read More →</span>
+        </div>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- TESTIMONIALS -->
+<div class="reviews-section">
+  <div class="reviews-inner">
+    <div class="section-header centered">
+      <p class="section-label" style="color:var(--gold);">What Clients Say</p>
+      <h2 class="section-title" style="color:var(--white);">Reviews</h2>
+      <p class="section-subtitle" style="color:rgba(255,255,255,0.6);">Real feedback from real travelers Robert has worked with.</p>
+    </div>
+    <div class="reviews-grid">
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"Robert made our first cruise completely stress-free. He knew every detail about the ship, the ports, and what to book in advance. We'll never plan a cruise without him again."</p>
+        <div class="review-author">— Sarah & Mike T.</div>
+        <div class="review-trip">Royal Caribbean, Caribbean 2025</div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"We asked Robert to plan our Italy trip and he completely exceeded our expectations. He knew every restaurant, every hidden gem, every shortcut. It felt like traveling with a local."</p>
+        <div class="review-author">— Jennifer L.</div>
+        <div class="review-trip">Italy — Rome, Florence, Amalfi Coast 2024</div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"I've used online booking sites my whole life. After one trip planned by Robert I will never go back. The savings alone paid for his fee — and the experience was flawless."</p>
+        <div class="review-author">— David R.</div>
+        <div class="review-trip">All-Inclusive, Cancun 2025</div>
+      </div>
+    </div>
+    <div style="text-align:center; margin-top:40px;">
+      <a href="reviews.html" class="btn-outline">Read All Reviews →</a>
+    </div>
+  </div>
+</div>
+
+<!-- DEALS TEASER -->
+<div class="deals-section">
+  <div class="deals-inner">
+    <div class="section-header">
+      <p class="section-label">Robert's Picks</p>
+      <h2 class="section-title">Featured Deals</h2>
+      <p class="section-subtitle">Handpicked offers Robert is excited about right now.</p>
+    </div>
+    <div class="deals-grid">
+      <div class="deal-card">
+        <span class="deal-tag">🚢 Limited Time</span>
+        <h3>Caribbean Cruise — 7 Nights</h3>
+        <p>Royal Caribbean's best itineraries at early-booking rates. Departure from Miami or Port Canaveral. Multiple sail dates available.</p>
+        <div class="deal-price">From $899 <span>per person</span></div>
+        <a href="#contact-form" class="deal-cta">Ask Robert About This →</a>
+      </div>
+      <div class="deal-card">
+        <span class="deal-tag">🏖️ All-Inclusive</span>
+        <h3>Mexico All-Inclusive Package</h3>
+        <p>Adults-only resort in the Riviera Maya. 5 nights, all meals and drinks included, round-trip transfers from Cancun airport.</p>
+        <div class="deal-price">From $1,299 <span>per person</span></div>
+        <a href="#contact-form" class="deal-cta">Ask Robert About This →</a>
+      </div>
+      <div class="deal-card">
+        <span class="deal-tag">🏰 Europe</span>
+        <h3>Mediterranean Cruise + Rome</h3>
+        <p>10-night Mediterranean sailing plus 3 nights in Rome pre-cruise. Celebrity Cruises. Includes flights from select US cities.</p>
+        <div class="deal-price">From $2,499 <span>per person</span></div>
+        <a href="#contact-form" class="deal-cta">Ask Robert About This →</a>
+      </div>
+    </div>
+    <div style="text-align:center; margin-top:40px;">
+      <a href="deals.html" class="btn-primary">View All Deals →</a>
+    </div>
+  </div>
+</div>
+
+<!-- CONTACT FORM -->
+<div class="form-section" id="contact-form">
+  <div class="form-inner">
+    <div class="form-header">
+      <p class="section-label">Get In Touch</p>
+      <h2 class="section-title">Send Robert a Message</h2>
+      <p>Ready to start planning? Fill out the form below and Robert will be in touch within 1–2 business days.</p>
+    </div>
+
+    <div class="success-message" id="successMsg">
+      <div class="success-icon">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <h2>Message Sent!</h2>
+      <p>Thanks for reaching out! Robert will be in touch within 1–2 business days.</p>
+      <a href="../../index.html" class="btn-home">← Back to PAC and GO Travel</a>
+    </div>
+
+    <form id="agentForm" data-agent-key="connie-brant" novalidate>
+      <div class="form-row col-2">
+        <div class="field">
+          <label for="firstName">First Name <span class="req">*</span></label>
+          <input type="text" id="firstName" name="firstName" placeholder="Jane" required />
+          <span class="field-error" id="err-firstName">Please enter your first name.</span>
+        </div>
+        <div class="field">
+          <label for="lastName">Last Name <span class="req">*</span></label>
+          <input type="text" id="lastName" name="lastName" placeholder="Smith" required />
+          <span class="field-error" id="err-lastName">Please enter your last name.</span>
+        </div>
+      </div>
+      <div class="form-row col-2">
+        <div class="field">
+          <label for="email">Email Address <span class="req">*</span></label>
+          <input type="email" id="email" name="email" placeholder="jane@example.com" required />
+          <span class="field-error" id="err-email">Please enter a valid email.</span>
+        </div>
+        <div class="field">
+          <label for="phone">Phone Number</label>
+          <input type="tel" id="phone" name="phone" placeholder="(555) 123-4567" />
+        </div>
+      </div>
+      <div class="form-row col-2">
+        <div class="field">
+          <label for="travelers">Number of Travelers</label>
+          <select id="travelers" name="travelers">
+            <option value="">— Select —</option>
+            <option>1 (Solo)</option>
+            <option>2 (Couple)</option>
+            <option>3–4</option>
+            <option>5–8</option>
+            <option>9–15</option>
+            <option>16+ (Group)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="budget">Approximate Budget (per person)</label>
+          <select id="budget" name="budget">
+            <option value="">— Select —</option>
+            <option>Under $1,500</option>
+            <option>$1,500–$3,000</option>
+            <option>$3,000–$6,000</option>
+            <option>$6,000+</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row col-2">
+        <div class="field">
+          <label for="destination">Destination in Mind</label>
+          <input type="text" id="destination" name="destination" placeholder="e.g. Caribbean, Mediterranean…" />
+        </div>
+        <div class="field">
+          <label for="departDate">Approximate Travel Date</label>
+          <input type="date" id="departDate" name="departDate" />
+        </div>
+      </div>
+      <div class="form-row col-1" style="margin-bottom:8px;">
+        <div class="field">
+          <label>Type of Travel (select all that apply)</label>
+          <div class="trip-types" style="margin-top:8px;">
+            <div class="trip-type-option"><input type="checkbox" id="tt1" name="tripType" value="Ocean Cruise" /><label class="trip-type-label" for="tt1"><span class="trip-type-icon">🚢</span><span class="trip-type-name">Ocean Cruise</span></label></div>
+            <div class="trip-type-option"><input type="checkbox" id="tt2" name="tripType" value="River Cruise" /><label class="trip-type-label" for="tt2"><span class="trip-type-icon">⛵</span><span class="trip-type-name">River Cruise</span></label></div>
+            <div class="trip-type-option"><input type="checkbox" id="tt3" name="tripType" value="All-Inclusive" /><label class="trip-type-label" for="tt3"><span class="trip-type-icon">🏖️</span><span class="trip-type-name">All-Inclusive</span></label></div>
+            <div class="trip-type-option"><input type="checkbox" id="tt4" name="tripType" value="European Escape" /><label class="trip-type-label" for="tt4"><span class="trip-type-icon">🏰</span><span class="trip-type-name">European</span></label></div>
+            <div class="trip-type-option"><input type="checkbox" id="tt5" name="tripType" value="Disney" /><label class="trip-type-label" for="tt5"><span class="trip-type-icon">🏰</span><span class="trip-type-name">Disney</span></label></div>
+            <div class="trip-type-option"><input type="checkbox" id="tt6" name="tripType" value="Other" /><label class="trip-type-label" for="tt6"><span class="trip-type-icon">✨</span><span class="trip-type-name">Other</span></label></div>
+          </div>
+        </div>
+      </div>
+      <div class="form-row col-1">
+        <div class="field">
+          <label for="message">Tell Robert About Your Dream Trip</label>
+          <textarea id="message" name="message" placeholder="Share any details, must-haves, or questions…"></textarea>
+        </div>
+      </div>
+      <div class="submit-area">
+        <button type="submit" class="submit-btn" id="submitBtn">Send Message ✈</button>
+        <p class="submit-note">Your information is never sold or shared with third parties.</p>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-left">
+    © 2026 <a href="../../index.html">PAC and GO Travel</a> · Connie Brant, ITA · CLIA #456611 · Florida Seller of Travel #40802
+  </div>
+  <div class="footer-right">
+    <a href="../../index.html#agents">All Agents</a>
+    <a href="specialties.html">Specialties</a>
+    <a href="deals.html">Deals</a>
+    <a href="../../privacy.html">Privacy Policy</a>
+    <a href="#contact-form">Contact</a>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>
+  // ── Mobile nav ──
+  const hamburger = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobileMenu');
+  hamburger.addEventListener('click', () => mobileMenu.classList.toggle('open'));
+  document.querySelectorAll('.mobile-menu a').forEach(a => {
+    a.addEventListener('click', () => mobileMenu.classList.remove('open'));
+  });
+
+  // ── EmailJS ──
+  const EMAILJS_PUBLIC_KEY  = 'z27LB5a5i1Xtgpt3q';
+  const EMAILJS_SERVICE_ID  = 'service_qouu00u';
+  const EMAILJS_TEMPLATE_ID = 'template_6ablo1d';
+
+  const AGENT_EMAILS = {
+    'alan-klein':        'pacandgoalan@gmail.com',
+    'anissa-dean':       'pacandgoaniska@gmail.com',
+    'beth-vanergrift':   'pacandgobeth@gmail.com',
+    'connie-brant':      'pacandgoconnie@gmail.com',
+    'dawn-roffey':       'pacandgodawn@gmail.com',
+    'denise-berger':     'pacandgodenise@gmail.com',
+    'jane-goerke':       'pacandgojane@gmail.com',
+    'joel-trinidad':     'pacandgojoel@gmail.com',
+    'larry-oakley':      'pacandgolarry@gmail.com',
+    'norma-allen':       'pacandgonorma@gmail.com',
+    'patty-wells':       'pacandgopatty@gmail.com',
+    'connie-brant':   'pacandgoconnie@gmail.com',
+    'rochelle-coronado': 'pacandgorochelle@gmail.com',
+    'rosemary-karnes':   'pacandgorosemary@gmail.com',
+    'sue-muldoon':       'pacandgosue@gmail.com'
+  };
+
+  emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+
+  const form      = document.getElementById('agentForm');
+  const successMsg = document.getElementById('successMsg');
+  const submitBtn  = document.getElementById('submitBtn');
+
+  const phoneEl = document.getElementById('phone');
+  phoneEl?.addEventListener('input', (e) => {
+    let v = e.target.value.replace(/[^0-9]/g,'').substring(0,10);
+    if (v.length >= 6) v = '(' + v.substring(0,3) + ') ' + v.substring(3,6) + '-' + v.substring(6);
+    else if (v.length >= 3) v = '(' + v.substring(0,3) + ') ' + v.substring(3);
+    e.target.value = v;
+  });
+
+  function validateField(input) {
+    const errEl = document.getElementById('err-' + input.id);
+    if (!errEl) return true;
+    const valid = input.checkValidity() && input.value.trim() !== '';
+    input.classList.toggle('invalid', !valid);
+    errEl.classList.toggle('show', !valid);
+    return valid;
+  }
+  ['firstName','lastName','email'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('blur', () => validateField(el));
+  });
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    let valid = true;
+    ['firstName','lastName','email'].forEach(id => {
+      if (!validateField(document.getElementById(id))) valid = false;
+    });
+    if (!valid) {
+      document.querySelector('.invalid')?.scrollIntoView({behavior:'smooth', block:'center'});
+      return;
+    }
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending\u2026';
+
+    const agentKey   = form.dataset.agentKey;
+    const agentEmail = AGENT_EMAILS[agentKey] || 'pacandgopatty@gmail.com';
+    const tripTypes  = [...form.querySelectorAll('input[name="tripType"]:checked')]
+      .map(cb => cb.value).join(', ') || 'Not specified';
+
+    const templateParams = {
+      to_email:    agentEmail,
+      from_name:   (document.getElementById('firstName').value.trim() + ' ' + document.getElementById('lastName').value.trim()).trim(),
+      reply_to:    document.getElementById('email').value.trim(),
+      phone:       document.getElementById('phone').value.trim()       || 'Not provided',
+      message:     document.getElementById('message').value.trim()     || 'No message provided',
+      travelers:   document.getElementById('travelers').value          || 'Not specified',
+      destination: document.getElementById('destination').value.trim() || 'Not specified',
+      travel_date: document.getElementById('departDate').value         || 'Not specified',
+      budget:      document.getElementById('budget').value             || 'Not specified',
+      trip_types:  tripTypes
+    };
+
+    emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams)
+      .then(() => {
+        form.style.display = 'none';
+        successMsg.style.display = 'block';
+        successMsg.scrollIntoView({behavior:'smooth'});
+      })
+      .catch((err) => {
+        console.error('EmailJS error:', err);
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Send Message \u2708';
+        alert('Something went wrong. Please email us directly at ' + agentEmail);
+      });
+  });
+</script>
+<script>
+(async()=>{
+  const SB_URL='https://yqyinpufmizrscdexlwr.supabase.co';
+  const SB_KEY='sb_publishable_T_cxTPA3gwEdEP93W7hnfw_78mr6vLI';
+  const AGENT='connie-brant';
+  try{
+    const r=await fetch(`${SB_URL}/rest/v1/settings?agent_id=eq.${AGENT}&select=photo_url,tagline,specialties,bio`,
+      {headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}});
+    const d=await r.json();
+    if(!d.length) return;
+    const s=d[0];
+    if(s.photo_url){const img=document.getElementById('profilePhoto');if(img)img.src=s.photo_url;}
+    if(s.tagline){const el=document.getElementById('profileTagline');if(el)el.textContent=s.tagline;}
+    if(s.specialties){
+      const el=document.getElementById('profileSpecialties');
+      if(el){
+        const tags=s.specialties.split(',').map(t=>t.trim()).filter(Boolean);
+        el.innerHTML=tags.map(t=>`<span class="specialty-tag">${t}</span>`).join('');
+      }
+    }
+    if(s.bio){
+      const el=document.getElementById('profileBioBody');
+      if(el){
+        const paras=s.bio.split(/\n\n+/).map(p=>p.trim()).filter(Boolean);
+        el.innerHTML=paras.map(p=>`<p>${p}</p>`).join('');
+      }
+    }
+  }catch(e){}
+})();
+</script>
+</body>
+</html>
