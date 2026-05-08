@@ -736,7 +736,7 @@ Return ONLY a raw JSON array with no markdown wrapper. Each deal object must fol
 Email to parse:
 ${text}`;
   try {
-    const result = await callClaude(prompt);
+    const result = await callClaude(prompt, 2000);
     extractedDeals = Array.isArray(result) ? result : [];
     if (!extractedDeals.length) {
       toast('No upcoming deals found in this email', 'error');
@@ -745,7 +745,8 @@ ${text}`;
       toast(`Found ${extractedDeals.length} deal${extractedDeals.length !== 1 ? 's' : ''} ✓`);
     }
   } catch(e) {
-    toast('AI extraction failed — check email content', 'error');
+    console.error('Email extraction error:', e);
+    toast('AI extraction failed: ' + e.message, 'error');
   } finally {
     spin('extractSpinner', false);
     document.getElementById('extractBtn').disabled = false;
@@ -1175,7 +1176,7 @@ async function delRow(tbl,id,cb){
   catch(e){toast('Error','error');}
 }
 
-async function callClaude(prompt){
+async function callClaude(prompt, maxTokens=800){
   const r=await fetch('https://api.anthropic.com/v1/messages',{
     method:'POST',
     headers:{
@@ -1184,10 +1185,12 @@ async function callClaude(prompt){
       'anthropic-version':'2023-06-01',
       'anthropic-dangerous-direct-browser-access':'true'
     },
-    body:JSON.stringify({model:CLAUDE,max_tokens:800,messages:[{role:'user',content:prompt}]})
+    body:JSON.stringify({model:CLAUDE,max_tokens:maxTokens,messages:[{role:'user',content:prompt}]})
   });
   const d=await r.json();
-  return JSON.parse(d.content[0].text.replace(/```json|```/g,'').trim());
+  if(d.error) throw new Error(d.error.message||'API error');
+  const raw=d.content[0].text.replace(/```json\s*/gi,'').replace(/```/g,'').trim();
+  return JSON.parse(raw);
 }
 
 function v(id){return document.getElementById(id)?.value?.trim()||'';}
