@@ -190,6 +190,27 @@
           </div>
         </div>
         <div class="admin-card">
+          <div class="card-title">📧 Extract Deals from Email</div>
+          <div class="fg fg1">
+            <div class="field">
+              <label>Paste Cruise Line Email</label>
+              <textarea id="emailText" rows="8" placeholder="Paste the full email from Royal Caribbean, MSC, Carnival, etc. Claude will find the deals, remove agent-only pricing language, and skip anything already departed."></textarea>
+            </div>
+          </div>
+          <div style="display:flex;gap:12px;align-items:center;margin-top:8px;">
+            <button class="btn btn-gold" id="extractBtn" onclick="extractDealsFromEmail()">✨ Extract Deals</button>
+            <div class="spin-row" id="extractSpinner"><div class="spinner"></div>Reading email…</div>
+          </div>
+          <div id="extractedPreview" style="display:none;margin-top:20px;">
+            <div style="font-size:0.75rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;">✨ Extracted Deals — Remove Any You Don't Want</div>
+            <div id="extractedCards" class="item-list"></div>
+            <div style="margin-top:16px;display:flex;gap:10px;">
+              <button class="btn btn-gold" onclick="addExtractedDeals()">Add All to Live Deals</button>
+              <button class="btn btn-outline" onclick="clearExtracted()">Clear</button>
+            </div>
+          </div>
+        </div>
+        <div class="admin-card">
           <div class="card-title">📋 Current Deals</div>
           <div class="item-list" id="dealsList"><div style="color:rgba(255,255,255,0.3);font-size:0.85rem;padding:16px 0;">Loading…</div></div>
         </div>
@@ -688,6 +709,101 @@ async function saveDealManual(){
     resetForm(['dealLine','dealShip','dealPrice','dealPort','dealDateFrom','dealDateTo']);
     loadDeals();toast('Deal saved ✓');
   }catch(e){toast('Error: '+e.message,'error');}
+}
+
+// ── EMAIL DEAL EXTRACTION ────────────────────────────────────
+let extractedDeals = [];
+
+async function extractDealsFromEmail() {
+  const text = v('emailText');
+  if (!text) return toast('Paste an email first', 'error');
+  spin('extractSpinner', true);
+  document.getElementById('extractBtn').disabled = true;
+  document.getElementById('extractedPreview').style.display = 'none';
+  const today = new Date().toISOString().split('T')[0];
+  const prompt = `You are a travel advisor's assistant. Read this cruise line email and extract up to 3 of the best upcoming deals.
+
+Rules:
+- Skip any sailing that has already departed (today is ${today})
+- Remove all agent-only language: no "net rates", "commissions", "GTY", "group space", "overrides", "NRD"
+- If prices look like net/agent-only rates, estimate consumer price by adding 20-25%
+- Write descriptions in friendly, honest language for leisure travelers
+- If no valid upcoming deals exist in the email, return an empty array []
+
+Return ONLY a raw JSON array with no markdown wrapper. Each deal object must follow this shape exactly:
+{"line":"Cruise line name","ship":"Ship name","title":"Short marketing title (max 8 words)","nights":"7 Nights","dates":"Aug 9 – Aug 16, 2026","port":"Galveston, TX","ports":"Cozumel, Costa Maya, Roatan","price":"$1,299","description":"2 friendly sentences about this cruise.","category":"Ocean Cruise","emoji":"🚢"}
+
+Email to parse:
+${text}`;
+  try {
+    const result = await callClaude(prompt);
+    extractedDeals = Array.isArray(result) ? result : [];
+    if (!extractedDeals.length) {
+      toast('No upcoming deals found in this email', 'error');
+    } else {
+      renderExtractedPreviews();
+      toast(`Found ${extractedDeals.length} deal${extractedDeals.length !== 1 ? 's' : ''} ✓`);
+    }
+  } catch(e) {
+    toast('AI extraction failed — check email content', 'error');
+  } finally {
+    spin('extractSpinner', false);
+    document.getElementById('extractBtn').disabled = false;
+  }
+}
+
+function renderExtractedPreviews() {
+  document.getElementById('extractedCards').innerHTML = extractedDeals.map((d, i) => `
+    <div class="list-item">
+      <div class="li-info">
+        <div class="li-title">${d.emoji || '🚢'} ${d.line} — ${d.title || d.ship}</div>
+        <div class="li-meta">
+          ${d.dates ? `<span>📅 ${d.dates}</span>` : ''}
+          ${d.nights ? `<span>🌙 ${d.nights}</span>` : ''}
+          ${d.port ? `<span>⚓ ${d.port}</span>` : ''}
+          ${d.ports ? `<span>🗺️ ${d.ports}</span>` : ''}
+        </div>
+        ${d.description ? `<div style="font-size:0.82rem;color:rgba(255,255,255,0.55);margin-top:6px;font-style:italic;">${d.description}</div>` : ''}
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+        <div class="li-price">${d.price || 'Call for price'}</div>
+        <button class="btn btn-sm btn-danger" onclick="removeExtracted(${i})">Remove</button>
+      </div>
+    </div>`).join('');
+  document.getElementById('extractedPreview').style.display = 'block';
+}
+
+function removeExtracted(i) {
+  extractedDeals.splice(i, 1);
+  if (!extractedDeals.length) { document.getElementById('extractedPreview').style.display = 'none'; }
+  else { renderExtractedPreviews(); }
+}
+
+function clearExtracted() {
+  extractedDeals = [];
+  document.getElementById('extractedPreview').style.display = 'none';
+  document.getElementById('emailText').value = '';
+}
+
+async function addExtractedDeals() {
+  if (!extractedDeals.length) return;
+  const count = extractedDeals.length;
+  const toAdd = [...extractedDeals];
+  try {
+    for (const d of toAdd) {
+      await DB.post('deals', {
+        agent_id: agent, type: d.category || 'Ocean Cruise',
+        line: d.line || '', ship: d.ship || '', port: d.port || '',
+        dates: d.dates || '', price: d.price || '',
+        title: d.title || d.ship, nights: d.nights || '',
+        ports: d.ports || '', description: d.description || '',
+        emoji: d.emoji || '🚢', category: d.category || 'Ocean Cruise', active: true
+      });
+    }
+    clearExtracted();
+    loadDeals();
+    toast(`${count} deal${count !== 1 ? 's' : ''} added and live ✓`);
+  } catch(e) { toast('Error saving: ' + e.message, 'error'); }
 }
 
 // ── TRIPS ───────────────────────────────────────────────────
