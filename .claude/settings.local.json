@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__claude_ai_Netlify__netlify-project-services-reader",
+      "mcp__claude_ai_Netlify__netlify-deploy-services-reader"
+    ]
+  }
+}

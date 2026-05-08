@@ -25,8 +25,10 @@
     .admin-brand{font-family:'Playfair Display',serif;font-size:1rem;color:var(--gold);}
     .admin-brand span{color:rgba(255,255,255,0.4);font-family:'Lato',sans-serif;font-size:0.78rem;font-weight:400;margin-left:8px;}
     .topbar-right{display:flex;align-items:center;gap:16px;}
-    .agent-switcher{background:rgba(255,255,255,0.08);border:1px solid var(--border);border-radius:6px;padding:6px 12px;color:#fff;font-size:0.82rem;font-family:'Lato',sans-serif;cursor:pointer;outline:none;}
-    .agent-switcher option{background:#1a2a3a;}
+    .agent-pills{display:flex;align-items:center;gap:6px;}
+    .agent-pill{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:20px;padding:5px 14px;color:rgba(255,255,255,0.55);font-size:0.78rem;font-family:'Lato',sans-serif;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+    .agent-pill:hover{background:rgba(255,255,255,0.12);color:#fff;}
+    .agent-pill.active{background:rgba(201,168,76,0.15);border-color:var(--gold);color:var(--gold);font-weight:700;}
     .logout-btn{background:none;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.5);padding:6px 14px;border-radius:6px;font-size:0.78rem;cursor:pointer;transition:all 0.2s;}
     .logout-btn:hover{border-color:#ff8080;color:#ff8080;}
     .admin-layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 60px);}
@@ -116,11 +118,11 @@
   <div class="admin-topbar">
     <div class="admin-brand">Agent+ Admin <span>PAC and GO Travel</span></div>
     <div class="topbar-right">
-      <select class="agent-switcher" id="agentSwitcher" onchange="switchAgent(this.value)">
-        <option value="robert-traversi">Robert Traversi</option>
-        <option value="patty-wells">Patty Wells</option>
-        <option value="connie-brant">Connie Brant</option>
-      </select>
+      <div class="agent-pills">
+        <button class="agent-pill active" id="pill-robert-traversi" onclick="switchAgent('robert-traversi')">Robert Traversi</button>
+        <button class="agent-pill" id="pill-patty-wells" onclick="switchAgent('patty-wells')">Patty Wells</button>
+        <button class="agent-pill" id="pill-connie-brant" onclick="switchAgent('connie-brant')">Connie Brant</button>
+      </div>
       <button class="logout-btn" onclick="doLogout()">Sign Out</button>
     </div>
   </div>
@@ -337,7 +339,7 @@
 
       <!-- PROFILE PANEL -->
       <div class="panel" id="panel-profile">
-        <div class="panel-header"><h1>Profile</h1><p>Update your bio, photo, tagline, and specialty tags. Changes publish instantly to your Agent+ page.</p></div>
+        <div class="panel-header"><h1>Profile — <span id="profileAgentName" style="color:var(--gold);">Robert Traversi</span></h1><p>Update your bio, photo, tagline, and specialty tags. Changes publish instantly to your Agent+ page.</p></div>
         <div class="admin-card">
           <div class="card-title">📸 Profile Photo</div>
           <div style="display:flex;gap:24px;align-items:flex-start;">
@@ -642,7 +644,19 @@ function copyAgentSql(){
 }
 
 // ── AGENT / NAV ─────────────────────────────────────────────
-function switchAgent(a){agent=a;loadAll();toast('Switched to '+{robert:'Robert Traversi',patty:'Patty Wells',connie:'Connie Brant'}[a.split('-')[0]]||a);}
+const AGENT_NAMES={'robert-traversi':'Robert Traversi','patty-wells':'Patty Wells','connie-brant':'Connie Brant'};
+function switchAgent(a){
+  agent=a;
+  // update pills
+  document.querySelectorAll('.agent-pill').forEach(p=>p.classList.remove('active'));
+  const pill=document.getElementById('pill-'+a);
+  if(pill) pill.classList.add('active');
+  // update profile panel header
+  const ph=document.getElementById('profileAgentName');
+  if(ph) ph.textContent=AGENT_NAMES[a]||a;
+  loadAll();
+  toast('Switched to '+(AGENT_NAMES[a]||a));
+}
 function showPanel(n,el){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.sidebar-link').forEach(l=>l.classList.remove('active'));
