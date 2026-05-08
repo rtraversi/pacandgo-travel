@@ -292,9 +292,17 @@
 
       <!-- REVIEWS PANEL -->
       <div class="panel" id="panel-reviews">
-        <div class="panel-header"><h1>Reviews</h1><p>Add and approve client testimonials.</p></div>
+        <div class="panel-header"><h1>Reviews</h1><p>Approve reviews submitted by clients, or add your own testimonials manually.</p></div>
+
+        <!-- Pending reviews — shown only when there are pending -->
+        <div class="admin-card" id="pendingReviewsCard" style="display:none;border-color:rgba(240,160,30,0.5);">
+          <div class="card-title" style="color:#f0a500;">🔔 Pending Approval</div>
+          <div class="item-list" id="pendingReviewsList"></div>
+        </div>
+
+        <!-- Add manually -->
         <div class="admin-card">
-          <div class="card-title">➕ Add Review</div>
+          <div class="card-title">➕ Add Review Manually</div>
           <div class="fg">
             <div class="field"><label>Client Name</label><input type="text" id="reviewName" placeholder="e.g. Sarah & Mike T." /></div>
             <div class="field"><label>Trip Type / Details</label><input type="text" id="reviewTrip" placeholder="e.g. Royal Caribbean, Caribbean 2025" /></div>
@@ -303,9 +311,17 @@
           <div class="fg fg1"><div class="field"><label>Review Text</label><textarea id="reviewText" rows="3" placeholder="Client's words…"></textarea></div></div>
           <button class="btn btn-gold" onclick="addReview()" style="margin-top:8px;">Add & Approve Review</button>
         </div>
+
+        <!-- Live approved reviews -->
         <div class="admin-card">
-          <div class="card-title">📋 All Reviews</div>
+          <div class="card-title">✅ Live Reviews</div>
           <div class="item-list" id="reviewsList"><div style="color:rgba(255,255,255,0.3);font-size:0.85rem;">Loading…</div></div>
+        </div>
+
+        <!-- Denied / hidden reviews -->
+        <div class="admin-card" id="deniedReviewsCard" style="display:none;border-color:rgba(255,100,100,0.2);">
+          <div class="card-title" style="color:rgba(255,100,100,0.7);">🚫 Denied (Hidden)</div>
+          <div class="item-list" id="deniedReviewsList"></div>
         </div>
       </div>
 
@@ -400,7 +416,12 @@
   ADD COLUMN IF NOT EXISTS tagline     TEXT,
   ADD COLUMN IF NOT EXISTS photo_url   TEXT,
   ADD COLUMN IF NOT EXISTS specialties TEXT,
-  ADD COLUMN IF NOT EXISTS highlights  TEXT;</code>
+  ADD COLUMN IF NOT EXISTS highlights  TEXT;
+
+-- Add status column to reviews (run once):
+ALTER TABLE reviews ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'pending';
+UPDATE reviews SET status = 'approved' WHERE approved = true AND status IS NULL;
+UPDATE reviews SET status = 'pending'  WHERE (approved IS NULL OR approved = false) AND status IS NULL;</code>
         </div>
       </div>
 
@@ -915,7 +936,7 @@ async function addReview(){
   const text=v('reviewText');
   if(!text) return toast('Review text required','error');
   try{
-    await DB.post('reviews',{agent_id:agent,client_name:v('reviewName'),trip_type:v('reviewTrip'),stars:parseInt(v('reviewStars')),review_text:text,approved:true});
+    await DB.post('reviews',{agent_id:agent,client_name:v('reviewName'),trip_type:v('reviewTrip'),stars:parseInt(v('reviewStars')),review_text:text,approved:true,status:'approved'});
     resetForm(['reviewName','reviewTrip','reviewText']);document.getElementById('reviewStars').value='5';
     loadReviews();toast('Review added ✓');
   }catch(e){toast('Error: '+e.message,'error');}
@@ -924,26 +945,92 @@ async function addReview(){
 async function loadReviews(){
   try{
     const d=await DB.get('reviews','agent_id=eq.'+agent+'&order=created_at.desc');
-    const pending=d.filter(r=>!r.approved).length;
+    const pending=d.filter(r=>r.status==='pending'||(r.status==null&&!r.approved));
+    const approved=d.filter(r=>r.status==='approved'||(!r.status&&r.approved===true));
+    const denied=d.filter(r=>r.status==='denied');
+
+    // sidebar badge
     const badge=document.getElementById('reviewsBadge');
-    badge.textContent=pending||'';badge.style.display=pending?'inline':'none';
+    badge.textContent=pending.length||'';
+    badge.style.display=pending.length?'inline':'none';
+
+    // pending card
+    const pendingCard=document.getElementById('pendingReviewsCard');
+    const pendingList=document.getElementById('pendingReviewsList');
+    if(pending.length){
+      pendingCard.style.display='';
+      pendingList.innerHTML=pending.map(x=>`
+        <div class="list-item" id="pr-${x.id}">
+          <div class="li-info">
+            <div class="li-title">${'★'.repeat(x.stars||5)} ${x.client_name||'Anonymous'}</div>
+            <div class="li-meta"><span>${x.trip_type||''}</span> <span style="color:rgba(255,255,255,0.3);font-size:0.75rem;">${x.created_at?new Date(x.created_at).toLocaleDateString():''}</span></div>
+            <div style="font-size:0.85rem;color:rgba(255,255,255,0.75);margin-top:8px;font-style:italic;">"${x.review_text||''}"</div>
+          </div>
+          <div class="li-actions" style="flex-direction:column;gap:6px;min-width:120px;">
+            <button class="btn btn-sm btn-gold" onclick="approveReview('${x.id}')">✓ Approve</button>
+            <button class="btn btn-sm" style="background:rgba(255,80,80,0.15);border:1px solid rgba(255,80,80,0.4);color:#ff8080;" onclick="showDenyOptions('${x.id}')">✗ Deny</button>
+          </div>
+        </div>
+        <div id="deny-opts-${x.id}" style="display:none;background:rgba(255,60,60,0.08);border:1px solid rgba(255,80,80,0.3);border-radius:8px;padding:14px 16px;margin:-8px 0 8px;">
+          <p style="font-size:0.82rem;color:rgba(255,255,255,0.7);margin-bottom:10px;">What would you like to do with this review?</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-sm btn-danger" onclick="deleteReview('${x.id}')">🗑 Delete Permanently</button>
+            <button class="btn btn-sm" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.6);" onclick="denyReview('${x.id}')">🚫 Keep Hidden</button>
+            <button class="btn btn-sm" style="background:none;border:none;color:rgba(255,255,255,0.3);cursor:pointer;" onclick="hideDenyOptions('${x.id}')">Cancel</button>
+          </div>
+        </div>`).join('');
+    } else {
+      pendingCard.style.display='none';
+    }
+
+    // approved list
     const el=document.getElementById('reviewsList');
-    if(!d.length){el.innerHTML='<div style="color:rgba(255,255,255,0.3);font-size:0.85rem;">No reviews yet.</div>';return;}
-    el.innerHTML=d.map(x=>`<div class="list-item">
+    if(!approved.length){el.innerHTML='<div style="color:rgba(255,255,255,0.3);font-size:0.85rem;">No approved reviews yet.</div>';}
+    else{el.innerHTML=approved.map(x=>`<div class="list-item">
       <div class="li-info"><div class="li-title">${'★'.repeat(x.stars||5)} ${x.client_name||'Anonymous'}</div>
       <div class="li-meta"><span>${x.trip_type||''}</span></div>
-      <div style="font-size:0.82rem;color:rgba(255,255,255,0.6);margin-top:6px;font-style:italic;">"${(x.review_text||'').substring(0,100)}${(x.review_text||'').length>100?'…':''}"</div></div>
+      <div style="font-size:0.82rem;color:rgba(255,255,255,0.6);margin-top:6px;font-style:italic;">"${(x.review_text||'').substring(0,120)}${(x.review_text||'').length>120?'…':''}"</div></div>
       <div class="li-actions">
-        <span class="badge ${x.approved?'badge-live':'badge-pending'}">${x.approved?'Live':'Pending'}</span>
-        ${!x.approved?`<button class="btn btn-sm btn-gold" onclick="approveReview('${x.id}')">Approve</button>`:''}
-        <button class="btn btn-sm btn-danger" onclick="delRow('reviews','${x.id}',loadReviews)">Delete</button>
-      </div></div>`).join('');
+        <span class="badge badge-live">Live</span>
+        <button class="btn btn-sm btn-danger" onclick="deleteReview('${x.id}')">Delete</button>
+      </div></div>`).join('');}
+
+    // denied list
+    const deniedCard=document.getElementById('deniedReviewsCard');
+    const deniedList=document.getElementById('deniedReviewsList');
+    if(denied.length){
+      deniedCard.style.display='';
+      deniedList.innerHTML=denied.map(x=>`<div class="list-item">
+        <div class="li-info"><div class="li-title" style="color:rgba(255,255,255,0.4);">${'★'.repeat(x.stars||5)} ${x.client_name||'Anonymous'}</div>
+        <div style="font-size:0.82rem;color:rgba(255,255,255,0.35);margin-top:6px;font-style:italic;">"${(x.review_text||'').substring(0,120)}…"</div></div>
+        <div class="li-actions">
+          <button class="btn btn-sm btn-gold" onclick="approveReview('${x.id}')">Restore</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteReview('${x.id}')">Delete</button>
+        </div></div>`).join('');
+    } else {
+      deniedCard.style.display='none';
+    }
   }catch(e){toast('Load error','error');}
 }
 
 async function approveReview(id){
-  try{await DB.patch('reviews','id=eq.'+id,{approved:true});loadReviews();toast('Approved ✓');}
+  try{await DB.patch('reviews','id=eq.'+id,{approved:true,status:'approved'});loadReviews();toast('Review approved ✓');}
   catch(e){toast('Error','error');}
+}
+async function denyReview(id){
+  try{await DB.patch('reviews','id=eq.'+id,{approved:false,status:'denied'});loadReviews();toast('Review kept hidden');}
+  catch(e){toast('Error','error');}
+}
+async function deleteReview(id){
+  if(!confirm('Permanently delete this review?')) return;
+  try{await DB.del('reviews','id=eq.'+id);loadReviews();toast('Review deleted');}
+  catch(e){toast('Error','error');}
+}
+function showDenyOptions(id){
+  document.getElementById('deny-opts-'+id).style.display='';
+}
+function hideDenyOptions(id){
+  document.getElementById('deny-opts-'+id).style.display='none';
 }
 
 // ── GALLERY ─────────────────────────────────────────────────

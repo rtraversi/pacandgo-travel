@@ -334,6 +334,19 @@
     }
     .deal-cta:hover { background: var(--ocean); }
 
+    /* ── LEAVE A REVIEW ─────────────────────────────────── */
+    .review-submit-section{background:var(--sand);padding:72px 5%;}
+    .review-submit-inner{max-width:640px;margin:0 auto;}
+    .review-submit-card{background:var(--white);border-radius:16px;padding:36px;box-shadow:0 4px 24px rgba(0,0,0,0.07);}
+    .rf-stars{display:flex;gap:6px;font-size:2.2rem;cursor:pointer;margin-bottom:24px;color:#ddd;user-select:none;}
+    .rf-star.on{color:var(--gold);}
+    .rf-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+    .rf-field{margin-bottom:16px;}
+    .rf-field label{display:block;font-size:0.78rem;font-weight:700;color:var(--navy);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.05em;}
+    .rf-field input,.rf-field textarea{width:100%;padding:10px 14px;border:1.5px solid #dde;border-radius:8px;font-family:'Lato',sans-serif;font-size:0.9rem;color:var(--navy);outline:none;transition:border-color 0.2s;background:#fff;}
+    .rf-field input:focus,.rf-field textarea:focus{border-color:var(--gold);}
+    .rf-field textarea{resize:vertical;}
+    .rf-thanks{display:none;text-align:center;padding:40px;background:rgba(201,168,76,0.08);border-radius:12px;border:1px solid rgba(201,168,76,0.3);}
     /* ── CONTACT FORM ────────────────────────────────────── */
     .form-section { background: var(--white); padding: 80px 5%; }
     .form-inner { max-width: 720px; margin: 0 auto; }
@@ -685,7 +698,7 @@
       <h2 class="section-title" style="color:var(--white);">Reviews</h2>
       <p class="section-subtitle" style="color:rgba(255,255,255,0.6);">Real feedback from real travelers Robert has worked with.</p>
     </div>
-    <div class="reviews-grid">
+    <div class="reviews-grid" id="publicReviewsGrid">
       <div class="review-card">
         <div class="review-stars">★★★★★</div>
         <p class="review-text">"Robert made our first cruise completely stress-free. He knew every detail about the ship, the ports, and what to book in advance. We'll never plan a cruise without him again."</p>
@@ -707,6 +720,38 @@
     </div>
     <div style="text-align:center; margin-top:40px;">
       <a href="reviews.html" class="btn-outline">Read All Reviews →</a>
+    </div>
+  </div>
+</div>
+
+<!-- LEAVE A REVIEW -->
+<div class="review-submit-section">
+  <div class="review-submit-inner">
+    <div class="section-header centered" style="margin-bottom:36px;">
+      <p class="section-label">Share Your Experience</p>
+      <h2 class="section-title">Leave a Review</h2>
+      <p class="section-subtitle">Had a great trip with Robert? We'd love to hear about it.</p>
+    </div>
+    <div class="review-submit-card" id="rfCard">
+      <div class="rf-stars" id="rfStars">
+        <span class="rf-star on" data-v="1">★</span>
+        <span class="rf-star on" data-v="2">★</span>
+        <span class="rf-star on" data-v="3">★</span>
+        <span class="rf-star on" data-v="4">★</span>
+        <span class="rf-star on" data-v="5">★</span>
+      </div>
+      <input type="hidden" id="rfStarVal" value="5" />
+      <div class="rf-row">
+        <div class="rf-field"><label>Your Name</label><input type="text" id="rfName" placeholder="e.g. Sarah & Mike T." /></div>
+        <div class="rf-field"><label>Trip Type (optional)</label><input type="text" id="rfTrip" placeholder="e.g. Caribbean Cruise, 2025" /></div>
+      </div>
+      <div class="rf-field"><label>Your Review</label><textarea id="rfText" rows="4" placeholder="Tell us about your experience…"></textarea></div>
+      <button onclick="submitReview()" id="rfBtn" class="btn-primary" style="width:100%;justify-content:center;margin-top:4px;">Submit Review ✈</button>
+    </div>
+    <div class="rf-thanks" id="rfThanks">
+      <div style="font-size:2.5rem;margin-bottom:16px;">🙏</div>
+      <h3 style="color:var(--navy);font-family:'Playfair Display',serif;margin-bottom:8px;">Thank You!</h3>
+      <p style="color:var(--gray);">Your review has been submitted and will appear on the site after Robert approves it.</p>
     </div>
   </div>
 </div>
@@ -971,41 +1016,71 @@
   });
 </script>
 <script>
+const SB_URL='https://yqyinpufmizrscdexlwr.supabase.co';
+const SB_KEY='sb_publishable_T_cxTPA3gwEdEP93W7hnfw_78mr6vLI';
+const AGENT='robert-traversi';
+const SB_HDR={'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json'};
+
+// ── Profile ──
 (async()=>{
-  const SB_URL='https://yqyinpufmizrscdexlwr.supabase.co';
-  const SB_KEY='sb_publishable_T_cxTPA3gwEdEP93W7hnfw_78mr6vLI';
-  const AGENT='robert-traversi';
   try{
-    const r=await fetch(`${SB_URL}/rest/v1/settings?agent_id=eq.${AGENT}&select=photo_url,tagline,specialties,bio,highlights`,
-      {headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}});
+    const r=await fetch(`${SB_URL}/rest/v1/settings?agent_id=eq.${AGENT}&select=photo_url,tagline,specialties,bio,highlights`,{headers:SB_HDR});
     const d=await r.json();
     if(!d.length) return;
     const s=d[0];
     if(s.photo_url){const img=document.getElementById('profilePhoto');if(img)img.src=s.photo_url;}
     if(s.tagline){const el=document.getElementById('profileTagline');if(el)el.textContent=s.tagline;}
-    if(s.specialties){
-      const el=document.getElementById('profileSpecialties');
-      if(el){
-        const tags=s.specialties.split(',').map(t=>t.trim()).filter(Boolean);
-        el.innerHTML=tags.map(t=>`<span class="specialty-tag">${t}</span>`).join('');
-      }
-    }
-    if(s.bio){
-      const el=document.getElementById('profileBioBody');
-      if(el){
-        const paras=s.bio.split(/\n\n+/).map(p=>p.trim()).filter(Boolean);
-        el.innerHTML=paras.map(p=>`<p>${p}</p>`).join('');
-      }
-    }
-    if(s.highlights){
-      const el=document.getElementById('profileHighlights');
-      if(el){try{
-        const items=JSON.parse(s.highlights);
-        el.innerHTML=items.map(h=>`<div class="cred-item"><span class="cred-icon">${h.icon}</span><div class="cred-text"><strong>${h.title}</strong> ${h.text}</div></div>`).join('');
-      }catch(e){}}
-    }
+    if(s.specialties){const el=document.getElementById('profileSpecialties');if(el){const tags=s.specialties.split(',').map(t=>t.trim()).filter(Boolean);el.innerHTML=tags.map(t=>`<span class="specialty-tag">${t}</span>`).join('');}}
+    if(s.bio){const el=document.getElementById('profileBioBody');if(el){const paras=s.bio.split(/\n\n+/).map(p=>p.trim()).filter(Boolean);el.innerHTML=paras.map(p=>`<p>${p}</p>`).join('');}}
+    if(s.highlights){const el=document.getElementById('profileHighlights');if(el){try{const items=JSON.parse(s.highlights);el.innerHTML=items.map(h=>`<div class="cred-item"><span class="cred-icon">${h.icon}</span><div class="cred-text"><strong>${h.title}</strong> ${h.text}</div></div>`).join('');}catch(e){}}}
   }catch(e){}
 })();
+
+// ── Approved reviews ──
+(async()=>{
+  try{
+    const r=await fetch(`${SB_URL}/rest/v1/reviews?agent_id=eq.${AGENT}&status=eq.approved&order=created_at.desc`,{headers:SB_HDR});
+    const d=await r.json();
+    if(!d.length) return;
+    const grid=document.getElementById('publicReviewsGrid');
+    if(!grid) return;
+    grid.innerHTML=d.map(x=>`<div class="review-card">
+      <div class="review-stars">${'★'.repeat(x.stars||5)}${'☆'.repeat(5-(x.stars||5))}</div>
+      <p class="review-text">"${x.review_text||''}"</p>
+      <div class="review-author">— ${x.client_name||'A traveler'}</div>
+      ${x.trip_type?`<div class="review-trip">${x.trip_type}</div>`:''}
+    </div>`).join('');
+  }catch(e){}
+})();
+
+// ── Star picker ──
+let rfVal=5;
+document.querySelectorAll('.rf-star').forEach(s=>{
+  s.addEventListener('mouseover',()=>{const v=+s.dataset.v;document.querySelectorAll('.rf-star').forEach(st=>st.classList.toggle('on',+st.dataset.v<=v));});
+  s.addEventListener('mouseout',()=>{document.querySelectorAll('.rf-star').forEach(st=>st.classList.toggle('on',+st.dataset.v<=rfVal));});
+  s.addEventListener('click',()=>{rfVal=+s.dataset.v;document.getElementById('rfStarVal').value=rfVal;document.querySelectorAll('.rf-star').forEach(st=>st.classList.toggle('on',+st.dataset.v<=rfVal));});
+});
+
+// ── Submit review ──
+async function submitReview(){
+  const name=document.getElementById('rfName').value.trim();
+  const text=document.getElementById('rfText').value.trim();
+  const trip=document.getElementById('rfTrip').value.trim();
+  const stars=parseInt(document.getElementById('rfStarVal').value)||5;
+  if(!name||!text){alert('Please enter your name and review.');return;}
+  const btn=document.getElementById('rfBtn');
+  btn.disabled=true;btn.textContent='Submitting…';
+  try{
+    const res=await fetch(`${SB_URL}/rest/v1/reviews`,{
+      method:'POST',
+      headers:{...SB_HDR,'Prefer':'return=minimal'},
+      body:JSON.stringify({agent_id:AGENT,client_name:name,review_text:text,trip_type:trip||null,stars,approved:false,status:'pending'})
+    });
+    if(!res.ok)throw new Error();
+    document.getElementById('rfCard').style.display='none';
+    document.getElementById('rfThanks').style.display='block';
+  }catch(e){alert('Something went wrong. Please try again.');btn.disabled=false;btn.textContent='Submit Review ✈';}
+}
 </script>
 </body>
 </html>
