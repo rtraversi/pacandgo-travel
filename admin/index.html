@@ -6,6 +6,7 @@
   <title>Agent+ Admin Panel | PAC and GO Travel</title>
   <meta name="robots" content="noindex, nofollow" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Mono:wght@400;500&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <style>
     :root{--navy:#0d2b45;--ocean:#1a5276;--gold:#c9a84c;--gold-light:#e8c97a;--white:#fff;--gray:#5d6d7e;--border:rgba(201,168,76,0.25);}
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -15,8 +16,10 @@
     .login-logo{font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--gold);margin-bottom:8px;}
     .login-sub{font-size:0.8rem;color:rgba(255,255,255,0.4);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:36px;}
     .login-card label{display:block;text-align:left;font-size:0.75rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:8px;}
-    .login-card input[type=password]{width:100%;padding:13px 16px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:#fff;font-size:1rem;font-family:'DM Mono',monospace;letter-spacing:0.15em;outline:none;margin-bottom:20px;transition:border-color 0.2s;}
-    .login-card input[type=password]:focus{border-color:var(--gold);}
+    .login-card input[type=email],.login-card input[type=password]{width:100%;padding:13px 16px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:#fff;font-size:1rem;font-family:'Lato',sans-serif;outline:none;margin-bottom:16px;transition:border-color 0.2s;}
+    .login-card input[type=password]{letter-spacing:0.15em;font-family:'DM Mono',monospace;}
+    .login-card input[type=email]:focus,.login-card input[type=password]:focus{border-color:var(--gold);}
+    .login-user{font-size:0.78rem;color:rgba(255,255,255,0.45);margin-left:8px;}
     .login-btn{width:100%;padding:13px;background:var(--gold);color:var(--navy);border:none;border-radius:8px;font-weight:700;font-size:0.9rem;letter-spacing:0.07em;text-transform:uppercase;cursor:pointer;transition:background 0.2s;}
     .login-btn:hover{background:var(--gold-light);}
     .login-error{font-size:0.82rem;color:#ff8080;margin-top:12px;display:none;}
@@ -107,18 +110,20 @@
   <div class="login-card">
     <div class="login-logo">PAC and GO Travel</div>
     <div class="login-sub">Agent+ Admin Panel</div>
+    <label for="loginEmail">Email</label>
+    <input type="email" id="loginEmail" placeholder="you@email.com" autocomplete="email" />
     <label for="loginPass">Password</label>
     <input type="password" id="loginPass" placeholder="••••••••••••" autocomplete="current-password" />
-    <button class="login-btn" onclick="doLogin()">Sign In</button>
-    <div class="login-error" id="loginError">Incorrect password. Please try again.</div>
+    <button class="login-btn" id="loginBtn" onclick="doLogin()">Sign In</button>
+    <div class="login-error" id="loginError">Incorrect email or password.</div>
   </div>
 </div>
 
 <div id="adminShell">
   <div class="admin-topbar">
-    <div class="admin-brand">Agent+ Admin <span>PAC and GO Travel</span></div>
+    <div class="admin-brand">Agent+ Admin <span>PAC and GO Travel</span><span class="login-user" id="topbarUser"></span></div>
     <div class="topbar-right">
-      <div class="agent-pills">
+      <div class="agent-pills" id="agentPillsRow">
         <button class="agent-pill active" id="pill-robert-traversi" onclick="switchAgent('robert-traversi')">Robert Traversi</button>
         <button class="agent-pill" id="pill-patty-wells" onclick="switchAgent('patty-wells')">Patty Wells</button>
         <button class="agent-pill" id="pill-connie-brant" onclick="switchAgent('connie-brant')">Connie Brant</button>
@@ -142,7 +147,7 @@
         <button class="sidebar-link" onclick="showPanel('profile',this)"><span class="sidebar-icon">👤</span>Profile</button>
         <button class="sidebar-link" onclick="showPanel('settings',this)"><span class="sidebar-icon">⚙️</span>Page Settings</button>
       </div>
-      <div class="sidebar-section">
+      <div class="sidebar-section" id="sidebar-mgmt">
         <div class="sidebar-label">Management</div>
         <button class="sidebar-link" onclick="showPanel('add-agent',this)"><span class="sidebar-icon">➕</span>Add New Agent+</button>
       </div>
@@ -437,7 +442,7 @@ UPDATE reviews SET status = 'pending'  WHERE (approved IS NULL OR approved = fal
           <button class="btn btn-gold" onclick="saveSettings()" style="margin-top:8px;">Save Settings</button>
         </div>
         <div class="admin-card">
-          <div class="card-title">🔑 Change Admin Password</div>
+          <div class="card-title">🔑 Change Your Password</div>
           <div class="fg">
             <div class="field"><label>New Password</label><input type="password" id="newPass" placeholder="Min 8 characters" /></div>
             <div class="field"><label>Confirm Password</label><input type="password" id="newPassConfirm" placeholder="Repeat password" /></div>
@@ -482,6 +487,13 @@ UPDATE reviews SET status = 'pending'  WHERE (approved IS NULL OR approved = fal
             <div>2. Run: <code id="agentScriptRun" style="color:#2ecc71;"></code></div>
             <div>3. Run this in <strong>Supabase SQL Editor</strong> after the script finishes:</div>
           </div>
+          <div style="margin-top:12px;padding:12px 14px;background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.25);border-radius:8px;font-size:0.8rem;color:rgba(255,255,255,0.65);line-height:1.8;">
+            <strong style="color:var(--gold);">4. Create login for this agent in Supabase:</strong><br/>
+            Go to <strong>Supabase → Authentication → Users → Add User</strong><br/>
+            Email: <em>the agent's email</em> · Set a temporary password<br/>
+            After creating, click the user → <strong>Edit User Metadata</strong> and paste:<br/>
+            <code id="agentAuthMeta" style="color:#e8c97a;word-break:break-all;font-size:0.78rem;"></code>
+          </div>
           <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:12px 16px;font-family:monospace;font-size:0.85rem;color:#e8c97a;display:flex;align-items:center;justify-content:space-between;gap:12px;">
             <span id="agentScriptSql"></span>
             <button onclick="copyAgentSql()" style="background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.3);color:var(--gold);padding:4px 12px;border-radius:4px;cursor:pointer;font-size:0.75rem;white-space:nowrap;">Copy SQL</button>
@@ -509,16 +521,24 @@ UPDATE reviews SET status = 'pending'  WHERE (approved IS NULL OR approved = fal
 const SB_URL = 'https://yqyinpufmizrscdexlwr.supabase.co';
 const SB_KEY = 'sb_publishable_T_cxTPA3gwEdEP93W7hnfw_78mr6vLI';
 const CLAUDE = 'claude-sonnet-4-20250514';
-const DEFAULT_PASS = 'pacandgo2026';
+
+const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
+let authToken = null;
+let currentRole = null;
 
 let agent = 'robert-traversi';
 let eDeal = null, eTrip = null;
 
+supabaseClient.auth.onAuthStateChange((event, session) => {
+  authToken = session?.access_token || null;
+});
+
 // ── SUPABASE ────────────────────────────────────────────────
 async function sb(method, table, params='', body=null, prefer='return=representation') {
+  const token = authToken || SB_KEY;
   const r = await fetch(`${SB_URL}/rest/v1/${table}${params?'?'+params:''}`, {
     method,
-    headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':prefer},
+    headers:{'apikey':SB_KEY,'Authorization':'Bearer '+token,'Content-Type':'application/json','Prefer':prefer},
     body: body ? JSON.stringify(body) : undefined
   });
   if(!r.ok) throw new Error(await r.text());
@@ -534,28 +554,75 @@ const DB = {
 };
 
 // ── AUTH ────────────────────────────────────────────────────
-function doLogin() {
-  const p = document.getElementById('loginPass').value;
-  const s = localStorage.getItem('ap') || DEFAULT_PASS;
-  if(p===s) {
-    document.getElementById('loginScreen').style.display='none';
-    document.getElementById('adminShell').style.display='block';
-    loadAll();
-  } else {
-    document.getElementById('loginError').style.display='block';
-    document.getElementById('loginPass').value='';
+async function doLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass  = document.getElementById('loginPass').value;
+  const btn   = document.getElementById('loginBtn');
+  const errEl = document.getElementById('loginError');
+  errEl.style.display = 'none';
+  if (!email || !pass) { errEl.style.display = 'block'; errEl.textContent = 'Enter your email and password.'; return; }
+  btn.disabled = true; btn.textContent = 'Signing in…';
+  const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
+  btn.disabled = false; btn.textContent = 'Sign In';
+  if (error) {
+    errEl.style.display = 'block';
+    errEl.textContent = 'Incorrect email or password.';
+    document.getElementById('loginPass').value = '';
+    return;
   }
+  applySession(data.user, data.session);
 }
-document.getElementById('loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
-function doLogout(){document.getElementById('adminShell').style.display='none';document.getElementById('loginScreen').style.display='flex';document.getElementById('loginPass').value='';}
-function changePassword(){
-  const n=document.getElementById('newPass').value,c=document.getElementById('newPassConfirm').value;
-  if(n.length<8) return toast('Min 8 characters','error');
-  if(n!==c) return toast('Passwords do not match','error');
-  localStorage.setItem('ap',n);
-  document.getElementById('newPass').value='';document.getElementById('newPassConfirm').value='';
+
+function applySession(user, session) {
+  if (session) authToken = session.access_token;
+  const meta = user.user_metadata || {};
+  currentRole = meta.role || 'agent';
+  const userAgentId = meta.agent_id || 'robert-traversi';
+
+  if (currentRole === 'supervisor') {
+    document.getElementById('agentPillsRow').style.display = '';
+    document.getElementById('sidebar-mgmt').style.display = '';
+    document.getElementById('topbarUser').textContent = 'Supervisor';
+  } else {
+    agent = userAgentId;
+    document.getElementById('agentPillsRow').style.display = 'none';
+    document.getElementById('sidebar-mgmt').style.display = 'none';
+    document.getElementById('topbarUser').textContent = (AGENT_NAMES[userAgentId] || userAgentId);
+  }
+
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('adminShell').style.display = 'block';
+  loadAll();
+}
+
+document.getElementById('loginPass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+document.getElementById('loginEmail').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('loginPass').focus(); });
+
+async function doLogout() {
+  await supabaseClient.auth.signOut();
+  authToken = null; currentRole = null;
+  document.getElementById('adminShell').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('loginPass').value = '';
+  document.getElementById('loginEmail').value = '';
+}
+
+async function changePassword() {
+  const n = document.getElementById('newPass').value;
+  const c = document.getElementById('newPassConfirm').value;
+  if (n.length < 8) return toast('Min 8 characters', 'error');
+  if (n !== c) return toast('Passwords do not match', 'error');
+  const { error } = await supabaseClient.auth.updateUser({ password: n });
+  if (error) return toast('Update failed: ' + error.message, 'error');
+  document.getElementById('newPass').value = '';
+  document.getElementById('newPassConfirm').value = '';
   toast('Password updated ✓');
 }
+
+// ── SESSION RESTORE ─────────────────────────────────────────
+supabaseClient.auth.getSession().then(({ data: { session } }) => {
+  if (session) applySession(session.user, session);
+});
 
 // ── ADD AGENT ───────────────────────────────────────────────
 function autoSlug(){
@@ -656,6 +723,7 @@ function generateAgentScript(){
   document.getElementById('agentScriptFilename').textContent=filename;
   document.getElementById('agentScriptRun').textContent='.\\'+filename;
   document.getElementById('agentScriptSql').textContent=sql;
+  document.getElementById('agentAuthMeta').textContent=JSON.stringify({role:'agent',agent_id:slug});
   document.getElementById('agentScriptReady').style.display='block';
   document.getElementById('agentScriptReady').scrollIntoView({behavior:'smooth',block:'center'});
 }
@@ -667,6 +735,7 @@ function copyAgentSql(){
 // ── AGENT / NAV ─────────────────────────────────────────────
 const AGENT_NAMES={'robert-traversi':'Robert Traversi','patty-wells':'Patty Wells','connie-brant':'Connie Brant'};
 function switchAgent(a){
+  if (currentRole !== 'supervisor') return;
   agent=a;
   // update pills
   document.querySelectorAll('.agent-pill').forEach(p=>p.classList.remove('active'));
