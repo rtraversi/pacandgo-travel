@@ -1279,6 +1279,8 @@ async function loadProfile(){
     const d=await DB.get('settings','agent_id=eq.'+agent);
     if(!d.length) return;
     const s=d[0];
+    const ph=document.getElementById('profileAgentName');
+    if(ph) ph.textContent=s.full_name||agentNames[agent]||agent;
     const setVal=(id,val)=>{const el=document.getElementById(id);if(el)el.value=val||'';};
     setVal('profilePhotoUrl',s.photo_url);
     setVal('profileTagline',s.tagline);
