@@ -588,7 +588,7 @@ function applySession(user, session) {
     agent = userAgentId;
     document.getElementById('agentPillsRow').style.display = 'none';
     document.getElementById('sidebar-mgmt').style.display = 'none';
-    document.getElementById('topbarUser').textContent = (AGENT_NAMES[userAgentId] || userAgentId);
+    document.getElementById('topbarUser').textContent = (agentNames[userAgentId] || userAgentId);
   }
 
   document.getElementById('loginScreen').style.display = 'none';
