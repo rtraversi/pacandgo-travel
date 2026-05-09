@@ -945,13 +945,37 @@
 (async()=>{
   const SB_URL='https://yqyinpufmizrscdexlwr.supabase.co';
   const SB_KEY='sb_publishable_T_cxTPA3gwEdEP93W7hnfw_78mr6vLI';
-  const AGENT='{{SLUG}}';
+  const AGENT = window.location.pathname.split('/').filter(Boolean)[1] || 'unknown';
+  // Set form agent key immediately so contact form routes correctly even before async load
+  const _form = document.getElementById('agentForm');
+  if(_form) _form.dataset.agentKey = AGENT;
   try{
-    const r=await fetch(`${SB_URL}/rest/v1/settings?agent_id=eq.${AGENT}&select=photo_url,tagline,specialties,bio,highlights`,
+    const r=await fetch(`${SB_URL}/rest/v1/settings?agent_id=eq.${AGENT}&select=photo_url,tagline,specialties,bio,highlights,full_name,first_name,clia,sot,email`,
       {headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}});
     const d=await r.json();
     if(!d.length) return;
     const s=d[0];
+    // Inject name, CLIA, SOT into all text nodes
+    const full=s.full_name||'';const first=s.first_name||'';
+    if(full||first){
+      const walk=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
+      let node;
+      while(node=walk.nextNode()){
+        if(node.textContent.includes('{{')){
+          node.textContent=node.textContent
+            .replace(/\{\{FULL\}\}/g,full||'Your Agent')
+            .replace(/\{\{FIRST\}\}/g,first||'Agent')
+            .replace(/\{\{CLIA\}\}/g,s.clia||'—')
+            .replace(/\{\{SOT\}\}/g,s.sot||'—');
+        }
+      }
+      if(full) document.title=full+' — Travel Specialist | PAC and GO Travel';
+      const meta=document.querySelector('meta[name="description"]');
+      if(meta) meta.content=`${full} — PAC and GO Travel Agent+ specialist.`;
+      const photo=document.getElementById('profilePhoto');
+      if(photo) photo.alt=full;
+      if(typeof AGENT_EMAILS!=='undefined'&&s.email) AGENT_EMAILS[AGENT]=s.email;
+    }
     if(s.photo_url){const img=document.getElementById('profilePhoto');if(img)img.src=s.photo_url;}
     if(s.tagline){const el=document.getElementById('profileTagline');if(el)el.textContent=s.tagline;}
     if(s.specialties){

@@ -222,7 +222,7 @@
 <script>
 const SB_URL  = 'https://yqyinpufmizrscdexlwr.supabase.co';
 const SB_KEY  = 'sb_publishable_T_cxTPA3gwEdEP93W7hnfw_78mr6vLI';
-const AGENT   = '{{SLUG}}';
+const AGENT   = window.location.pathname.split('/').filter(Boolean)[1] || 'unknown';
 
 let displayedPosts = [];
 
@@ -260,10 +260,14 @@ async function sbGet(path) {
 async function init() {
   try {
     const [settings, posts] = await Promise.all([
-      sbGet('/rest/v1/settings?agent_id=eq.' + AGENT),
+      sbGet('/rest/v1/settings?agent_id=eq.' + AGENT + '&select=blog_enabled,full_name,first_name,clia,sot'),
       sbGet('/rest/v1/blog_posts?agent_id=eq.' + AGENT + '&active=eq.true&order=publish_date.desc,created_at.desc')
     ]);
-    if (settings[0]?.blog_enabled === false) {
+    const s=settings[0]||{};
+    // Inject name/CLIA/SOT into all text nodes
+    if(s.full_name||s.first_name){const walk=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);let node;while(node=walk.nextNode()){if(node.textContent.includes('{{')){node.textContent=node.textContent.replace(/\{\{FULL\}\}/g,s.full_name||'Agent Name').replace(/\{\{FIRST\}\}/g,s.first_name||'Agent').replace(/\{\{CLIA\}\}/g,s.clia||'—').replace(/\{\{SOT\}\}/g,s.sot||'—');}}}
+    if(s.full_name){document.title=s.full_name+' — Travel Blog | PAC and GO Travel';const meta=document.querySelector('meta[name="description"]');if(meta)meta.content=`Travel stories and trip reports from ${s.full_name} — PAC and GO Travel specialist.`;}
+    if (s.blog_enabled === false) {
       document.getElementById('comingSoon').style.display = 'block';
       return;
     }

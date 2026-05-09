@@ -476,16 +476,16 @@ UPDATE reviews SET status = 'pending'  WHERE (approved IS NULL OR approved = fal
           <div style="margin-top:16px;padding:14px 16px;background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.2);border-radius:8px;font-size:0.82rem;color:rgba(255,255,255,0.6);line-height:1.7;">
             <strong style="color:var(--gold);">After running the script:</strong> run the Supabase SQL below, add the agent to the switcher above, then open the <strong>Profile</strong> panel in admin to upload a photo and fill in their bio — no file editing needed.
           </div>
-          <button class="btn btn-gold" onclick="generateAgentScript()" style="margin-top:16px;">⬇ Generate &amp; Download Script</button>
+          <button class="btn btn-gold" onclick="createAgent()" style="margin-top:16px;">✓ Create Agent</button>
         </div>
 
         <!-- SUCCESS CARD — shown after script downloads -->
         <div class="admin-card" id="agentScriptReady" style="display:none;border:1px solid rgba(39,174,96,0.4);background:rgba(39,174,96,0.07);">
           <div class="card-title" style="color:#2ecc71;">✅ Script Ready — <span id="agentScriptFilename" style="font-family:monospace;font-weight:400;font-size:0.9rem;"></span></div>
           <div style="font-size:0.85rem;color:rgba(255,255,255,0.75);line-height:1.9;margin-bottom:16px;">
-            <div>1. Open PowerShell in <code>C:\sites\pacnandgotravel\</code></div>
-            <div>2. Run: <code id="agentScriptRun" style="color:#2ecc71;"></code></div>
-            <div>3. Run this in <strong>Supabase SQL Editor</strong> after the script finishes:</div>
+            <div>1. Run in PowerShell from <code>C:\sites\pacnandgotravel\</code>:</div>
+            <div style="background:rgba(0,0,0,0.3);border-radius:6px;padding:8px 12px;margin:6px 0;font-family:monospace;color:#2ecc71;font-size:0.82rem;" id="agentCopyCmd"></div>
+            <div style="margin-top:8px;">2. Run in <strong>Supabase SQL Editor</strong> to set login permissions:</div>
           </div>
           <div style="margin-top:12px;padding:12px 14px;background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.25);border-radius:8px;font-size:0.8rem;color:rgba(255,255,255,0.65);line-height:1.8;">
             <strong style="color:var(--gold);">4. Create login for this agent in Supabase:</strong><br/>
@@ -583,6 +583,7 @@ function applySession(user, session) {
     document.getElementById('agentPillsRow').style.display = '';
     document.getElementById('sidebar-mgmt').style.display = '';
     document.getElementById('topbarUser').textContent = 'Supervisor';
+    loadAgentPills();
   } else {
     agent = userAgentId;
     document.getElementById('agentPillsRow').style.display = 'none';
@@ -625,6 +626,29 @@ supabaseClient.auth.getSession().then(({ data: { session } }) => {
 });
 
 // ── ADD AGENT ───────────────────────────────────────────────
+async function createAgent(){
+  const first  =document.getElementById('newAgentFirst').value.trim();
+  const last   =document.getElementById('newAgentLast').value.trim();
+  const slug   =document.getElementById('newAgentSlug').value.trim();
+  const email  =document.getElementById('newAgentEmail').value.trim();
+  const tagline=document.getElementById('newAgentTagline').value.trim()||'Travel Specialist';
+  const clia   =document.getElementById('newAgentClia').value.trim()||null;
+  const sot    =document.getElementById('newAgentSot').value.trim()||null;
+  const photo  =document.getElementById('newAgentPhoto').value.trim()||null;
+  if(!first||!last||!slug||!email) return toast('First name, last name, slug, and email are required','error');
+  const full=first+' '+last;
+  try{
+    await DB.upsert('settings',{agent_id:slug,full_name:full,first_name:first,email,tagline,clia,sot,photo_url:(photo&&photo.match(/^https?:\/\//))?photo:null});
+    document.getElementById('agentCopyCmd').textContent=`Copy-Item "agents\\template" "agents\\${slug}" -Recurse`;
+    document.getElementById('agentScriptSql').textContent=`UPDATE auth.users SET raw_user_meta_data = '{"role":"agent","agent_id":"${slug}"}' WHERE email = '${email}';`;
+    document.getElementById('agentAuthMeta').textContent=JSON.stringify({role:'agent',agent_id:slug});
+    document.getElementById('agentScriptFilename').textContent=full;
+    document.getElementById('agentScriptReady').style.display='block';
+    document.getElementById('agentScriptReady').scrollIntoView({behavior:'smooth',block:'center'});
+    if(currentRole==='supervisor') loadAgentPills();
+    toast('Agent profile created for '+full+' ✓');
+  }catch(e){toast('Error: '+e.message,'error');}
+}
 function autoSlug(){
   const first=(document.getElementById('newAgentFirst').value||'').trim();
   const last=(document.getElementById('newAgentLast').value||'').trim();
@@ -733,17 +757,27 @@ function copyAgentSql(){
 }
 
 // ── AGENT / NAV ─────────────────────────────────────────────
-const AGENT_NAMES={'robert-traversi':'Robert Traversi','patty-wells':'Patty Wells','connie-brant':'Connie Brant'};
+let agentNames = {}; // populated dynamically from DB
+async function loadAgentPills() {
+  try {
+    const agents = await DB.get('settings','select=agent_id,full_name&order=full_name.asc');
+    agentNames = {};
+    agents.forEach(a=>{ agentNames[a.agent_id]=a.full_name||a.agent_id; });
+    const container = document.getElementById('agentPillsRow');
+    if (!container) return;
+    container.innerHTML = agents.map(a=>
+      `<button class="agent-pill${a.agent_id===agent?' active':''}" id="pill-${a.agent_id}" onclick="switchAgent('${a.agent_id}')">${a.full_name||a.agent_id}</button>`
+    ).join('');
+  } catch(e) {}
+}
 function switchAgent(a){
   if (currentRole !== 'supervisor') return;
   agent=a;
-  // update pills
   document.querySelectorAll('.agent-pill').forEach(p=>p.classList.remove('active'));
   const pill=document.getElementById('pill-'+a);
   if(pill) pill.classList.add('active');
-  // update profile panel header
   const ph=document.getElementById('profileAgentName');
-  if(ph) ph.textContent=AGENT_NAMES[a]||a;
+  if(ph) ph.textContent=agentNames[a]||a;
   loadAll();
   toast('Switched to '+(AGENT_NAMES[a]||a));
 }

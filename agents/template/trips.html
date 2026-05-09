@@ -244,7 +244,8 @@
 <script>
   const SB_URL  = 'https://yqyinpufmizrscdexlwr.supabase.co';
   const SB_KEY  = 'sb_publishable_T_cxTPA3gwEdEP93W7hnfw_78mr6vLI';
-  const AGENT_KEY = '{{SLUG}}';
+  const AGENT_KEY = window.location.pathname.split('/').filter(Boolean)[1] || 'unknown';
+  (async()=>{try{const r=await fetch(`${SB_URL}/rest/v1/settings?agent_id=eq.${AGENT_KEY}&select=full_name,first_name,clia,sot`,{headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}});const d=await r.json();const s=d[0]||{};if(s.full_name||s.first_name){const walk=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);let node;while(node=walk.nextNode()){if(node.textContent.includes('{{')){node.textContent=node.textContent.replace(/\{\{FULL\}\}/g,s.full_name||'Agent Name').replace(/\{\{FIRST\}\}/g,s.first_name||'Agent').replace(/\{\{CLIA\}\}/g,s.clia||'—').replace(/\{\{SOT\}\}/g,s.sot||'—');}}}if(s.full_name){document.title=s.full_name+' — Upcoming Trips | PAC and GO Travel';}}}catch(e){}})();
 
   const LINE_STYLES = {
     'Royal Caribbean': { bg: '#1a4a8a', text: '#ffffff' },
