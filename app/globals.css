@@ -1,26 +1,40 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Brand colours */
+  --color-navy:       #0a1628;
+  --color-navy-light: #112240;
+  --color-navy-card:  #1a2f4e;
+  --color-gold:       #c9a84c;
+  --color-gold-light: #e2c06e;
+  --color-gold-muted: #a07c2e;
+
+  /* Typography */
+  --font-sans:    var(--font-inter);
+  --font-display: var(--font-playfair);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root {
+  --background: #0a1628;
+  --foreground: #f0f4f8;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), Arial, sans-serif;
 }
+
+h1, h2, h3, h4 {
+  font-family: var(--font-playfair), Georgia, serif;
+}
+
+/* Gold accent utility */
+.text-gold       { color: #c9a84c; }
+.bg-gold         { background-color: #c9a84c; }
+.border-gold     { border-color: #c9a84c; }
+
+/* Scrollbar styling */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #112240; }
+::-webkit-scrollbar-thumb { background: #c9a84c; border-radius: 3px; }

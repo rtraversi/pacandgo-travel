@@ -1,0 +1,12 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# Wildcard subdomain rewrites are handled by Next.js middleware
+# Make sure *.pacandgotravel.com is pointed at this Netlify site in DNS
