@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useTransition, useRef } from 'react'
+import { useState, useTransition, useRef, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import type { GalleryFormData } from '@/app/actions/gallery'
 import type { GalleryItem } from '@/lib/types'
 
@@ -24,8 +25,11 @@ const EMPTY_FORM: FormState = {
 }
 
 export default function GalleryManager({ items: initialItems, onSave, onDelete, onToggle, onReorder }: Props) {
+  const router = useRouter()
   const [items, setItems] = useState(initialItems)
   const [view, setView] = useState<'grid' | 'form'>('grid')
+
+  useEffect(() => { setItems(initialItems) }, [initialItems])
   const [editing, setEditing] = useState<GalleryItem | null>(null)
   const [form, setForm] = useState<FormState>(EMPTY_FORM)
   const [uploading, setUploading] = useState(false)
@@ -80,6 +84,7 @@ export default function GalleryManager({ items: initialItems, onSave, onDelete, 
       try {
         await onSave(data, editing?.id)
         setView('grid')
+        router.refresh()
       } catch (e) {
         setError(e instanceof Error ? e.message : 'Save failed')
       }
@@ -159,12 +164,16 @@ export default function GalleryManager({ items: initialItems, onSave, onDelete, 
 
           <div>
             <label className="block text-xs text-white/45 mb-1.5">Category</label>
-            <select value={form.category ?? ''}
+            <input
+              value={form.category ?? ''}
               onChange={e => set('category', e.target.value || null)}
-              className={INPUT + ' bg-navy-dark'}>
-              <option value="">No category</option>
-              {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-            </select>
+              list="gallery-categories"
+              placeholder="Select or type a category…"
+              className={INPUT}
+            />
+            <datalist id="gallery-categories">
+              {CATEGORIES.map(c => <option key={c} value={c} />)}
+            </datalist>
           </div>
 
           <label className="flex items-center gap-3 cursor-pointer">

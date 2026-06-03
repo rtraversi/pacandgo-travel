@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { formatDate, formatPrice } from '@/lib/utils'
+import { formatDate, formatPrice, CRUISE_LINES } from '@/lib/utils'
 import type { CruiseFormData } from '@/app/actions/deals'
 
 type CruiseItem = {
@@ -111,9 +111,11 @@ export default function CruiseItemManager({ label, items, onSave, onDelete, onTo
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs text-white/45 mb-1.5">Cruise Line</label>
-              <input value={form.line ?? ''} onChange={e => set('line', e.target.value)}
-                placeholder="e.g. Royal Caribbean"
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm placeholder-white/20 focus:outline-none focus:border-gold/50 transition" />
+              <select value={form.line ?? ''} onChange={e => set('line', e.target.value || null)}
+                className="w-full bg-navy border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-gold/50 transition">
+                <option value="">Select a cruise line…</option>
+                {CRUISE_LINES.map(l => <option key={l} value={l}>{l}</option>)}
+              </select>
             </div>
             <div>
               <label className="block text-xs text-white/45 mb-1.5">Ship</label>
