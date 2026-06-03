@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
+import LoginForm from './LoginForm'
 
-export const metadata: Metadata = { title: 'Agent Login' }
+export const metadata: Metadata = { title: 'Agent Login — PAC and GO Travel' }
 
 export default function LoginPage() {
   return (
@@ -12,7 +13,7 @@ export default function LoginPage() {
           <p className="text-white/60 mt-2 text-sm">Sign in to manage your profile, deals, and content.</p>
         </div>
         <div className="bg-white/5 border border-white/10 rounded-2xl p-8">
-          <p className="text-white/50 text-center text-sm">Login form coming in Phase 3.</p>
+          <LoginForm />
         </div>
       </div>
     </div>
