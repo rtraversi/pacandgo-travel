@@ -17,9 +17,8 @@ const s = StyleSheet.create({
   goldBar:   { height: 3, backgroundColor: GOLD },
   header:    { backgroundColor: NAVY, paddingHorizontal: 32, paddingVertical: 22, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
   hLeft:     { flex: 1 },
-  logo:      { fontSize: 20, fontFamily: 'Helvetica-Bold', color: GOLD, letterSpacing: 2 },
-  logoSub:   { fontSize: 7, color: WHITE, opacity: 0.5, letterSpacing: 2, marginTop: 3 },
-  docType:   { fontSize: 10, color: WHITE, opacity: 0.55, marginTop: 14 },
+  logoImg:   { height: 44, width: 'auto', objectFit: 'contain', objectPositionX: 0 },
+  docType:   { fontSize: 10, color: WHITE, opacity: 0.55, marginTop: 10 },
   hRight:    { alignItems: 'flex-end' },
   photo:     { width: 52, height: 52, borderRadius: 26, marginBottom: 8, borderWidth: 2, borderColor: GOLD },
   agentName: { fontSize: 11, fontFamily: 'Helvetica-Bold', color: WHITE },
@@ -46,7 +45,8 @@ const s = StyleSheet.create({
   priceSub:      { fontSize: 7, color: WHITE, opacity: 0.5, textAlign: 'right', marginTop: 1 },
 
   // Customer box
-  custBox:   { flexDirection: 'row', backgroundColor: SAND, borderRadius: 5, paddingHorizontal: 14, paddingVertical: 9, marginTop: 10 },
+  custBox:   { backgroundColor: SAND, borderRadius: 5, paddingHorizontal: 14, paddingVertical: 10, marginTop: 10 },
+  custRow:   { flexDirection: 'row', marginBottom: 6 },
   custCell:  { flex: 1 },
   custLabel: { fontSize: 7, color: TEXT_MUTED, marginBottom: 2 },
   custValue: { fontSize: 10, fontFamily: 'Helvetica-Bold', color: TEXT_DARK },
@@ -97,9 +97,9 @@ function formatDate(dateStr: string | null) {
   } catch { return dateStr }
 }
 
-interface Props { quote: Quote; agent: Agent; profile: AgentProfile | null }
+interface Props { quote: Quote; agent: Agent; profile: AgentProfile | null; logoUrl?: string }
 
-export default function QuotePDFDocument({ quote, agent, profile }: Props) {
+export default function QuotePDFDocument({ quote, agent, profile, logoUrl }: Props) {
   const { ai_data } = quote
   const totalPrice = (quote.price ?? 0) * (quote.guests ?? 2)
   const half = ai_data?.included ? Math.ceil(ai_data.included.length / 2) : 0
@@ -113,8 +113,11 @@ export default function QuotePDFDocument({ quote, agent, profile }: Props) {
         {/* Header */}
         <View style={s.header}>
           <View style={s.hLeft}>
-            <Text style={s.logo}>PAC AND GO</Text>
-            <Text style={s.logoSub}>TRAVEL AGENCY</Text>
+            {logoUrl ? (
+              <Image src={logoUrl} style={s.logoImg} />
+            ) : (
+              <Text style={{ fontSize: 20, fontFamily: 'Helvetica-Bold', color: GOLD, letterSpacing: 2 }}>PAC AND GO</Text>
+            )}
             <Text style={s.docType}>Cruise Quote</Text>
           </View>
           <View style={s.hRight}>
@@ -171,18 +174,48 @@ export default function QuotePDFDocument({ quote, agent, profile }: Props) {
           </View>
 
           {/* Customer */}
-          {(quote.customer_name || quote.customer_email) ? (
+          {(quote.customer_name || quote.customer_email || quote.client_info) ? (
             <View style={s.custBox}>
-              {quote.customer_name ? (
-                <View style={s.custCell}>
-                  <Text style={s.custLabel}>PREPARED FOR</Text>
-                  <Text style={s.custValue}>{quote.customer_name}</Text>
-                </View>
-              ) : null}
-              {quote.customer_email ? (
-                <View style={s.custCell}>
-                  <Text style={s.custLabel}>EMAIL</Text>
-                  <Text style={s.custValue}>{quote.customer_email}</Text>
+              <View style={s.custRow}>
+                {quote.customer_name ? (
+                  <View style={s.custCell}>
+                    <Text style={s.custLabel}>PREPARED FOR</Text>
+                    <Text style={s.custValue}>{quote.customer_name}</Text>
+                  </View>
+                ) : null}
+                {quote.customer_email ? (
+                  <View style={s.custCell}>
+                    <Text style={s.custLabel}>EMAIL</Text>
+                    <Text style={s.custValue}>{quote.customer_email}</Text>
+                  </View>
+                ) : null}
+                {quote.client_info?.phone ? (
+                  <View style={s.custCell}>
+                    <Text style={s.custLabel}>PHONE</Text>
+                    <Text style={s.custValue}>{quote.client_info.phone}</Text>
+                  </View>
+                ) : null}
+              </View>
+              {(quote.client_info?.address || quote.client_info?.dob || quote.client_info?.loyalty_number) ? (
+                <View style={s.custRow}>
+                  {quote.client_info?.address ? (
+                    <View style={[s.custCell, { flex: 2 }]}>
+                      <Text style={s.custLabel}>ADDRESS</Text>
+                      <Text style={s.custValue}>{quote.client_info.address}</Text>
+                    </View>
+                  ) : null}
+                  {quote.client_info?.dob ? (
+                    <View style={s.custCell}>
+                      <Text style={s.custLabel}>DATE OF BIRTH</Text>
+                      <Text style={s.custValue}>{quote.client_info.dob}</Text>
+                    </View>
+                  ) : null}
+                  {quote.client_info?.loyalty_number ? (
+                    <View style={s.custCell}>
+                      <Text style={s.custLabel}>LOYALTY #</Text>
+                      <Text style={s.custValue}>{quote.client_info.loyalty_number}</Text>
+                    </View>
+                  ) : null}
                 </View>
               ) : null}
             </View>

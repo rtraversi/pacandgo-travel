@@ -8,6 +8,7 @@ import type { QuoteFormData } from '@/app/actions/quotes'
 import type { Quote, Agent, AgentProfile, QuoteAIData, ItineraryDay, PortDetail } from '@/lib/types'
 import { CRUISE_LINES } from '@/lib/utils'
 import { SHIPS_BY_LINE } from '@/lib/cruise-data'
+import type { ClientInfo } from '@/lib/types'
 
 const PDFDownloadBtn = dynamic(() => import('./QuotePDFDownloadBtn'), { ssr: false })
 
@@ -46,6 +47,10 @@ export default function QuoteBuilder({ quotes: initial, agent, profile }: Props)
   // Form fields
   const [customerName, setCustomerName] = useState('')
   const [customerEmail, setCustomerEmail] = useState('')
+  const [clientPhone, setClientPhone] = useState('')
+  const [clientAddress, setClientAddress] = useState('')
+  const [clientDob, setClientDob] = useState('')
+  const [clientLoyalty, setClientLoyalty] = useState('')
   const [line, setLine] = useState('')
   const [ship, setShip] = useState('')
   const [startDate, setStartDate] = useState('')
@@ -139,6 +144,7 @@ export default function QuoteBuilder({ quotes: initial, agent, profile }: Props)
   function openNew() {
     setEditId(null)
     setCustomerName(''); setCustomerEmail('')
+    setClientPhone(''); setClientAddress(''); setClientDob(''); setClientLoyalty('')
     setLine(''); setShip(''); setStartDate('')
     setNights(''); setRoomCategory('Balcony')
     setPrice(''); setGuests('2'); setNotes('')
@@ -151,6 +157,8 @@ export default function QuoteBuilder({ quotes: initial, agent, profile }: Props)
   function openEdit(q: Quote) {
     setEditId(q.id)
     setCustomerName(q.customer_name ?? ''); setCustomerEmail(q.customer_email ?? '')
+    setClientPhone(q.client_info?.phone ?? ''); setClientAddress(q.client_info?.address ?? '')
+    setClientDob(q.client_info?.dob ?? ''); setClientLoyalty(q.client_info?.loyalty_number ?? '')
     setLine(q.line); setShip(q.ship); setStartDate(q.start_date ?? '')
     setNights(q.nights ? String(q.nights) : ''); setRoomCategory(q.room_category ?? 'Balcony')
     setPrice(q.price ? String(q.price) : ''); setGuests(String(q.guests ?? 2)); setNotes(q.notes ?? '')
@@ -168,9 +176,17 @@ export default function QuoteBuilder({ quotes: initial, agent, profile }: Props)
     setSaveError('')
     startTransition(async () => {
       try {
+        const clientInfo: ClientInfo = {
+          phone: clientPhone || null,
+          address: clientAddress || null,
+          dob: clientDob || null,
+          loyalty_number: clientLoyalty || null,
+        }
+        const hasClientInfo = Object.values(clientInfo).some(v => v !== null)
         const data: QuoteFormData = {
           customer_name: customerName || null,
           customer_email: customerEmail || null,
+          client_info: hasClientInfo ? clientInfo : null,
           line: line.trim(), ship: ship.trim(),
           start_date: startDate || null,
           nights: nights ? parseInt(nights) : null,
@@ -343,6 +359,35 @@ export default function QuoteBuilder({ quotes: initial, agent, profile }: Props)
             <label className={labelCls}>Email</label>
             <input value={customerEmail} onChange={e => setCustomerEmail(e.target.value)}
               placeholder="jane@example.com" type="email" className={inputCls} />
+          </div>
+        </div>
+      </section>
+
+      {/* ─── Client Card ───────────────────────────────────── */}
+      <section className="bg-white/5 border border-white/10 rounded-xl p-6 mb-4">
+        <h2 className="text-[0.65rem] font-bold tracking-[0.18em] uppercase text-white/45 mb-5">
+          Client Card <span className="text-white/20 normal-case font-normal tracking-normal">— for booking</span>
+        </h2>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className={labelCls}>Phone</label>
+            <input value={clientPhone} onChange={e => setClientPhone(e.target.value)}
+              placeholder="+1 (555) 000-0000" type="tel" className={inputCls} />
+          </div>
+          <div>
+            <label className={labelCls}>Date of Birth</label>
+            <input value={clientDob} onChange={e => setClientDob(e.target.value)}
+              placeholder="MM/DD/YYYY" className={inputCls} />
+          </div>
+          <div className="col-span-2">
+            <label className={labelCls}>Address</label>
+            <input value={clientAddress} onChange={e => setClientAddress(e.target.value)}
+              placeholder="123 Main St, City, State, ZIP" className={inputCls} />
+          </div>
+          <div>
+            <label className={labelCls}>Loyalty / Crown & Anchor #</label>
+            <input value={clientLoyalty} onChange={e => setClientLoyalty(e.target.value)}
+              placeholder="Member number" className={inputCls} />
           </div>
         </div>
       </section>

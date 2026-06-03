@@ -13,6 +13,8 @@ interface Props {
 }
 
 export default function QuotePDFDownloadBtn({ quote, agent, profile, className, label }: Props) {
+  const logoUrl = typeof window !== 'undefined' ? window.location.origin + '/images/logo.png' : ''
+
   const fileName = [
     'PAC-GO-Quote',
     quote.line,
@@ -26,7 +28,7 @@ export default function QuotePDFDownloadBtn({ quote, agent, profile, className, 
 
   return (
     <PDFDownloadLink
-      document={<QuotePDFDocument quote={quote} agent={agent} profile={profile} />}
+      document={<QuotePDFDocument quote={quote} agent={agent} profile={profile} logoUrl={logoUrl} />}
       fileName={fileName}
       className={className}
     >

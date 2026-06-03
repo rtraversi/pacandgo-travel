@@ -104,11 +104,19 @@ export interface GalleryItem {
   created_at: string
 }
 
+export interface ClientInfo {
+  address: string | null
+  phone: string | null
+  dob: string | null
+  loyalty_number: string | null
+}
+
 export interface Quote {
   id: string
   agent_id: string
   customer_name: string | null
   customer_email: string | null
+  client_info: ClientInfo | null
   line: string
   ship: string
   start_date: string | null

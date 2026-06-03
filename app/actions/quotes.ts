@@ -7,6 +7,7 @@ import type { QuoteAIData } from '@/lib/types'
 export type QuoteFormData = {
   customer_name: string | null
   customer_email: string | null
+  client_info: import('@/lib/types').ClientInfo | null
   line: string
   ship: string
   start_date: string | null
