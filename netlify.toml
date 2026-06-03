@@ -8,8 +8,5 @@
 [build.environment]
   NODE_VERSION = "20"
 
-[functions]
-  timeout = 26
-
 # Wildcard subdomain rewrites are handled by Next.js middleware
 # Make sure *.pacandgotravel.com is pointed at this Netlify site in DNS
