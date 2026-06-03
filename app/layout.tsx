@@ -15,16 +15,14 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: 'PAC and GO Travel',
+  title: { default: 'PAC and GO Travel', template: '%s | PAC and GO Travel' },
   description: 'Your trusted travel agency for cruises, vacations, and adventures worldwide.',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${playfair.variable} ${inter.variable} h-full`}>
-      <body className="min-h-full flex flex-col bg-navy text-white antialiased">
-        {children}
-      </body>
+      <body className="min-h-full antialiased">{children}</body>
     </html>
   )
 }

@@ -1,40 +1,28 @@
 @import "tailwindcss";
 
 @theme inline {
-  /* Brand colours */
-  --color-navy:       #0a1628;
-  --color-navy-light: #112240;
-  --color-navy-card:  #1a2f4e;
+  --color-navy:       #0d2b45;
+  --color-ocean:      #1a5276;
+  --color-navy-dark:  #081a2e;
   --color-gold:       #c9a84c;
-  --color-gold-light: #e2c06e;
-  --color-gold-muted: #a07c2e;
+  --color-gold-hover: #e0bb5f;
+  --color-sand:       #f5f0e8;
+  --color-light:      #eaf2f8;
 
-  /* Typography */
   --font-sans:    var(--font-inter);
   --font-display: var(--font-playfair);
 }
 
-:root {
-  --background: #0a1628;
-  --foreground: #f0f4f8;
-}
-
 body {
-  background: var(--background);
-  color: var(--foreground);
   font-family: var(--font-inter), Arial, sans-serif;
+  color: #0d2b45;
+  background: #ffffff;
 }
 
-h1, h2, h3, h4 {
+h1, h2, h3, h4, h5 {
   font-family: var(--font-playfair), Georgia, serif;
 }
 
-/* Gold accent utility */
-.text-gold       { color: #c9a84c; }
-.bg-gold         { background-color: #c9a84c; }
-.border-gold     { border-color: #c9a84c; }
-
-/* Scrollbar styling */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: #112240; }
 ::-webkit-scrollbar-thumb { background: #c9a84c; border-radius: 3px; }
