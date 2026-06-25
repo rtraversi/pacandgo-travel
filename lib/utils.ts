@@ -40,12 +40,15 @@ export const CRUISE_LINES = [
   'Windstar Cruises',
 ]
 
-export function agentProfileUrl(slug: string): string {
+export function agentProfileUrl(slug: string, tier?: string): string {
   const domain = process.env.NEXT_PUBLIC_MAIN_DOMAIN
   if (!domain || process.env.NODE_ENV === 'development') {
     return `/agent/${slug}`
   }
-  return `https://${slug}.${domain}`
+  if (tier === 'agent_plus') {
+    return `https://${slug}.${domain}`
+  }
+  return `/agent/${slug}`
 }
 
 export function formatDate(dateStr: string | null): string {
