@@ -244,6 +244,12 @@ export default function QuoteBuilder({ quotes: initial, agent, profile }: Props)
     }))
   }
 
+  const pdfClientInfo: ClientInfo = {
+    phone: clientPhone || null,
+    address: clientAddress || null,
+    dob: clientDob || null,
+    loyalty_number: clientLoyalty || null,
+  }
   const pdfQuote: Quote = {
     id: editId ?? 'preview', agent_id: agent.id,
     customer_name: customerName || null, customer_email: customerEmail || null,
@@ -253,6 +259,7 @@ export default function QuoteBuilder({ quotes: initial, agent, profile }: Props)
     price: price ? parseFloat(price) : null,
     guests: guests ? parseInt(guests) : 2,
     ai_data: aiData, pdf_url: null, notes: notes || null,
+    client_info: Object.values(pdfClientInfo).some(v => v !== null) ? pdfClientInfo : null,
     created_at: new Date().toISOString(),
   }
 
