@@ -46,6 +46,100 @@ const SPECIALTIES = [
   },
 ]
 
+const HOW_IT_WORKS = [
+  { step: '01', title: 'Share Your Dream', desc: 'Tell us where you want to go, your travel dates, and your budget — we listen first.' },
+  { step: '02', title: 'We Do the Research', desc: 'We compare cruise lines, ships, itineraries, and exclusive perks to find your perfect match.' },
+  { step: '03', title: 'We Handle Everything', desc: 'From booking to shore excursions, we manage every detail at absolutely no extra cost to you.' },
+  { step: '04', title: 'You Travel Confidently', desc: "We're with you before, during, and after your trip — your advocate every step of the way." },
+]
+
+const CRUISE_LINE_FEATURES = [
+  {
+    name: 'Royal Caribbean',
+    tagline: 'The ultimate family & adventure cruise line',
+    icon: '👑',
+    bg: 'bg-gradient-to-br from-[#003087] to-[#0051a0]',
+    highlights: [
+      'Largest ships at sea — perfect for families',
+      'Top-rated thrills, dining, and entertainment',
+      'Destinations worldwide including Alaska & Europe',
+    ],
+  },
+  {
+    name: 'Celebrity Cruises',
+    tagline: 'Modern luxury at an accessible price',
+    icon: '⭐',
+    bg: 'bg-gradient-to-br from-[#1a1a2e] to-[#16213e]',
+    highlights: [
+      'Award-winning dining and spa experiences',
+      'All-included fares with drinks & Wi-Fi',
+      'Intimate ships with exceptional service',
+    ],
+  },
+  {
+    name: 'Norwegian Cruise Line',
+    tagline: 'Freestyle cruising — your way',
+    icon: '🌊',
+    bg: 'bg-gradient-to-br from-[#003366] to-[#0055a5]',
+    highlights: [
+      'No set dining times — eat when you want',
+      'Great value with Free At Sea perks',
+      'Wide variety of ships and itineraries',
+    ],
+  },
+  {
+    name: 'Princess Cruises',
+    tagline: 'Discover the world in comfort & style',
+    icon: '💫',
+    bg: 'bg-gradient-to-br from-[#1b3a6b] to-[#2d5aa0]',
+    highlights: [
+      'Alaska & world voyage specialists',
+      'Elegant atmosphere for couples & adults',
+      'Iconic MedallionClass® technology',
+    ],
+  },
+  {
+    name: 'Holland America Line',
+    tagline: 'Premium cruising with a rich history',
+    icon: '🚢',
+    bg: 'bg-gradient-to-br from-[#003399] to-[#1a4db3]',
+    highlights: [
+      '150+ years of seafaring excellence',
+      'Immersive destination & enrichment programs',
+      'Beloved by experienced cruisers',
+    ],
+  },
+  {
+    name: 'Viking Ocean & River',
+    tagline: 'Cultural discovery on ocean & river',
+    icon: '🌍',
+    bg: 'bg-gradient-to-br from-[#2c2c2c] to-[#444]',
+    highlights: [
+      'Adult-only ships for a serene experience',
+      'Destination-focused itineraries in Europe & beyond',
+      'All-inclusive with exceptional shore excursions',
+    ],
+  },
+]
+
+const TESTIMONIALS = [
+  {
+    quote: "PAC and GO took all the stress out of planning our cruise. They found us an amazing deal on a Caribbean sailing with onboard credit we never would have gotten on our own. We'll never book direct again!",
+    name: 'Sandra & Mike T.',
+    trip: '7-Night Caribbean Cruise',
+  },
+  {
+    quote: "I've used PAC and GO for three cruises now. Every time they go above and beyond — from picking the right cabin to making sure our dining requests are set before we even board. Truly exceptional service.",
+    name: 'Linda R.',
+    trip: 'Mediterranean & Alaska Cruises',
+  },
+  {
+    quote: "As first-time cruisers we had so many questions. Our agent was patient, knowledgeable, and made us feel completely at ease. We had the vacation of a lifetime and are already planning our next trip with them!",
+    name: 'The Johnson Family',
+    trip: 'Alaska Cruise',
+  },
+]
+
 const TRUST_ITEMS = [
   { icon: '🛡️', label: '35+ Years Experience' },
   { icon: '🌍', label: 'Full-Service Support' },
@@ -143,6 +237,27 @@ export default async function HomePage() {
         ))}
       </div>
 
+      {/* How It Works */}
+      <section className="py-20 px-[5%] bg-white">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-14">
+            <p className="text-[0.7rem] font-bold tracking-[0.2em] uppercase text-gold mb-3">Simple &amp; Stress-Free</p>
+            <h2 className="text-[clamp(1.8rem,3.5vw,2.8rem)] text-navy leading-[1.2]">How It Works</h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+            {HOW_IT_WORKS.map(item => (
+              <div key={item.step} className="text-center">
+                <div className="w-14 h-14 rounded-full bg-gold/10 border-2 border-gold/30 flex items-center justify-center mx-auto mb-4">
+                  <span className="text-gold font-bold text-lg">{item.step}</span>
+                </div>
+                <h3 className="text-navy font-bold text-base mb-2">{item.title}</h3>
+                <p className="text-gray-500 text-sm leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* The PAC and GO Difference */}
       <section className="py-24 px-[5%]" id="about">
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
@@ -206,6 +321,38 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* Cruise Lines Showcase */}
+      <section className="py-24 px-[5%] bg-white">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-14">
+            <p className="text-[0.7rem] font-bold tracking-[0.2em] uppercase text-gold mb-3">Our Expertise</p>
+            <h2 className="text-[clamp(1.8rem,3.5vw,2.8rem)] text-navy leading-[1.2] mb-4">The Lines We Know Best</h2>
+            <p className="text-gray-500 max-w-xl mx-auto">Certified specialists across the world&apos;s leading cruise lines — which means insider knowledge, better service, and exclusive perks for you.</p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {CRUISE_LINE_FEATURES.map(cl => (
+              <div key={cl.name} className="rounded-xl overflow-hidden border border-light shadow-sm hover:shadow-md transition-shadow">
+                <div className={`${cl.bg} px-6 py-5`}>
+                  <span className="text-2xl mb-2 block">{cl.icon}</span>
+                  <h3 className="text-white font-bold text-xl">{cl.name}</h3>
+                  <p className="text-white/80 text-sm mt-1">{cl.tagline}</p>
+                </div>
+                <div className="p-6 bg-white">
+                  <ul className="space-y-2">
+                    {cl.highlights.map(h => (
+                      <li key={h} className="flex items-start gap-2 text-sm text-gray-600">
+                        <span className="text-gold mt-0.5 flex-shrink-0">✓</span>
+                        {h}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Quote banner */}
       <div className="bg-light py-12 px-[5%] text-center">
         <blockquote className="text-[clamp(1.1rem,2.5vw,1.5rem)] italic text-navy/70 max-w-2xl mx-auto">
@@ -213,6 +360,30 @@ export default async function HomePage() {
         </blockquote>
         <cite className="block mt-3 text-xs font-bold tracking-widest uppercase text-gold">— Anonymous</cite>
       </div>
+
+      {/* Testimonials */}
+      <section className="py-24 px-[5%] bg-navy">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-14">
+            <p className="text-[0.7rem] font-bold tracking-[0.2em] uppercase text-gold mb-3">Happy Travelers</p>
+            <h2 className="text-[clamp(1.8rem,3.5vw,2.8rem)] text-white leading-[1.2]">What Our Clients Say</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {TESTIMONIALS.map((t, i) => (
+              <div key={i} className="bg-white/5 border border-white/10 rounded-xl p-6">
+                <div className="flex mb-3">
+                  {Array.from({ length: 5 }).map((_, j) => <span key={j} className="text-gold text-lg">★</span>)}
+                </div>
+                <p className="text-white/85 text-sm leading-relaxed italic mb-5">&ldquo;{t.quote}&rdquo;</p>
+                <div>
+                  <p className="text-white font-semibold text-sm">{t.name}</p>
+                  <p className="text-gold text-xs mt-0.5">{t.trip}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* Meet Our Team */}
       <section className="py-24 px-[5%]" id="team">
