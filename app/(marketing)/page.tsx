@@ -124,19 +124,19 @@ const CRUISE_LINE_FEATURES = [
 
 const TESTIMONIALS = [
   {
-    quote: "PAC and GO took all the stress out of planning our cruise. They found us an amazing deal on a Caribbean sailing with onboard credit we never would have gotten on our own. We'll never book direct again!",
-    name: 'Sandra & Mike T.',
-    trip: '7-Night Caribbean Cruise',
+    quote: "Patty Wells is exceptional! Having traveled extensively herself, she is extremely knowledgeable on different countries, cultures as well as air and cruise lines. She cares about each of her clients and strives to ensure they have a fabulous vacation. I highly recommend Patty Wells for your upcoming adventures.",
+    name: 'Barbara Miller',
+    trip: 'PAC and GO Travel Client',
   },
   {
-    quote: "I've used PAC and GO for three cruises now. Every time they go above and beyond — from picking the right cabin to making sure our dining requests are set before we even board. Truly exceptional service.",
-    name: 'Linda R.',
-    trip: 'Mediterranean & Alaska Cruises',
+    quote: "PAC and GO Travel is our 'go to' travel agency. Patty is extremely knowledgeable and fun to work with. We've never had any issues — first class and highly personalized service. We would (and have numerous times) highly recommend PAC and GO Travel.",
+    name: 'Duane and Anna Jackson',
+    trip: 'PAC and GO Travel Clients',
   },
   {
-    quote: "As first-time cruisers we had so many questions. Our agent was patient, knowledgeable, and made us feel completely at ease. We had the vacation of a lifetime and are already planning our next trip with them!",
-    name: 'The Johnson Family',
-    trip: 'Alaska Cruise',
+    quote: "We are very fortunate to have Patty Wells as our travel agent. We live in Texas but our brother in Orlando hooked us up with her. So glad for her persistence and attention to detail on every trip!",
+    name: 'The Fleming Family',
+    trip: 'PAC and GO Travel Clients',
   },
 ]
 
