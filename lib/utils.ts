@@ -45,10 +45,7 @@ export function agentProfileUrl(slug: string, tier?: string): string {
   if (!domain || process.env.NODE_ENV === 'development') {
     return `/agent/${slug}`
   }
-  if (tier === 'agent_plus') {
-    return `https://${slug}.${domain}`
-  }
-  return `/agent/${slug}`
+  return `https://${slug}.${domain}`
 }
 
 export function formatDate(dateStr: string | null): string {
