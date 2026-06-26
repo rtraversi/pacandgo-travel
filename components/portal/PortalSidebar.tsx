@@ -6,8 +6,10 @@ import { logout } from '@/app/actions/auth'
 import type { Agent, AgentProfile } from '@/lib/types'
 import {
   LayoutDashboard, User, Tag, Plane, BookOpen,
-  Star, Images, Settings, FileText, LogOut, Compass,
+  Star, Images, Settings, FileText, LogOut, Compass, ShieldCheck,
 } from 'lucide-react'
+
+const ADMIN_USER_ID = '552d2159-35e8-440f-b1f5-cd649ff16885'
 
 type Props = {
   agent: Agent & { agent_profiles: AgentProfile | null }
@@ -97,6 +99,20 @@ export default function PortalSidebar({ agent }: Props) {
             <FileText size={14} strokeWidth={pathname.startsWith('/portal/quotes') ? 2.5 : 2} />
             Quote Builder
             <span className="ml-auto text-[0.55rem] bg-gold/25 text-gold px-1.5 py-0.5 rounded font-bold tracking-wide">A+</span>
+          </Link>
+        )}
+
+        {agent.user_id === ADMIN_USER_ID && (
+          <Link
+            href="/portal/admin"
+            className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs transition-colors ${
+              pathname.startsWith('/portal/admin')
+                ? 'bg-gold/15 text-gold font-medium'
+                : 'text-white/55 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <ShieldCheck size={14} strokeWidth={pathname.startsWith('/portal/admin') ? 2.5 : 2} />
+            Admin
           </Link>
         )}
       </nav>
