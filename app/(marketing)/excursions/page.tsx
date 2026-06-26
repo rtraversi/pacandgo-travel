@@ -2,7 +2,18 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 
-export const metadata: Metadata = { title: 'Excursions' }
+export const metadata: Metadata = { title: 'Excursions & Tours' }
+
+const DESTINATIONS = [
+  { label: '🏰 Europe' },
+  { label: '🌴 Caribbean' },
+  { label: '🌮 Mexico' },
+  { label: '🌺 Hawaii' },
+  { label: '🏯 Asia' },
+  { label: '🦁 Africa' },
+  { label: '🦘 Australia & NZ' },
+  { label: '🌍 All Destinations' },
+]
 
 const EXCURSIONS = [
   {
@@ -48,13 +59,79 @@ export default function ExcursionsPage() {
     <>
       <div className="bg-navy py-20 px-[5%] text-center">
         <p className="text-xs font-bold tracking-[0.2em] uppercase text-gold mb-3">Beyond the Ship</p>
-        <h1 className="text-[clamp(2rem,4vw,3.2rem)] text-white">Shore Excursions & Add-Ons</h1>
+        <h1 className="text-[clamp(2rem,4vw,3.2rem)] text-white">Shore Excursions & Tours</h1>
         <p className="text-white/70 mt-4 max-w-xl mx-auto">
           The best travel experiences happen off the beaten path. Our agents know exactly which excursions deliver unforgettable memories.
         </p>
       </div>
 
       <div className="py-20 px-[5%] max-w-6xl mx-auto">
+
+        {/* Viator Partner Section */}
+        <div className="mb-16">
+          <p className="text-[0.7rem] font-bold tracking-[0.2em] uppercase text-gold mb-2">Our Booking Partner</p>
+          <h2 className="text-[clamp(1.6rem,3vw,2.2rem)] text-navy mb-8">Thousands of Experiences Worldwide</h2>
+
+          <div className="border border-light rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+            <div className="bg-navy px-8 py-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <div className="text-gold text-xs font-bold uppercase tracking-widest mb-1">Featured Partner</div>
+                <h3 className="text-white text-2xl font-bold">Viator</h3>
+                <p className="text-white/60 text-sm mt-1">World&apos;s largest tours &amp; experiences marketplace · 300,000+ activities</p>
+              </div>
+              <a
+                href="https://www.viator.com/?pid=P00002449&uid=U00002894&mcid=58086&currency=USD"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block bg-gold text-navy font-bold uppercase tracking-wider text-sm px-7 py-3 rounded hover:bg-gold-hover transition-colors no-underline whitespace-nowrap"
+              >
+                Browse Viator →
+              </a>
+            </div>
+
+            <div className="px-8 py-6">
+              <p className="text-gray-600 text-sm leading-relaxed mb-5">
+                Viator is the world&apos;s leading marketplace for travel experiences — with over 300,000 tours, activities, shore excursions,
+                and day trips across every destination on the planet. Backed by TripAdvisor, every listing includes verified traveler reviews
+                so you can book with confidence.
+              </p>
+
+              <div className="flex flex-wrap gap-2 mb-6">
+                {['300,000+ Experiences', 'Free Cancellation Options', 'Verified Reviews', 'Shore Excursions', 'Skip-the-Line Tours', 'Private & Group Options', 'Instant Confirmation', '24/7 Support'].map(pill => (
+                  <span key={pill} className="bg-light text-navy text-[0.65rem] font-bold uppercase tracking-wide px-3 py-1 rounded-full">{pill}</span>
+                ))}
+              </div>
+
+              <div className="flex flex-wrap gap-2 mb-6">
+                {DESTINATIONS.map(d => (
+                  <a
+                    key={d.label}
+                    href={`https://www.viator.com/?pid=P00002449&uid=U00002894&mcid=58086&currency=USD`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-navy/5 hover:bg-gold/10 text-navy text-sm font-semibold px-3 py-1.5 rounded-lg transition-colors no-underline"
+                  >
+                    {d.label}
+                  </a>
+                ))}
+              </div>
+
+              <div className="bg-gold/10 border border-gold/20 rounded-lg p-4">
+                <p className="text-navy text-sm">
+                  <span className="font-bold">💡 Pro Tip from Our Agents:</span>{' '}
+                  Cruise line excursions are convenient, but third-party operators like Viator often offer the same tours at lower prices — with more
+                  unique options. The key rule: if your excursion is booked through the cruise line, the ship waits for you. If not, book operators
+                  with strong reviews and early return guarantees. Not sure?{' '}
+                  <Link href="/contact" className="text-ocean font-semibold hover:underline">Ask your agent</Link> — we&apos;ve been to these ports and know who to trust.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Destination Cards */}
+        <p className="text-[0.7rem] font-bold tracking-[0.2em] uppercase text-gold mb-2">Inspiration by Region</p>
+        <h2 className="text-[clamp(1.6rem,3vw,2.2rem)] text-navy mb-8">Popular Excursion Categories</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
           {EXCURSIONS.map(ex => (
             <div key={ex.title} className="rounded-xl overflow-hidden border border-light hover:shadow-xl transition-shadow group">
@@ -71,9 +148,7 @@ export default function ExcursionsPage() {
                 <p className="text-gray-500 text-sm leading-relaxed mb-4">{ex.desc}</p>
                 <div className="flex flex-wrap gap-1.5">
                   {ex.tags.map(tag => (
-                    <span key={tag} className="bg-light text-navy text-[0.65rem] font-bold uppercase tracking-wide px-2 py-0.5 rounded">
-                      {tag}
-                    </span>
+                    <span key={tag} className="bg-light text-navy text-[0.65rem] font-bold uppercase tracking-wide px-2 py-0.5 rounded">{tag}</span>
                   ))}
                 </div>
               </div>

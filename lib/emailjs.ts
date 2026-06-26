@@ -7,7 +7,7 @@ export const EMAILJS = {
 // Maps agent slug → contact email (kept in sync with Supabase agents table)
 export const AGENT_EMAILS: Record<string, string> = {
   alan:     'pacandgoalan@gmail.com',
-  anissa:   'pacandgoanissa@gmail.com',
+  aniska:   'pacandgoanissa@gmail.com',
   beth:     'pacandgobeth@gmail.com',
   connie:   'pacandgoconnie@gmail.com',
   dawn:     'pacandgodawn@gmail.com',
