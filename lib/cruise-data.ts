@@ -138,8 +138,8 @@ export const SHIPS_BY_LINE: Record<string, string[]> = {
     'Navigator of the Seas', 'Oasis of the Seas', 'Odyssey of the Seas',
     'Ovation of the Seas', 'Quantum of the Seas', 'Radiance of the Seas',
     'Rhapsody of the Seas', 'Serenade of the Seas', 'Spectrum of the Seas',
-    'Star of the Seas', 'Symphony of the Seas', 'Vision of the Seas',
-    'Voyager of the Seas', 'Wonder of the Seas',
+    'Star of the Seas', 'Symphony of the Seas', 'Utopia of the Seas',
+    'Vision of the Seas', 'Voyager of the Seas', 'Wonder of the Seas',
   ],
   'Scenic Cruises': [
     'Scenic Amber', 'Scenic Azure', 'Scenic Crystal', 'Scenic Diamond',
