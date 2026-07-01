@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import QuoteBuilder from '@/components/portal/QuoteBuilder'
 import AgentPlusGate from '@/components/portal/AgentPlusGate'
-import type { Agent, AgentProfile, Quote } from '@/lib/types'
+import type { Agent, AgentProfile, Quote, Client } from '@/lib/types'
 
 export const metadata: Metadata = { title: 'Quote Builder — Agent Portal' }
 
@@ -34,13 +34,13 @@ export default async function QuotesPage() {
   }
   const profile: AgentProfile | null = row.agent_profiles ?? null
 
-  const { data } = await (supabase as any)
-    .from('quotes')
-    .select('*')
-    .eq('agent_id', agent.id)
-    .order('created_at', { ascending: false })
+  const [quotesRes, clientsRes] = await Promise.all([
+    (supabase as any).from('quotes').select('*').eq('agent_id', agent.id).order('created_at', { ascending: false }),
+    (supabase as any).from('clients').select('*').eq('agent_id', agent.id).order('full_name', { ascending: true }),
+  ])
 
-  const quotes = (data ?? []) as Quote[]
+  const quotes = (quotesRes.data ?? []) as Quote[]
+  const clients = (clientsRes.data ?? []) as Client[]
 
-  return <QuoteBuilder quotes={quotes} agent={agent} profile={profile} />
+  return <QuoteBuilder quotes={quotes} agent={agent} profile={profile} clients={clients} />
 }

@@ -5,7 +5,8 @@ import dynamic from 'next/dynamic'
 import { Trash2, ChevronLeft, Plus, X } from 'lucide-react'
 import { saveQuote, deleteQuote } from '@/app/actions/quotes'
 import type { QuoteFormData } from '@/app/actions/quotes'
-import type { Quote, Agent, AgentProfile, QuoteAIData, ItineraryDay, PortDetail } from '@/lib/types'
+import { saveClient } from '@/app/actions/clients'
+import type { Quote, Agent, AgentProfile, QuoteAIData, ItineraryDay, PortDetail, Client } from '@/lib/types'
 import { CRUISE_LINES } from '@/lib/utils'
 import { SHIPS_BY_LINE } from '@/lib/cruise-data'
 import type { ClientInfo } from '@/lib/types'
@@ -18,6 +19,7 @@ interface Props {
   quotes: Quote[]
   agent: Agent
   profile: AgentProfile | null
+  clients: Client[]
 }
 
 type View = 'list' | 'form'
@@ -38,7 +40,7 @@ function formatDate(dateStr: string | null) {
 const inputCls = 'w-full bg-white/5 border border-white/10 rounded-lg px-3.5 py-2.5 text-white text-sm placeholder-white/20 focus:outline-none focus:border-gold/50 transition'
 const labelCls = 'block text-xs text-white/45 mb-1.5'
 
-export default function QuoteBuilder({ quotes: initial, agent, profile }: Props) {
+export default function QuoteBuilder({ quotes: initial, agent, profile, clients }: Props) {
   const [quotes, setQuotes] = useState<Quote[]>(initial)
   const [view, setView] = useState<View>('list')
   const [editId, setEditId] = useState<string | null>(null)
@@ -51,6 +53,18 @@ export default function QuoteBuilder({ quotes: initial, agent, profile }: Props)
   const [clientAddress, setClientAddress] = useState('')
   const [clientDob, setClientDob] = useState('')
   const [clientLoyalty, setClientLoyalty] = useState('')
+
+  // Client picker
+  const [optimisticClients, setOptimisticClients] = useState<Client[]>([])
+  const clientList = optimisticClients.length
+    ? [...clients, ...optimisticClients.filter(oc => !clients.some(c => c.id === oc.id))]
+    : clients
+  const [selectedClientId, setSelectedClientId] = useState<string | null>(null)
+  const [additionalGuestIds, setAdditionalGuestIds] = useState<string[]>([])
+  const [clientSearch, setClientSearch] = useState('')
+  const [showClientDropdown, setShowClientDropdown] = useState(false)
+  const [newClientName, setNewClientName] = useState('')
+  const [creatingClient, setCreatingClient] = useState(false)
   const [line, setLine] = useState('')
   const [ship, setShip] = useState('')
   const [startDate, setStartDate] = useState('')
@@ -145,6 +159,8 @@ export default function QuoteBuilder({ quotes: initial, agent, profile }: Props)
     setEditId(null)
     setCustomerName(''); setCustomerEmail('')
     setClientPhone(''); setClientAddress(''); setClientDob(''); setClientLoyalty('')
+    setSelectedClientId(null); setAdditionalGuestIds([]); setClientSearch(''); setShowClientDropdown(false)
+    setNewClientName(''); setCreatingClient(false)
     setLine(''); setShip(''); setStartDate('')
     setNights(''); setRoomCategory('Balcony')
     setPrice(''); setGuests('2'); setNotes('')
@@ -159,6 +175,8 @@ export default function QuoteBuilder({ quotes: initial, agent, profile }: Props)
     setCustomerName(q.customer_name ?? ''); setCustomerEmail(q.customer_email ?? '')
     setClientPhone(q.client_info?.phone ?? ''); setClientAddress(q.client_info?.address ?? '')
     setClientDob(q.client_info?.dob ?? ''); setClientLoyalty(q.client_info?.loyalty_number ?? '')
+    setSelectedClientId(q.client_id ?? null); setAdditionalGuestIds(q.additional_guest_ids ?? [])
+    setClientSearch(''); setShowClientDropdown(false); setNewClientName(''); setCreatingClient(false)
     setLine(q.line); setShip(q.ship); setStartDate(q.start_date ?? '')
     setNights(q.nights ? String(q.nights) : ''); setRoomCategory(q.room_category ?? 'Balcony')
     setPrice(q.price ? String(q.price) : ''); setGuests(String(q.guests ?? 2)); setNotes(q.notes ?? '')
@@ -167,6 +185,63 @@ export default function QuoteBuilder({ quotes: initial, agent, profile }: Props)
     setResearchState(hasData ? 'confirmed' : 'idle')
     confirmedKeyRef.current = hasData ? `${q.line}|${q.ship}|${q.start_date ?? ''}` : ''
     setSailingChanged(false); setResearchError(''); setSaveError(''); setView('form')
+  }
+
+  const selectedClient = clientList.find(c => c.id === selectedClientId) ?? null
+  const householdMembers = selectedClient?.household_id
+    ? clientList.filter(c => c.household_id === selectedClient.household_id && c.id !== selectedClient.id)
+    : []
+  const matchingClients = clientSearch.trim()
+    ? clientList.filter(c =>
+        c.full_name.toLowerCase().includes(clientSearch.toLowerCase()) ||
+        (c.email ?? '').toLowerCase().includes(clientSearch.toLowerCase())
+      ).slice(0, 8)
+    : []
+
+  function selectClient(client: Client) {
+    setSelectedClientId(client.id)
+    setCustomerName(client.full_name)
+    setCustomerEmail(client.email ?? '')
+    setClientPhone(client.phone ?? '')
+    setClientAddress(client.address ?? '')
+    setClientDob(client.dob ?? '')
+    setClientLoyalty(client.loyalty_number ?? '')
+    setAdditionalGuestIds([])
+    setClientSearch('')
+    setShowClientDropdown(false)
+  }
+
+  function clearSelectedClient() {
+    setSelectedClientId(null)
+    setAdditionalGuestIds([])
+  }
+
+  function toggleGuest(id: string, checked: boolean) {
+    setAdditionalGuestIds(ids => checked ? [...ids, id] : ids.filter(g => g !== id))
+    setGuests(prev => {
+      const n = prev ? parseInt(prev) : 2
+      return String(checked ? n + 1 : Math.max(1, n - 1))
+    })
+  }
+
+  async function handleCreateClient() {
+    if (!newClientName.trim()) return
+    setCreatingClient(true)
+    try {
+      const result = await saveClient({
+        full_name: newClientName.trim(), email: null, phone: null, address: null, dob: null, loyalty_number: null, notes: null,
+      })
+      const created: Client = {
+        id: result.id, agent_id: agent.id, household_id: null,
+        full_name: newClientName.trim(), email: null, phone: null, address: null, dob: null, loyalty_number: null, notes: null,
+        created_at: new Date().toISOString(),
+      }
+      setOptimisticClients(list => [...list, created])
+      selectClient(created)
+      setNewClientName('')
+    } finally {
+      setCreatingClient(false)
+    }
   }
 
   function goList() { setView('list'); setEditId(null) }
@@ -187,6 +262,8 @@ export default function QuoteBuilder({ quotes: initial, agent, profile }: Props)
           customer_name: customerName || null,
           customer_email: customerEmail || null,
           client_info: hasClientInfo ? clientInfo : null,
+          client_id: selectedClientId,
+          additional_guest_ids: additionalGuestIds,
           line: line.trim(), ship: ship.trim(),
           start_date: startDate || null,
           nights: nights ? parseInt(nights) : null,
@@ -253,6 +330,7 @@ export default function QuoteBuilder({ quotes: initial, agent, profile }: Props)
   const pdfQuote: Quote = {
     id: editId ?? 'preview', agent_id: agent.id,
     customer_name: customerName || null, customer_email: customerEmail || null,
+    client_id: selectedClientId, additional_guest_ids: additionalGuestIds,
     line, ship, start_date: startDate || null,
     nights: nights ? parseInt(nights) : null,
     room_category: roomCategory || null,
@@ -352,6 +430,70 @@ export default function QuoteBuilder({ quotes: initial, agent, profile }: Props)
         <ChevronLeft size={16} /> Quotes
       </button>
       <h1 className="text-2xl font-display text-white mb-6">{editId ? 'Edit Quote' : 'New Quote'}</h1>
+
+      {/* ─── Client Picker ──────────────────────────────────── */}
+      <section className="bg-white/5 border border-white/10 rounded-xl p-6 mb-4">
+        <h2 className="text-[0.65rem] font-bold tracking-[0.18em] uppercase text-white/45 mb-5">
+          Client <span className="text-white/20 normal-case font-normal tracking-normal">— pick a returning client or enter details below</span>
+        </h2>
+
+        {selectedClient ? (
+          <div className="flex items-center gap-3 bg-gold/8 border border-gold/20 rounded-lg px-4 py-2.5">
+            <span className="text-white text-sm font-medium flex-1">{selectedClient.full_name}</span>
+            <button onClick={clearSelectedClient} className="text-white/40 hover:text-white text-xs transition">
+              Change
+            </button>
+          </div>
+        ) : (
+          <div className="relative">
+            <input
+              value={clientSearch}
+              onChange={e => { setClientSearch(e.target.value); setShowClientDropdown(true) }}
+              onFocus={() => setShowClientDropdown(true)}
+              placeholder="Search clients by name or email…"
+              className={inputCls}
+            />
+            {showClientDropdown && clientSearch.trim() && (
+              <div className="absolute z-10 mt-1 w-full bg-navy border border-white/10 rounded-lg shadow-lg max-h-56 overflow-y-auto">
+                {matchingClients.map(c => (
+                  <button key={c.id} onClick={() => selectClient(c)}
+                    className="w-full text-left px-3.5 py-2.5 text-sm text-white hover:bg-white/5 transition flex items-center justify-between gap-2">
+                    <span>{c.full_name}</span>
+                    {c.email && <span className="text-white/30 text-xs">{c.email}</span>}
+                  </button>
+                ))}
+                {matchingClients.length === 0 && (
+                  <p className="px-3.5 py-2.5 text-sm text-white/30">No matching clients.</p>
+                )}
+              </div>
+            )}
+            <div className="flex items-center gap-2 mt-3">
+              <input value={newClientName} onChange={e => setNewClientName(e.target.value)}
+                placeholder="New client name…" className={`${inputCls} flex-1`} />
+              <button onClick={handleCreateClient} disabled={creatingClient || !newClientName.trim()}
+                className="shrink-0 text-xs bg-gold/12 text-gold border border-gold/30 px-3 py-2 rounded-lg hover:bg-gold/20 transition disabled:opacity-35 disabled:cursor-not-allowed">
+                {creatingClient ? 'Adding…' : '+ New Client'}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {householdMembers.length > 0 && (
+          <div className="mt-4 border-t border-white/10 pt-4">
+            <p className="text-xs text-white/45 mb-2.5">Add linked family members to this quote?</p>
+            <div className="space-y-1">
+              {householdMembers.map(m => (
+                <label key={m.id} className="flex items-center gap-3 px-2 py-1.5 rounded-lg hover:bg-white/5 cursor-pointer transition">
+                  <input type="checkbox" checked={additionalGuestIds.includes(m.id)}
+                    onChange={e => toggleGuest(m.id, e.target.checked)}
+                    className="w-4 h-4 rounded accent-gold" />
+                  <span className="text-white text-sm">{m.full_name}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+        )}
+      </section>
 
       {/* ─── Customer ──────────────────────────────────────── */}
       <section className="bg-white/5 border border-white/10 rounded-xl p-6 mb-4">

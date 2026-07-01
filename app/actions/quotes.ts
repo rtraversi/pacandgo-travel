@@ -8,6 +8,8 @@ export type QuoteFormData = {
   customer_name: string | null
   customer_email: string | null
   client_info: import('@/lib/types').ClientInfo | null
+  client_id: string | null
+  additional_guest_ids: string[]
   line: string
   ship: string
   start_date: string | null
@@ -30,6 +32,11 @@ async function getAgentId(supabase: Awaited<ReturnType<typeof createClient>>) {
 export async function saveQuote(data: QuoteFormData, id?: string): Promise<{ id: string }> {
   const supabase = await createClient()
   const agentId = await getAgentId(supabase)
+
+  if (data.client_id) {
+    const clientRes = await (supabase as any).from('clients').select('id').eq('id', data.client_id).eq('agent_id', agentId).single()
+    if (!clientRes.data) throw new Error('Client not found')
+  }
 
   if (id) {
     const res = await (supabase as any).from('quotes').update(data).eq('id', id).eq('agent_id', agentId)

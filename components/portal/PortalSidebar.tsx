@@ -6,7 +6,7 @@ import { logout } from '@/app/actions/auth'
 import type { Agent, AgentProfile } from '@/lib/types'
 import {
   LayoutDashboard, User, Tag, Plane, BookOpen,
-  Star, Images, Settings, FileText, LogOut, Compass, ShieldCheck,
+  Star, Images, Settings, FileText, LogOut, Compass, ShieldCheck, Users,
 } from 'lucide-react'
 
 const ADMIN_USER_ID = '552d2159-35e8-440f-b1f5-cd649ff16885'
@@ -86,6 +86,20 @@ export default function PortalSidebar({ agent }: Props) {
             </Link>
           )
         })}
+
+        {isPlus && (
+          <Link
+            href="/portal/clients"
+            className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs transition-colors ${
+              pathname.startsWith('/portal/clients')
+                ? 'bg-gold/15 text-gold font-medium'
+                : 'text-white/55 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <Users size={14} strokeWidth={pathname.startsWith('/portal/clients') ? 2.5 : 2} />
+            Clients
+          </Link>
+        )}
 
         {isPlus && (
           <Link

@@ -111,12 +111,28 @@ export interface ClientInfo {
   loyalty_number: string | null
 }
 
+export interface Client {
+  id: string
+  agent_id: string
+  household_id: string | null
+  full_name: string
+  email: string | null
+  phone: string | null
+  address: string | null
+  dob: string | null
+  loyalty_number: string | null
+  notes: string | null
+  created_at: string
+}
+
 export interface Quote {
   id: string
   agent_id: string
   customer_name: string | null
   customer_email: string | null
   client_info: ClientInfo | null
+  client_id: string | null
+  additional_guest_ids: string[]
   line: string
   ship: string
   start_date: string | null
@@ -167,6 +183,7 @@ export type Database = {
       reviews: { Row: Review; Insert: Omit<Review, 'id' | 'created_at'>; Update: Partial<Review> }
       gallery: { Row: GalleryItem; Insert: Omit<GalleryItem, 'id' | 'created_at'>; Update: Partial<GalleryItem> }
       quotes: { Row: Quote; Insert: Omit<Quote, 'id' | 'created_at'>; Update: Partial<Quote> }
+      clients: { Row: Client; Insert: Omit<Client, 'id' | 'created_at'>; Update: Partial<Client> }
     }
   }
 }
