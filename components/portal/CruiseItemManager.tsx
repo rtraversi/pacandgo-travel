@@ -38,6 +38,7 @@ export default function CruiseItemManager({ label, items, onSave, onDelete, onTo
   const [isPending, startTransition] = useTransition()
   const [aiLoading, setAiLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [selected, setSelected] = useState<Set<string>>(new Set())
 
   function openNew() {
     setEditing(null)
@@ -96,6 +97,27 @@ export default function CruiseItemManager({ label, items, onSave, onDelete, onTo
   function handleToggle(id: string, current: boolean) {
     startTransition(async () => {
       await onToggle(id, !current)
+    })
+  }
+
+  function toggleSelected(id: string, checked: boolean) {
+    setSelected(s => {
+      const next = new Set(s)
+      if (checked) next.add(id); else next.delete(id)
+      return next
+    })
+  }
+
+  function toggleSelectAll(checked: boolean) {
+    setSelected(checked ? new Set(items.map(i => i.id)) : new Set())
+  }
+
+  function handleBulkDelete() {
+    if (selected.size === 0) return
+    if (!confirm(`Delete ${selected.size} selected ${label.toLowerCase()}${selected.size > 1 ? 's' : ''}?`)) return
+    startTransition(async () => {
+      for (const id of selected) await onDelete(id)
+      setSelected(new Set())
     })
   }
 
@@ -204,6 +226,8 @@ export default function CruiseItemManager({ label, items, onSave, onDelete, onTo
     )
   }
 
+  const allSelected = items.length > 0 && selected.size === items.length
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
@@ -211,10 +235,18 @@ export default function CruiseItemManager({ label, items, onSave, onDelete, onTo
           <h1 className="text-3xl font-display text-white">{label}s</h1>
           <p className="text-white/40 text-sm mt-1">{items.length} total</p>
         </div>
-        <button onClick={openNew}
-          className="bg-gold text-navy font-semibold px-5 py-2 rounded-lg hover:bg-gold-hover transition text-sm">
-          + Add {label}
-        </button>
+        <div className="flex items-center gap-3">
+          {selected.size > 0 && (
+            <button onClick={handleBulkDelete} disabled={isPending}
+              className="text-red-400 hover:text-red-300 border border-red-400/30 hover:border-red-400/50 px-4 py-2 rounded-lg transition text-sm disabled:opacity-50">
+              Delete Selected ({selected.size})
+            </button>
+          )}
+          <button onClick={openNew}
+            className="bg-gold text-navy font-semibold px-5 py-2 rounded-lg hover:bg-gold-hover transition text-sm">
+            + Add {label}
+          </button>
+        </div>
       </div>
 
       {items.length === 0 ? (
@@ -224,8 +256,15 @@ export default function CruiseItemManager({ label, items, onSave, onDelete, onTo
         </div>
       ) : (
         <div className="space-y-2">
+          <label className="flex items-center gap-3 px-5 py-1.5 cursor-pointer">
+            <input type="checkbox" checked={allSelected} onChange={e => toggleSelectAll(e.target.checked)}
+              className="w-4 h-4 rounded accent-gold" />
+            <span className="text-white/40 text-xs">Select all</span>
+          </label>
           {items.map(item => (
             <div key={item.id} className="bg-white/5 border border-white/10 rounded-xl px-5 py-4 flex items-center gap-4">
+              <input type="checkbox" checked={selected.has(item.id)} onChange={e => toggleSelected(item.id, e.target.checked)}
+                className="w-4 h-4 rounded accent-gold shrink-0" />
               <div className="flex-1 min-w-0">
                 <p className="text-white font-medium text-sm truncate">{item.title || item.ship || '—'}</p>
                 <p className="text-white/40 text-xs mt-0.5">
