@@ -2,6 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { agentProfileUrl, initials } from '@/lib/utils'
+import { sortAgentsForDisplay } from '@/lib/agentOrder'
 import IntakeForm from '@/components/home/IntakeForm'
 import type { Agent, AgentProfile } from '@/lib/types'
 
@@ -186,7 +187,7 @@ export default async function HomePage() {
     .select('*, agent_profiles(*)')
     .order('tier', { ascending: false })
     .order('full_name', { ascending: true })
-  const agents = (data || []) as AgentWithProfile[]
+  const agents = sortAgentsForDisplay((data || []) as AgentWithProfile[])
 
   return (
     <>

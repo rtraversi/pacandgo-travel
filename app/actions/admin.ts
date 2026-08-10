@@ -3,7 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { revalidatePath } from 'next/cache'
-import type { AgentTier } from '@/lib/types'
+import type { AgentTier, Highlight } from '@/lib/types'
 
 const ADMIN_USER_ID = '552d2159-35e8-440f-b1f5-cd649ff16885'
 
@@ -69,6 +69,37 @@ export async function addAgent(data: {
   await admin.from('agent_profiles').insert({ agent_id: agent.id })
 
   revalidatePath('/portal/admin')
+}
+
+export async function saveAgentProfile(agentId: string, data: {
+  photo_url: string | null
+  tagline: string | null
+  bio: string | null
+  specialties: string[]
+  highlights: Highlight[]
+  blog_url: string | null
+}) {
+  await assertAdmin()
+  const admin = createAdminClient()
+
+  const agentRes = await admin.from('agents').select('slug').eq('id', agentId).single()
+  const agent = agentRes.data as { slug: string } | null
+  if (!agent) throw new Error('Agent not found')
+
+  const existingRes = await admin
+    .from('agent_profiles')
+    .select('id')
+    .eq('agent_id', agentId)
+    .maybeSingle()
+
+  const { error } = existingRes.data
+    ? await admin.from('agent_profiles').update(data).eq('agent_id', agentId)
+    : await admin.from('agent_profiles').insert({ agent_id: agentId, ...data })
+  if (error) throw new Error(error.message)
+
+  revalidatePath('/portal/admin')
+  revalidatePath(`/portal/admin/${agentId}`)
+  revalidatePath(`/agent/${agent.slug}`)
 }
 
 export async function removeAgentLogin(agentId: string) {

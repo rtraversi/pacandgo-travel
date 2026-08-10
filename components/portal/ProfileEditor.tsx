@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { saveProfile } from '@/app/actions/profile'
+import { saveAgentProfile } from '@/app/actions/admin'
 import type { AgentProfile, Highlight } from '@/lib/types'
 
 const CLOUD = 'dh811jlgd'
@@ -11,9 +12,11 @@ interface Props {
   agentName: string
   agentSlug: string
   profile: AgentProfile | null
+  /** Set by the admin panel to edit another agent's profile. Omit for self-editing. */
+  agentId?: string
 }
 
-export default function ProfileEditor({ agentName, agentSlug, profile }: Props) {
+export default function ProfileEditor({ agentName, agentSlug, profile, agentId }: Props) {
   const [isPending, startTransition] = useTransition()
   const [saved, setSaved] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
@@ -27,6 +30,7 @@ export default function ProfileEditor({ agentName, agentSlug, profile }: Props) 
   const [highlights, setHighlights] = useState<Highlight[]>(profile?.highlights ?? [])
 
   const [uploading, setUploading] = useState(false)
+  const [photoError, setPhotoError] = useState<string | null>(null)
   const [aiLoading, setAiLoading] = useState(false)
   const [aiError, setAiError] = useState<string | null>(null)
 
@@ -34,16 +38,27 @@ export default function ProfileEditor({ agentName, agentSlug, profile }: Props) 
     const file = e.target.files?.[0]
     if (!file) return
     setUploading(true)
-    const fd = new FormData()
-    fd.append('file', file)
-    fd.append('upload_preset', PRESET)
-    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD}/image/upload`, {
-      method: 'POST',
-      body: fd,
-    })
-    const json = await res.json()
-    if (json.secure_url) setPhotoUrl(json.secure_url)
-    setUploading(false)
+    setPhotoError(null)
+    try {
+      const fd = new FormData()
+      fd.append('file', file)
+      fd.append('upload_preset', PRESET)
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD}/image/upload`, {
+        method: 'POST',
+        body: fd,
+      })
+      const json = await res.json()
+      if (json.secure_url) {
+        setPhotoUrl(json.secure_url)
+      } else {
+        setPhotoError(json.error?.message || 'Upload failed — try a different image.')
+      }
+    } catch {
+      setPhotoError('Upload failed — check your connection and try again.')
+    } finally {
+      setUploading(false)
+      e.target.value = ''
+    }
   }
 
   async function generateHighlights() {
@@ -85,14 +100,15 @@ export default function ProfileEditor({ agentName, agentSlug, profile }: Props) 
     setSaveError(null)
     startTransition(async () => {
       try {
-        await saveProfile({
+        const payload = {
           photo_url: photoUrl || null,
           tagline: tagline || null,
           bio: bio || null,
           specialties,
           highlights,
           blog_url: blogUrl || null,
-        })
+        }
+        await (agentId ? saveAgentProfile(agentId, payload) : saveProfile(payload))
         setSaved(true)
         setTimeout(() => setSaved(false), 3000)
       } catch (err) {
@@ -126,6 +142,7 @@ export default function ProfileEditor({ agentName, agentSlug, profile }: Props) 
               </span>
               <input type="file" accept="image/*" onChange={handlePhoto} disabled={uploading} className="hidden" />
             </label>
+            {photoError && <p className="text-red-400 text-[0.65rem] mt-1.5 max-w-24 leading-snug">{photoError}</p>}
           </div>
 
           <div className="flex-1 space-y-3">
@@ -163,7 +180,7 @@ export default function ProfileEditor({ agentName, agentSlug, profile }: Props) 
           className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-sm placeholder-white/20 focus:outline-none focus:border-gold/50 transition leading-relaxed resize-none"
         />
         <p className="text-white/25 text-xs mt-2">
-          Your public page at <span className="text-white/40">rob.pacandgotravel.com</span> shows this bio.
+          The public page at <span className="text-white/40">{agentSlug}.pacandgotravel.com</span> shows this bio.
         </p>
       </section>
 

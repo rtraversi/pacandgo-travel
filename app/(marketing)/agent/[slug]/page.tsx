@@ -46,7 +46,7 @@ export default async function AgentProfilePage({ params }: Props) {
   const gallery = (galleryRes.data || []) as GalleryItem[]
   const blog = (blogRes.data || []) as BlogPost[]
   const highlights = (profile?.highlights || []) as Highlight[]
-  const agentEmail = AGENT_EMAILS[slug] || AGENT_EMAILS.any
+  const agentEmail = AGENT_EMAILS[slug] || agent.email || AGENT_EMAILS.any
 
   return (
     <>

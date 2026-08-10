@@ -1,9 +1,10 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { Fragment, useState, useTransition } from 'react'
+import NextLink from 'next/link'
 import { setAgentTier, linkUserToAgent, createLoginForAgent, addAgent, removeAgentLogin } from '@/app/actions/admin'
 import type { AdminAgent } from '@/app/(portal)/portal/admin/page'
-import { UserCheck, UserX, ShieldPlus, ShieldMinus, Plus, X, KeyRound, Link } from 'lucide-react'
+import { UserCheck, UserX, ShieldPlus, ShieldMinus, Plus, X, KeyRound, Link, ImagePlus } from 'lucide-react'
 
 type Props = { agents: AdminAgent[] }
 
@@ -168,8 +169,8 @@ export default function AdminPanel({ agents: initial }: Props) {
               const pc = profileComplete(agent)
               const action = rowAction[agent.id] || null
               return (
-                <>
-                  <tr key={agent.id} className="hover:bg-white/3 transition-colors">
+                <Fragment key={agent.id}>
+                  <tr className="hover:bg-white/3 transition-colors">
                     {/* Name */}
                     <td className="px-5 py-3.5">
                       <p className="text-white font-medium">{agent.full_name}</p>
@@ -220,6 +221,15 @@ export default function AdminPanel({ agents: initial }: Props) {
                     {/* Actions */}
                     <td className="px-4 py-3.5">
                       <div className="flex items-center gap-2 justify-end">
+                        {/* Edit photo / bio / highlights on the agent's behalf */}
+                        <NextLink
+                          href={`/portal/admin/${agent.id}`}
+                          title="Edit photo & bio"
+                          className="p-1.5 rounded text-white/40 hover:text-gold hover:bg-gold/10 transition-colors no-underline"
+                        >
+                          <ImagePlus size={14} />
+                        </NextLink>
+
                         {/* Toggle tier */}
                         <button
                           onClick={() => handleToggleTier(agent)}
@@ -264,7 +274,7 @@ export default function AdminPanel({ agents: initial }: Props) {
 
                   {/* Inline action row */}
                   {action && (
-                    <tr key={`${agent.id}-action`} className="bg-navy/50">
+                    <tr className="bg-navy/50">
                       <td colSpan={5} className="px-5 py-3">
                         {action.type === 'create-login' && (
                           <CreateLoginForm
@@ -284,7 +294,7 @@ export default function AdminPanel({ agents: initial }: Props) {
                       </td>
                     </tr>
                   )}
-                </>
+                </Fragment>
               )
             })}
           </tbody>
