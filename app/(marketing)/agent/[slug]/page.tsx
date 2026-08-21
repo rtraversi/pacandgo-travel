@@ -1,10 +1,12 @@
 import Image from 'next/image'
+import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import AgentContactForm from '@/components/agent/AgentContactForm'
 import { formatDate, formatPrice, initials } from '@/lib/utils'
 import { AGENT_EMAILS } from '@/lib/emailjs'
-import { bioToSafeHtml } from '@/lib/richText.server'
+import { richTextToSafeHtml } from '@/lib/richText.server'
+import { blogCardHref } from '@/lib/blog'
 import type { Agent, AgentProfile, Deal, Trip, Review, GalleryItem, BlogPost, Highlight } from '@/lib/types'
 
 type PageAgent = Agent & { agent_profiles: AgentProfile | null }
@@ -47,7 +49,7 @@ export default async function AgentProfilePage({ params }: Props) {
   const gallery = (galleryRes.data || []) as GalleryItem[]
   const blog = (blogRes.data || []) as BlogPost[]
   const highlights = (profile?.highlights || []) as Highlight[]
-  const bioHtml = bioToSafeHtml(profile?.bio)
+  const bioHtml = richTextToSafeHtml(profile?.bio)
   const agentEmail = AGENT_EMAILS[slug] || agent.email || AGENT_EMAILS.any
 
   return (
@@ -101,7 +103,7 @@ export default async function AgentProfilePage({ params }: Props) {
               {bioHtml && (
                 // Sanitized here and again on save — agents can format their
                 // bio but cannot inject markup or scripts.
-                <div className="bio-rich max-w-none" dangerouslySetInnerHTML={{ __html: bioHtml }} />
+                <div className="rich-text max-w-none" dangerouslySetInnerHTML={{ __html: bioHtml }} />
               )}
             </div>
             <div>
@@ -239,24 +241,36 @@ export default async function AgentProfilePage({ params }: Props) {
             <p className="text-[0.7rem] font-bold tracking-[0.2em] uppercase text-gold mb-2">Insights & Stories</p>
             <h2 className="text-[clamp(1.6rem,3vw,2.4rem)] text-navy mb-10">From My Blog</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {blog.map(post => (
-                <a
-                  key={post.id}
-                  href={post.url || '#'}
-                  className="bg-white rounded-xl p-6 border border-light hover:shadow-md transition-shadow no-underline group"
-                  target={post.url ? '_blank' : undefined}
-                  rel={post.url ? 'noopener noreferrer' : undefined}
-                >
-                  {post.tags && post.tags.length > 0 && (
-                    <span className="inline-block bg-gold/10 text-gold text-[0.65rem] font-bold uppercase tracking-wider px-2 py-0.5 rounded mb-3">
-                      {post.tags[0]}
-                    </span>
-                  )}
-                  <h3 className="text-navy font-bold text-base leading-snug mb-2 group-hover:text-ocean transition-colors">{post.title}</h3>
-                  {post.description && <p className="text-gray-500 text-sm line-clamp-3">{post.description}</p>}
-                  {post.publish_date && <p className="text-gray-400 text-xs mt-4">{formatDate(post.publish_date)}</p>}
-                </a>
-              ))}
+              {blog.map(post => {
+                const link = blogCardHref(agent.slug, post)
+                const cardClass = `bg-white rounded-xl p-6 border border-light transition-shadow no-underline group${link ? ' hover:shadow-md' : ''}`
+                const content = (
+                  <>
+                    {post.tags && post.tags.length > 0 && (
+                      <span className="inline-block bg-gold/10 text-gold text-[0.65rem] font-bold uppercase tracking-wider px-2 py-0.5 rounded mb-3">
+                        {post.tags[0]}
+                      </span>
+                    )}
+                    <h3 className="text-navy font-bold text-base leading-snug mb-2 group-hover:text-ocean transition-colors">{post.title}</h3>
+                    {post.description && <p className="text-gray-500 text-sm line-clamp-3">{post.description}</p>}
+                    {post.publish_date && <p className="text-gray-400 text-xs mt-4">{formatDate(post.publish_date)}</p>}
+                    {link && !link.external && (
+                      <p className="text-ocean text-xs font-medium mt-3 group-hover:text-gold transition-colors">Read article →</p>
+                    )}
+                  </>
+                )
+                // Posts with neither a body nor a link have nowhere to send
+                // people, so they render as a plain card instead of a dead "#".
+                if (!link) return <div key={post.id} className={cardClass}>{content}</div>
+                if (link.external) {
+                  return (
+                    <a key={post.id} href={link.href} target="_blank" rel="noopener noreferrer" className={cardClass}>
+                      {content}
+                    </a>
+                  )
+                }
+                return <Link key={post.id} href={link.href} className={cardClass}>{content}</Link>
+              })}
             </div>
           </div>
         </section>

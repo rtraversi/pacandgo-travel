@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { sanitizeRichText } from '@/lib/richText.server'
 
 export type BlogFormData = {
   title: string
@@ -25,12 +26,16 @@ export async function saveBlogPost(data: BlogFormData, id?: string) {
   const supabase = await createClient()
   const agentId = await getAgentId(supabase)
 
+  // The body is rendered as HTML on the public article page — scrub it before
+  // it is stored, same as profile bios.
+  const payload = { ...data, body: sanitizeRichText(data.body) }
+
   let error
   if (id) {
-    const res = await (supabase as any).from('blog_posts').update(data).eq('id', id).eq('agent_id', agentId)
+    const res = await (supabase as any).from('blog_posts').update(payload).eq('id', id).eq('agent_id', agentId)
     error = res.error
   } else {
-    const res = await (supabase as any).from('blog_posts').insert({ ...data, agent_id: agentId })
+    const res = await (supabase as any).from('blog_posts').insert({ ...payload, agent_id: agentId })
     error = res.error
   }
   if (error) throw new Error(error.message)

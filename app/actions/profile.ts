@@ -2,7 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
-import { sanitizeBioHtml } from '@/lib/richText.server'
+import { sanitizeRichText } from '@/lib/richText.server'
 import type { Highlight } from '@/lib/types'
 
 export async function saveProfile(data: {
@@ -30,7 +30,7 @@ export async function saveProfile(data: {
     photo_url: data.photo_url,
     tagline: data.tagline,
     // Bios render as HTML on the public site — never store unscrubbed markup.
-    bio: sanitizeBioHtml(data.bio),
+    bio: sanitizeRichText(data.bio),
     specialties: data.specialties,
     highlights: data.highlights,
     blog_url: data.blog_url,

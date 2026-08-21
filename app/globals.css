@@ -28,39 +28,39 @@ h1, h2, h3, h4, h5 {
 ::-webkit-scrollbar-thumb { background: #c9a84c; border-radius: 3px; }
 
 /* ---------------------------------------------------------------------------
-   Agent bios (rich text)
-   .bio-editor  — the TipTap surface in the dark agent portal
-   .bio-rich    — the same markup rendered on the light public profile page
+   Rich text written by agents (profile bios, blog articles)
+   .rich-editor  — the TipTap surface in the dark agent portal
+   .rich-text    — the same markup rendered on the light public pages
    Tailwind's typography plugin isn't installed, so these are styled by hand.
 --------------------------------------------------------------------------- */
 
-.bio-editor { color: #ffffff; font-size: 0.875rem; line-height: 1.7; }
-.bio-editor p { margin: 0 0 0.75rem; }
-.bio-editor p:last-child { margin-bottom: 0; }
-.bio-editor strong { font-weight: 700; }
-.bio-editor em { font-style: italic; }
-.bio-editor u { text-decoration: underline; }
-.bio-editor s { text-decoration: line-through; }
-.bio-editor a { color: #c9a84c; text-decoration: underline; }
-.bio-editor ul,
-.bio-editor ol { margin: 0 0 0.75rem; padding-left: 1.5rem; }
-.bio-editor ul { list-style: disc; }
-.bio-editor ol { list-style: decimal; }
-.bio-editor li { margin: 0.2rem 0; }
-.bio-editor li p { margin: 0; }
-.bio-editor blockquote {
+.rich-editor { color: #ffffff; font-size: 0.875rem; line-height: 1.7; }
+.rich-editor p { margin: 0 0 0.75rem; }
+.rich-editor p:last-child { margin-bottom: 0; }
+.rich-editor strong { font-weight: 700; }
+.rich-editor em { font-style: italic; }
+.rich-editor u { text-decoration: underline; }
+.rich-editor s { text-decoration: line-through; }
+.rich-editor a { color: #c9a84c; text-decoration: underline; }
+.rich-editor ul,
+.rich-editor ol { margin: 0 0 0.75rem; padding-left: 1.5rem; }
+.rich-editor ul { list-style: disc; }
+.rich-editor ol { list-style: decimal; }
+.rich-editor li { margin: 0.2rem 0; }
+.rich-editor li p { margin: 0; }
+.rich-editor blockquote {
   border-left: 2px solid rgba(201, 168, 76, 0.5);
   padding-left: 0.875rem;
   margin: 0 0 0.75rem;
   color: rgba(255, 255, 255, 0.65);
 }
-.bio-editor h3,
-.bio-editor h4 { font-weight: 600; margin: 1rem 0 0.5rem; }
-.bio-editor h3 { font-size: 1.05rem; }
-.bio-editor h4 { font-size: 0.95rem; }
+.rich-editor h3,
+.rich-editor h4 { font-weight: 600; margin: 1rem 0 0.5rem; }
+.rich-editor h3 { font-size: 1.05rem; }
+.rich-editor h4 { font-size: 0.95rem; }
 
 /* Placeholder shown while the editor is empty */
-.bio-editor p.is-editor-empty:first-child::before {
+.rich-editor p.is-editor-empty:first-child::before {
   content: attr(data-placeholder);
   float: left;
   height: 0;
@@ -68,33 +68,33 @@ h1, h2, h3, h4, h5 {
   color: rgba(255, 255, 255, 0.2);
 }
 
-.bio-rich { color: #4b5563; line-height: 1.75; }
-.bio-rich p { margin: 0 0 1rem; }
-.bio-rich p:last-child { margin-bottom: 0; }
-.bio-rich strong { font-weight: 700; color: #0d2b45; }
-.bio-rich em { font-style: italic; }
-.bio-rich u { text-decoration: underline; }
-.bio-rich s { text-decoration: line-through; }
-.bio-rich a { color: #1a5276; text-decoration: underline; }
-.bio-rich a:hover { color: #c9a84c; }
-.bio-rich ul,
-.bio-rich ol { margin: 0 0 1rem; padding-left: 1.5rem; }
-.bio-rich ul { list-style: disc; }
-.bio-rich ol { list-style: decimal; }
-.bio-rich li { margin: 0.35rem 0; }
-.bio-rich li p { margin: 0; }
-.bio-rich blockquote {
+.rich-text { color: #4b5563; line-height: 1.75; }
+.rich-text p { margin: 0 0 1rem; }
+.rich-text p:last-child { margin-bottom: 0; }
+.rich-text strong { font-weight: 700; color: #0d2b45; }
+.rich-text em { font-style: italic; }
+.rich-text u { text-decoration: underline; }
+.rich-text s { text-decoration: line-through; }
+.rich-text a { color: #1a5276; text-decoration: underline; }
+.rich-text a:hover { color: #c9a84c; }
+.rich-text ul,
+.rich-text ol { margin: 0 0 1rem; padding-left: 1.5rem; }
+.rich-text ul { list-style: disc; }
+.rich-text ol { list-style: decimal; }
+.rich-text li { margin: 0.35rem 0; }
+.rich-text li p { margin: 0; }
+.rich-text blockquote {
   border-left: 3px solid #c9a84c;
   padding-left: 1rem;
   margin: 0 0 1rem;
   font-style: italic;
   color: #6b7280;
 }
-.bio-rich h3,
-.bio-rich h4 {
+.rich-text h3,
+.rich-text h4 {
   font-family: var(--font-playfair), Georgia, serif;
   color: #0d2b45;
   margin: 1.5rem 0 0.6rem;
 }
-.bio-rich h3 { font-size: 1.35rem; }
-.bio-rich h4 { font-size: 1.12rem; }
+.rich-text h3 { font-size: 1.35rem; }
+.rich-text h4 { font-size: 1.12rem; }

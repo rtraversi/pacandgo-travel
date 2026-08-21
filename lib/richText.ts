@@ -1,20 +1,20 @@
 /**
- * Shared helpers for agent bios, which are stored as HTML since the portal
- * switched to a rich-text editor.
+ * Shared helpers for the rich text agents write — profile bios and blog post
+ * bodies — both stored as HTML since the portal gained a WYSIWYG editor.
  *
  * Everything here is dependency-free so it can run in client components too.
  * Sanitizing lives in richText.server.ts — it needs a Node library and must
  * only ever run on the server, where it is a real trust boundary.
  */
 
-/** Tags the bio editor can produce. Kept in sync with the sanitizer. */
-export const BIO_ALLOWED_TAGS = [
+/** Tags the rich-text editor can produce. Kept in sync with the sanitizer. */
+export const RICH_TEXT_ALLOWED_TAGS = [
   'p', 'br', 'strong', 'em', 'u', 's', 'a',
   'ul', 'ol', 'li', 'blockquote', 'h3', 'h4',
 ]
 
 /**
- * Bios written before the rich-text editor are plain text with newlines.
+ * Text written before the rich-text editor is plain, with newlines.
  * Rather than migrating the table, we detect and convert them on read.
  */
 export function isLikelyHtml(value: string): boolean {

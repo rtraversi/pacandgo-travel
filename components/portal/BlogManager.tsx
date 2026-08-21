@@ -1,6 +1,8 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import RichTextEditor from './RichTextEditor'
+import { isBlankHtml, isLikelyHtml, plainTextToHtml } from '@/lib/richText'
 import type { BlogFormData } from '@/app/actions/blog'
 import type { BlogPost } from '@/lib/types'
 
@@ -43,7 +45,8 @@ export default function BlogManager({ posts, onSave, onDelete, onToggle }: Props
     setEditing(post)
     setForm({
       title: post.title,
-      body: post.body,
+      // Articles written before the rich-text editor are plain text.
+      body: post.body && !isLikelyHtml(post.body) ? plainTextToHtml(post.body) : post.body,
       url: post.url,
       description: post.description,
       tags: post.tags,
@@ -76,7 +79,7 @@ export default function BlogManager({ posts, onSave, onDelete, onToggle }: Props
     setError(null)
     const data: BlogFormData = {
       ...form,
-      body: postType === 'article' ? form.body : null,
+      body: postType === 'article' && !isBlankHtml(form.body) ? form.body : null,
       url: postType === 'link' ? form.url : null,
     }
     startTransition(async () => {
@@ -132,9 +135,11 @@ export default function BlogManager({ posts, onSave, onDelete, onToggle }: Props
           {postType === 'article' ? (
             <div>
               <label className="block text-xs text-white/45 mb-1.5">Content</label>
-              <textarea value={form.body ?? ''} onChange={e => set('body', e.target.value)}
-                rows={8} placeholder="Write your article…"
-                className={INPUT + ' resize-none'} />
+              <RichTextEditor
+                value={form.body ?? ''}
+                onChange={html => set('body', html)}
+                placeholder="Write your article…"
+              />
             </div>
           ) : (
             <div>

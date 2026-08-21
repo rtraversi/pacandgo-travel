@@ -58,7 +58,7 @@ export default function RichTextEditor({ value, onChange, placeholder }: Props) 
     immediatelyRender: false,
     editorProps: {
       attributes: {
-        class: 'bio-editor focus:outline-none min-h-[11rem] px-4 py-3',
+        class: 'rich-editor focus:outline-none min-h-[11rem] px-4 py-3',
       },
     },
     onUpdate: ({ editor }) => onChange(editor.getHTML(), editor.getText()),
