@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { revalidatePath } from 'next/cache'
+import { registerAgentSubdomain, normalizeSlug, validateSlug, type SubdomainResult } from '@/lib/netlify'
 import type { AgentTier, Highlight } from '@/lib/types'
 
 const ADMIN_USER_ID = '552d2159-35e8-440f-b1f5-cd649ff16885'
@@ -55,20 +56,32 @@ export async function addAgent(data: {
   email: string
   slug: string
   tier: AgentTier
-}) {
+}): Promise<{ agentId: string; subdomain: SubdomainResult }> {
   await assertAdmin()
   const admin = createAdminClient()
 
+  // Validate before inserting: a slug with a space or capital letter can never
+  // become a working subdomain, and fixing it after the fact means editing the
+  // row by hand in Supabase.
+  const slug = normalizeSlug(data.slug)
+  const slugError = validateSlug(slug)
+  if (slugError) throw new Error(slugError)
+
   const { data: agent, error } = await admin
     .from('agents')
-    .insert({ full_name: data.full_name, email: data.email, slug: data.slug, tier: data.tier })
+    .insert({ full_name: data.full_name, email: data.email, slug, tier: data.tier })
     .select('id')
     .single()
   if (error) throw new Error(error.message)
 
   await admin.from('agent_profiles').insert({ agent_id: agent.id })
 
+  // Fails soft — the agent exists either way; the panel surfaces a warning so
+  // the alias can be added by hand.
+  const subdomain = await registerAgentSubdomain(slug)
+
   revalidatePath('/portal/admin')
+  return { agentId: agent.id as string, subdomain }
 }
 
 export async function saveAgentProfile(agentId: string, data: {

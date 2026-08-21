@@ -2,9 +2,10 @@
 
 import { Fragment, useState, useTransition } from 'react'
 import NextLink from 'next/link'
+import { useRouter } from 'next/navigation'
 import { setAgentTier, linkUserToAgent, createLoginForAgent, addAgent, removeAgentLogin } from '@/app/actions/admin'
 import type { AdminAgent } from '@/app/(portal)/portal/admin/page'
-import { UserCheck, UserX, ShieldPlus, ShieldMinus, Plus, X, KeyRound, Link, ImagePlus } from 'lucide-react'
+import { UserCheck, UserX, ShieldPlus, ShieldMinus, Plus, X, KeyRound, Link, ImagePlus, AlertTriangle } from 'lucide-react'
 
 type Props = { agents: AdminAgent[] }
 
@@ -15,7 +16,9 @@ export default function AdminPanel({ agents: initial }: Props) {
   const [rowAction, setRowAction] = useState<Record<string, RowAction>>({})
   const [addingAgent, setAddingAgent] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [warning, setWarning] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
+  const router = useRouter()
 
   const clearError = () => setError(null)
 
@@ -65,15 +68,24 @@ export default function AdminPanel({ agents: initial }: Props) {
     const fd = new FormData(form)
     const full_name = fd.get('full_name') as string
     const email = fd.get('email') as string
-    const slug = fd.get('slug') as string
+    // Mirror the server's normalization so the warning below shows the slug
+    // that was actually saved.
+    const slug = (fd.get('slug') as string).trim().toLowerCase()
     const tier = fd.get('tier') as 'agent' | 'agent_plus'
     startTransition(async () => {
       try {
-        await addAgent({ full_name, email, slug, tier })
+        const { subdomain } = await addAgent({ full_name, email, slug, tier })
         form.reset()
         setAddingAgent(false)
-        // Server revalidates — hard refresh to show new row
-        window.location.reload()
+        setError(null)
+        setWarning(subdomain.ok ? null : (
+          `${full_name} was created, but ${subdomain.host || 'their subdomain'} could not be registered on Netlify — ` +
+          `${subdomain.reason} Their profile still works at /agent/${slug}. ` +
+          `To fix the subdomain, add it in Netlify under Domain management → Add domain alias.`
+        ))
+        // router.refresh() re-renders the server component with the new row
+        // without wiping the warning above, which a full reload would.
+        router.refresh()
       } catch (e: any) { setError(e.message) }
     })
   }
@@ -89,6 +101,14 @@ export default function AdminPanel({ agents: initial }: Props) {
         <div className="mb-4 flex items-center justify-between bg-red-900/40 border border-red-500/40 text-red-300 text-sm px-4 py-3 rounded-lg">
           {error}
           <button onClick={clearError}><X size={14} /></button>
+        </div>
+      )}
+
+      {warning && (
+        <div className="mb-4 flex items-start justify-between gap-3 bg-amber-900/30 border border-amber-500/40 text-amber-200 text-sm px-4 py-3 rounded-lg">
+          <AlertTriangle size={16} className="mt-0.5 shrink-0" />
+          <span className="flex-1 leading-relaxed">{warning}</span>
+          <button onClick={() => setWarning(null)} className="mt-0.5 shrink-0"><X size={14} /></button>
         </div>
       )}
 
@@ -131,7 +151,14 @@ export default function AdminPanel({ agents: initial }: Props) {
             </div>
             <div>
               <label className="block text-white/50 text-xs mb-1">Slug (URL key)</label>
-              <input name="slug" required placeholder="e.g. sarah" className="w-full bg-white/10 border border-white/15 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-gold" />
+              <input
+                name="slug"
+                required
+                pattern="[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?"
+                title="Letters, numbers and hyphens only — no spaces or dots."
+                placeholder="e.g. sarah"
+                className="w-full bg-white/10 border border-white/15 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-gold" />
+              <p className="text-white/25 text-[0.65rem] mt-1">Becomes their subdomain — no spaces or dots.</p>
             </div>
             <div>
               <label className="block text-white/50 text-xs mb-1">Tier</label>

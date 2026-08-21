@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { agentProfileUrl } from '@/lib/utils'
 import type { Agent, AgentProfile } from '@/lib/types'
 
 export const metadata: Metadata = { title: 'Dashboard — Agent Portal' }
@@ -25,6 +26,9 @@ export default async function PortalDashboardPage() {
   const profile = agent.agent_profiles
   const profileComplete = !!(profile?.bio && profile?.photo_url && profile?.tagline)
   const isPlus = agent.tier === 'agent_plus'
+
+  const publicUrl = agentProfileUrl(agent.slug, agent.tier)
+  const publicUrlLabel = publicUrl.replace(/^https?:\/\//, '')
 
   // Agent+ stat counts
   let stats: { label: string; value: number; href: string; alert: boolean }[] = []
@@ -130,11 +134,11 @@ export default async function PortalDashboardPage() {
             <div>
               <p className="text-xs font-bold tracking-widest uppercase text-white/30 mb-4">Your Public Page</p>
               <p className="text-white/45 text-sm leading-relaxed">
-                Your profile is live at <span className="text-gold font-medium">pacandgotravel.com/{agent.slug}</span>. Share it with clients to let them contact you directly.
+                Your profile is live at <span className="text-gold font-medium">{publicUrlLabel}</span>. Share it with clients to let them contact you directly.
               </p>
             </div>
             <a
-              href={`https://pacandgotravel.com/${agent.slug}`}
+              href={publicUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="mt-5 inline-block text-xs bg-gold/10 text-gold border border-gold/25 px-4 py-2 rounded-lg hover:bg-gold/20 transition w-fit">
