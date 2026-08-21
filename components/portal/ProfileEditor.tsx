@@ -1,6 +1,8 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import RichTextEditor from './RichTextEditor'
+import { isBlankHtml, isLikelyHtml, plainTextToHtml } from '@/lib/richText'
 import { saveProfile } from '@/app/actions/profile'
 import { saveAgentProfile } from '@/app/actions/admin'
 import type { AgentProfile, Highlight } from '@/lib/types'
@@ -23,7 +25,15 @@ export default function ProfileEditor({ agentName, agentSlug, profile, agentId }
 
   const [photoUrl, setPhotoUrl] = useState(profile?.photo_url ?? '')
   const [tagline, setTagline] = useState(profile?.tagline ?? '')
-  const [bio, setBio] = useState(profile?.bio ?? '')
+  // Bios are stored as HTML now; ones written before the rich-text editor are
+  // plain text, so convert them on the way in.
+  const [bio, setBio] = useState(() => {
+    const stored = profile?.bio ?? ''
+    if (!stored) return ''
+    return isLikelyHtml(stored) ? stored : plainTextToHtml(stored)
+  })
+  // Kept alongside the HTML so the AI prompt gets prose, not markup.
+  const [bioText, setBioText] = useState(() => (profile?.bio ?? '').replace(/<[^>]*>/g, ' ').trim())
   const [blogUrl, setBlogUrl] = useState(profile?.blog_url ?? '')
   const [specialties, setSpecialties] = useState<string[]>(profile?.specialties ?? [])
   const [specInput, setSpecInput] = useState('')
@@ -62,13 +72,13 @@ export default function ProfileEditor({ agentName, agentSlug, profile, agentId }
   }
 
   async function generateHighlights() {
-    if (!bio.trim()) return
+    if (!bioText.trim()) return
     setAiLoading(true)
     setAiError(null)
     const res = await fetch('/api/claude', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ bio, agentName }),
+      body: JSON.stringify({ bio: bioText, agentName }),
     })
     const json = await res.json()
     if (json.highlights) {
@@ -103,7 +113,7 @@ export default function ProfileEditor({ agentName, agentSlug, profile, agentId }
         const payload = {
           photo_url: photoUrl || null,
           tagline: tagline || null,
-          bio: bio || null,
+          bio: isBlankHtml(bio) ? null : bio,
           specialties,
           highlights,
           blog_url: blogUrl || null,
@@ -172,12 +182,10 @@ export default function ProfileEditor({ agentName, agentSlug, profile, agentId }
       {/* Bio */}
       <section className="bg-white/5 border border-white/10 rounded-xl p-6">
         <h2 className="text-[0.65rem] font-bold tracking-[0.18em] uppercase text-white/45 mb-5">Bio</h2>
-        <textarea
+        <RichTextEditor
           value={bio}
-          onChange={e => setBio(e.target.value)}
-          rows={8}
+          onChange={(html, text) => { setBio(html); setBioText(text) }}
           placeholder="Tell clients about your travel experience, specialties, and what makes you the right agent for them…"
-          className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-sm placeholder-white/20 focus:outline-none focus:border-gold/50 transition leading-relaxed resize-none"
         />
         <p className="text-white/25 text-xs mt-2">
           The public page at <span className="text-white/40">{agentSlug}.pacandgotravel.com</span> shows this bio.
@@ -222,7 +230,7 @@ export default function ProfileEditor({ agentName, agentSlug, profile, agentId }
           </div>
           <button
             onClick={generateHighlights}
-            disabled={!bio.trim() || aiLoading}
+            disabled={!bioText.trim() || aiLoading}
             className="text-xs flex items-center gap-2 bg-gold/12 text-gold border border-gold/30 px-4 py-2 rounded-lg hover:bg-gold/20 transition disabled:opacity-35 disabled:cursor-not-allowed"
           >
             {aiLoading ? (

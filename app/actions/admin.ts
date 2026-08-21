@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { revalidatePath } from 'next/cache'
 import { registerAgentSubdomain, normalizeSlug, validateSlug, type SubdomainResult } from '@/lib/netlify'
+import { sanitizeBioHtml } from '@/lib/richText.server'
 import type { AgentTier, Highlight } from '@/lib/types'
 
 const ADMIN_USER_ID = '552d2159-35e8-440f-b1f5-cd649ff16885'
@@ -105,9 +106,12 @@ export async function saveAgentProfile(agentId: string, data: {
     .eq('agent_id', agentId)
     .maybeSingle()
 
+  // Same scrub as the agent-facing save — this path writes the same column.
+  const payload = { ...data, bio: sanitizeBioHtml(data.bio) }
+
   const { error } = existingRes.data
-    ? await admin.from('agent_profiles').update(data).eq('agent_id', agentId)
-    : await admin.from('agent_profiles').insert({ agent_id: agentId, ...data })
+    ? await admin.from('agent_profiles').update(payload).eq('agent_id', agentId)
+    : await admin.from('agent_profiles').insert({ agent_id: agentId, ...payload })
   if (error) throw new Error(error.message)
 
   revalidatePath('/portal/admin')

@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import AgentContactForm from '@/components/agent/AgentContactForm'
 import { formatDate, formatPrice, initials } from '@/lib/utils'
 import { AGENT_EMAILS } from '@/lib/emailjs'
+import { bioToSafeHtml } from '@/lib/richText.server'
 import type { Agent, AgentProfile, Deal, Trip, Review, GalleryItem, BlogPost, Highlight } from '@/lib/types'
 
 type PageAgent = Agent & { agent_profiles: AgentProfile | null }
@@ -46,6 +47,7 @@ export default async function AgentProfilePage({ params }: Props) {
   const gallery = (galleryRes.data || []) as GalleryItem[]
   const blog = (blogRes.data || []) as BlogPost[]
   const highlights = (profile?.highlights || []) as Highlight[]
+  const bioHtml = bioToSafeHtml(profile?.bio)
   const agentEmail = AGENT_EMAILS[slug] || agent.email || AGENT_EMAILS.any
 
   return (
@@ -96,10 +98,10 @@ export default async function AgentProfilePage({ params }: Props) {
               <h2 className="text-[clamp(1.6rem,3vw,2.4rem)] text-navy mb-5">
                 {profile?.tagline || `Your Travel Specialist`}
               </h2>
-              {profile?.bio && (
-                <div className="prose prose-slate max-w-none text-gray-600 leading-relaxed">
-                  {profile.bio.split('\n').map((para, i) => para.trim() ? <p key={i}>{para}</p> : null)}
-                </div>
+              {bioHtml && (
+                // Sanitized here and again on save — agents can format their
+                // bio but cannot inject markup or scripts.
+                <div className="bio-rich max-w-none" dangerouslySetInnerHTML={{ __html: bioHtml }} />
               )}
             </div>
             <div>
