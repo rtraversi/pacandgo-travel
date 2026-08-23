@@ -82,6 +82,11 @@ export async function addAgent(data: {
   const subdomain = await registerAgentSubdomain(slug)
 
   revalidatePath('/portal/admin')
+  // The team grid and the intake form's preferred-agent dropdown both read the
+  // `agents` table, so the new agent is live on the public site as soon as
+  // these are refreshed — there is no list to edit by hand.
+  revalidatePath('/')
+  revalidatePath('/contact')
   return { agentId: agent.id as string, subdomain }
 }
 

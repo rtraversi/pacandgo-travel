@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { agentProfileUrl, initials } from '@/lib/utils'
 import { sortAgentsForDisplay } from '@/lib/agentOrder'
 import IntakeForm from '@/components/home/IntakeForm'
+import { getIntakeAgents } from '@/lib/intakeAgents'
 import type { Agent, AgentProfile } from '@/lib/types'
 
 type AgentWithProfile = Agent & { agent_profiles: AgentProfile | null }
@@ -188,6 +189,7 @@ export default async function HomePage() {
     .order('tier', { ascending: false })
     .order('full_name', { ascending: true })
   const agents = sortAgentsForDisplay((data || []) as AgentWithProfile[])
+  const intakeAgents = await getIntakeAgents()
 
   return (
     <>
@@ -437,7 +439,7 @@ export default async function HomePage() {
       </section>
 
       {/* Intake form */}
-      <IntakeForm />
+      <IntakeForm agents={intakeAgents} />
     </>
   )
 }

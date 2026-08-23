@@ -1,27 +1,18 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { EMAILJS, AGENT_EMAILS } from '@/lib/emailjs'
+import type { IntakeAgent } from '@/lib/types'
 
-const AGENTS = [
-  { value: 'any',      label: 'No preference — assign me an agent' },
-  { value: 'alan',     label: 'Alan Klein' },
-  { value: 'aniska',   label: 'Aniska Dean' },
-  { value: 'beth',     label: 'Beth Vanergrift' },
-  { value: 'connie',   label: 'Connie Brant' },
-  { value: 'dawn',     label: 'Dawn Roffey' },
-  { value: 'denise',   label: 'Denise Berger' },
-  { value: 'jane',     label: 'Jane Goerke' },
-  { value: 'joel',     label: 'Joel Trinidad Mattlé' },
-  { value: 'larry',    label: 'Larry Oakley' },
-  { value: 'norma',    label: 'Norma Allen' },
-  { value: 'patty',    label: 'Patty Wells' },
-  { value: 'rob',      label: 'Robert Traversi' },
-  { value: 'rochelle', label: 'Rochelle Coronado' },
-  { value: 'rosemary', label: 'Rosemary Karnes' },
-  { value: 'sue',      label: 'Sue Muldoon' },
-]
+// The roster itself comes from the `agents` table via getIntakeAgents(), so
+// adding an agent in the admin panel is all it takes to list them here.
+const NO_PREFERENCE: IntakeAgent = {
+  slug: 'any',
+  label: 'No preference — assign me an agent',
+  email: AGENT_EMAILS.any,
+}
 
-export default function IntakeForm() {
+export default function IntakeForm({ agents }: { agents: IntakeAgent[] }) {
+  const options = [NO_PREFERENCE, ...agents]
   const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle')
   const [loaded, setLoaded] = useState(false)
 
@@ -41,7 +32,7 @@ export default function IntakeForm() {
     setStatus('sending')
     try {
       await emailjs.send(EMAILJS.serviceId, EMAILJS.templateId, {
-        to_email:    AGENT_EMAILS[agent] || AGENT_EMAILS.any,
+        to_email:    options.find(o => o.slug === agent)?.email || NO_PREFERENCE.email,
         from_name:   fd.get('name'),
         reply_to:    fd.get('email'),
         phone:       fd.get('phone') || 'Not provided',
@@ -101,8 +92,8 @@ export default function IntakeForm() {
         <div>
           <label className={label}>Preferred Agent</label>
           <select name="agent" className={input + ' cursor-pointer'}>
-            {AGENTS.map(a => (
-              <option key={a.value} value={a.value} className="bg-navy text-white">{a.label}</option>
+            {options.map(a => (
+              <option key={a.slug} value={a.slug} className="bg-navy text-white">{a.label}</option>
             ))}
           </select>
         </div>

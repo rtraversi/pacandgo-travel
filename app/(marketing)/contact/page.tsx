@@ -1,9 +1,12 @@
 import type { Metadata } from 'next'
 import IntakeForm from '@/components/home/IntakeForm'
+import { getIntakeAgents } from '@/lib/intakeAgents'
 
 export const metadata: Metadata = { title: 'Contact Us' }
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const agents = await getIntakeAgents()
+
   return (
     <>
       <div className="bg-navy py-20 px-[5%] text-center">
@@ -13,7 +16,7 @@ export default function ContactPage() {
           Ready to start planning? Fill out the form below and one of our certified travel specialists will be in touch within 24 hours.
         </p>
       </div>
-      <IntakeForm />
+      <IntakeForm agents={agents} />
     </>
   )
 }

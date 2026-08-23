@@ -12,6 +12,13 @@ export interface Agent {
   created_at: string
 }
 
+/** One option in the intake form's preferred-agent dropdown. */
+export interface IntakeAgent {
+  slug: string
+  label: string
+  email: string
+}
+
 export interface AgentProfile {
   id: string
   agent_id: string

@@ -139,7 +139,11 @@ export default function AdminPanel({ agents: initial }: Props) {
       {/* Add agent form */}
       {addingAgent && (
         <form onSubmit={handleAddAgent} className="mb-6 bg-white/5 border border-white/15 rounded-xl p-6">
-          <h3 className="text-white font-semibold text-sm mb-4">New Agent</h3>
+          <h3 className="text-white font-semibold text-sm mb-1">New Agent</h3>
+          <p className="text-white/35 text-xs mb-4">
+            Creating an agent registers their subdomain and lists them on the team grid and the
+            &ldquo;Preferred Agent&rdquo; dropdown of the site&apos;s intake form automatically.
+          </p>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-white/50 text-xs mb-1">Full Name</label>
@@ -148,6 +152,7 @@ export default function AdminPanel({ agents: initial }: Props) {
             <div>
               <label className="block text-white/50 text-xs mb-1">Email</label>
               <input name="email" type="email" required className="w-full bg-white/10 border border-white/15 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-gold" />
+              <p className="text-white/25 text-[0.65rem] mt-1">Receives leads when a visitor picks them on the intake form.</p>
             </div>
             <div>
               <label className="block text-white/50 text-xs mb-1">Slug (URL key)</label>
