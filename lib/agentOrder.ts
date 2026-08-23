@@ -2,8 +2,9 @@
  * Manual display order for the agent grid, by slug.
  *
  * The `agents` table has no ordering column, so placement that isn't
- * alphabetical lives here. Agents are still grouped by tier first (Agent+
- * above Agent); this list only controls the order *within* a tier.
+ * alphabetical lives here. Agents are grouped by tier first (Agent+ above
+ * Agent) and then by whether they have a photo; this list only controls the
+ * order *within* one of those groups.
  *
  * Any agent not listed here sorts after the listed ones, alphabetically by
  * full name — so new agents appear automatically and only need adding here
@@ -14,7 +15,6 @@ export const AGENT_DISPLAY_ORDER: string[] = [
   'aniska',
   'beth',
   'dawn',
-  'teal',
   'denise',
   'jane',
   'joel',
@@ -32,12 +32,29 @@ function rank(slug: string): number {
   return i === -1 ? UNRANKED : i
 }
 
-/** Sorts Agent+ first, then by the manual order above, then alphabetically. */
-export function sortAgentsForDisplay<T extends { slug: string; tier: string; full_name: string }>(
-  agents: T[]
-): T[] {
+type SortableAgent = {
+  slug: string
+  tier: string
+  full_name: string
+  agent_profiles?: { photo_url: string | null } | null
+}
+
+/** True when the grid will render a real photo rather than initials. */
+function hasPhoto(agent: SortableAgent): boolean {
+  return !!agent.agent_profiles?.photo_url
+}
+
+/**
+ * Sorts Agent+ first, then agents with a photo ahead of agents still showing
+ * initials, then by the manual order above, then alphabetically.
+ *
+ * The photo grouping keeps the top of the grid looking finished: an agent who
+ * uploads a photo moves up on the next render, with no code change.
+ */
+export function sortAgentsForDisplay<T extends SortableAgent>(agents: T[]): T[] {
   return [...agents].sort((a, b) => {
     if (a.tier !== b.tier) return a.tier === 'agent_plus' ? -1 : 1
+    if (hasPhoto(a) !== hasPhoto(b)) return hasPhoto(a) ? -1 : 1
     const diff = rank(a.slug) - rank(b.slug)
     if (diff !== 0) return diff
     return a.full_name.localeCompare(b.full_name)
