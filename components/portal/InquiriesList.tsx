@@ -50,6 +50,11 @@ export default function InquiriesList({
     [inquiries]
   )
 
+  const sentCount = useMemo(
+    () => inquiries.filter(i => i.email_status === 'sent').length,
+    [inquiries]
+  )
+
   const shown = useMemo(
     () => (filter === 'all' ? inquiries : inquiries.filter(i => i.email_status === filter)),
     [inquiries, filter]
@@ -94,7 +99,7 @@ export default function InquiriesList({
               filter === f ? 'bg-gold text-navy' : 'bg-white/5 text-white/50 hover:text-white/80'
             }`}
           >
-            {f === 'all' ? `All ${inquiries.length}` : f === 'sent' ? 'Delivered' : `Failed ${failedCount}`}
+            {f === 'all' ? `All ${inquiries.length}` : f === 'sent' ? `Delivered ${sentCount}` : `Failed ${failedCount}`}
           </button>
         ))}
       </div>
