@@ -7,6 +7,7 @@ const FEATURES = [
   { icon: '⭐', label: 'Reviews', desc: 'Collect and approve client testimonials' },
   { icon: '🖼️', label: 'Photo Gallery', desc: 'Showcase your travel photography' },
   { icon: '📄', label: 'Quote Builder', desc: 'AI-researched branded PDF quotes for clients' },
+  { icon: '📥', label: 'Inquiries', desc: 'Every website lead, with delivery confirmation' },
 ]
 
 export default function AgentPlusGate({ feature }: { feature?: string }) {

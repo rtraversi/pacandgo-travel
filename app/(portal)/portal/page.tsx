@@ -2,10 +2,13 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { agentProfileUrl } from '@/lib/utils'
 import type { Agent, AgentProfile } from '@/lib/types'
 
 export const metadata: Metadata = { title: 'Dashboard — Agent Portal' }
+
+const ADMIN_USER_ID = '552d2159-35e8-440f-b1f5-cd649ff16885'
 
 type AgentRow = Agent & { agent_profiles: AgentProfile | null }
 
@@ -31,19 +34,33 @@ export default async function PortalDashboardPage() {
   const publicUrlLabel = publicUrl.replace(/^https?:\/\//, '')
 
   // Agent+ stat counts
+  const isAdmin = user.id === ADMIN_USER_ID
   let stats: { label: string; value: number; href: string; alert: boolean }[] = []
+  let failedEmails = 0
   if (isPlus) {
-    const [dealsRes, tripsRes, reviewsRes, galleryRes] = await Promise.all([
+    // Admins are accountable for every agent's mail, so their failure count spans
+    // the whole roster; everyone else sees only their own.
+    const failedQuery = isAdmin
+      ? createAdminClient().from('inquiries').select('id', { count: 'exact', head: true }).eq('email_status', 'failed')
+      : supabase.from('inquiries').select('id', { count: 'exact', head: true }).eq('agent_id', agent.id).eq('email_status', 'failed')
+
+    const [dealsRes, tripsRes, reviewsRes, galleryRes, inquiriesRes, failedRes] = await Promise.all([
       supabase.from('deals').select('id', { count: 'exact', head: true }).eq('agent_id', agent.id).eq('active', true),
       supabase.from('trips').select('id', { count: 'exact', head: true }).eq('agent_id', agent.id).eq('active', true),
       supabase.from('reviews').select('id', { count: 'exact', head: true }).eq('agent_id', agent.id).eq('status', 'pending'),
       supabase.from('gallery').select('id', { count: 'exact', head: true }).eq('agent_id', agent.id).eq('active', true),
+      isAdmin
+        ? createAdminClient().from('inquiries').select('id', { count: 'exact', head: true })
+        : supabase.from('inquiries').select('id', { count: 'exact', head: true }).eq('agent_id', agent.id),
+      failedQuery,
     ])
+    failedEmails = failedRes.count ?? 0
     stats = [
       { label: 'Active Deals', value: dealsRes.count ?? 0, href: '/portal/deals', alert: false },
       { label: 'Active Trips', value: tripsRes.count ?? 0, href: '/portal/trips', alert: false },
       { label: 'Pending Reviews', value: reviewsRes.count ?? 0, href: '/portal/reviews', alert: (reviewsRes.count ?? 0) > 0 },
       { label: 'Gallery Photos', value: galleryRes.count ?? 0, href: '/portal/gallery', alert: false },
+      { label: 'Inquiries', value: inquiriesRes.count ?? 0, href: '/portal/inquiries', alert: failedEmails > 0 },
     ]
   }
 
@@ -68,6 +85,24 @@ export default async function PortalDashboardPage() {
         )}
       </div>
 
+      {/* Undelivered inquiry notifications — the lead is safe, only the email failed */}
+      {isPlus && failedEmails > 0 && (
+        <div className="bg-red-500/10 border border-red-500/25 rounded-xl p-4 mb-8 flex items-start gap-4">
+          <span className="text-red-400 text-lg mt-0.5">⚠</span>
+          <div>
+            <p className="text-white font-medium text-sm">
+              {failedEmails} inquiry {failedEmails === 1 ? 'notification' : 'notifications'} failed to send
+            </p>
+            <p className="text-white/55 text-sm mt-0.5">
+              {isAdmin ? 'Across all agents. ' : ''}The lead details were still captured — only the email failed.
+            </p>
+            <Link href="/portal/inquiries" className="text-gold text-sm hover:underline mt-2 inline-block">
+              Review inquiries →
+            </Link>
+          </div>
+        </div>
+      )}
+
       {/* Profile incomplete nudge */}
       {!profileComplete && (
         <div className="bg-gold/10 border border-gold/25 rounded-xl p-4 mb-8 flex items-start gap-4">
@@ -89,7 +124,7 @@ export default async function PortalDashboardPage() {
 
       {/* Agent+ stat grid */}
       {isPlus && (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-10">
           {stats.map(({ label, value, href, alert }) => (
             <Link
               key={label}

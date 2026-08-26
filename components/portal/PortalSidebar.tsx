@@ -6,7 +6,7 @@ import { logout } from '@/app/actions/auth'
 import type { Agent, AgentProfile } from '@/lib/types'
 import {
   LayoutDashboard, User, Tag, Plane, BookOpen,
-  Star, Images, Settings, FileText, LogOut, Compass, ShieldCheck, Users,
+  Star, Images, Settings, FileText, LogOut, Compass, ShieldCheck, Users, Inbox,
 } from 'lucide-react'
 
 const ADMIN_USER_ID = '552d2159-35e8-440f-b1f5-cd649ff16885'
@@ -27,6 +27,7 @@ const PLUS_NAV = [
   { label: 'Deals', href: '/portal/deals', icon: Tag },
   { label: 'Trips', href: '/portal/trips', icon: Plane },
   { label: 'Blog', href: '/portal/blog', icon: BookOpen },
+  { label: 'Inquiries', href: '/portal/inquiries', icon: Inbox },
   { label: 'Reviews', href: '/portal/reviews', icon: Star },
   { label: 'Gallery', href: '/portal/gallery', icon: Images },
   { label: 'Resources', href: '/portal/resources', icon: Compass },

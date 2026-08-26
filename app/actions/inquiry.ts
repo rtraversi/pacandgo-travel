@@ -123,6 +123,24 @@ export async function submitInquiry(formData: FormData): Promise<InquiryState> {
       </p>
     </div>`
 
+  // Resend derives a plaintext alternative from the HTML when none is given, and
+  // it flattens the detail table onto one unreadable line. Supply our own.
+  const textLines = [
+    `You have a new inquiry from the PAC and GO Travel website${agentId ? ` for ${agentName}` : ''}.`,
+    '',
+    `Name:         ${name}`,
+    `Email:        ${email}`,
+    payload.phone       ? `Phone:        ${payload.phone}` : '',
+    payload.travelers   ? `Travelers:    ${payload.travelers}` : '',
+    payload.destination ? `Destination:  ${payload.destination}` : '',
+    payload.travel_date ? `Travel dates: ${payload.travel_date}` : '',
+    payload.budget      ? `Budget:       ${payload.budget}` : '',
+    payload.message     ? `\n${payload.message}` : '',
+    '',
+    `Reply to this email to respond directly to ${name}.`,
+  ].filter(l => l !== '')
+  const text = textLines.join('\n')
+
   try {
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -133,6 +151,7 @@ export async function submitInquiry(formData: FormData): Promise<InquiryState> {
         reply_to: email,
         subject,
         html,
+        text,
       }),
     })
 
