@@ -2,10 +2,23 @@
 import { useState } from 'react'
 import Link from 'next/link'
 
-const TABS = ['All', 'Insurance', 'eSIM', 'VPN', 'Transfers'] as const
+const TABS = ['All', 'Cruise Research', 'Insurance', 'eSIM', 'VPN', 'Transfers'] as const
 type Tab = typeof TABS[number]
 
 const AFFILIATE_SECTIONS = {
+  'Cruise Research': {
+    label: 'Cruise Research',
+    description: 'Compare sailings, cabin categories, and fare history before you book — then bring what you find to your agent.',
+    tip: 'Fares move constantly. Track a sailing you like for a week or two before booking, and let us know the moment it drops — we can often reprice an existing booking.',
+    items: [
+      {
+        name: 'CruisePlum',
+        desc: 'Search every major cruise line at once, filter by price per night, and watch fares change over time.',
+        href: 'https://www.cruiseplum.com/',
+        pills: ['All Major Lines', 'Price Tracking', 'Cabin Comparison', 'Deal Alerts'],
+      },
+    ],
+  },
   Insurance: {
     label: 'Travel Insurance',
     description: "Don't let the unexpected derail your dream vacation. PAC and GO Travel strongly recommends insuring every trip.",
@@ -54,12 +67,6 @@ const AFFILIATE_SECTIONS = {
         desc: 'The fastest and most reliable travel VPN — one-click connect, works in 94+ countries.',
         href: 'https://www.expressvpn.com',
         pills: ['94+ Countries', 'No-Log Policy', 'Split Tunneling', '5 Devices'],
-      },
-      {
-        name: 'NordVPN',
-        desc: 'Top-rated security with a strict no-logs policy and great value for frequent travelers.',
-        href: 'https://nordvpn.com',
-        pills: ['6 Devices', 'Double VPN', 'Threat Protection', 'Streaming Access'],
       },
     ],
   },

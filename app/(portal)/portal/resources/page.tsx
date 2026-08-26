@@ -10,7 +10,7 @@ const COMING_SOON = [
   { icon: '✈️', label: 'Flights & Hotels', desc: 'Expedia affiliate links for pre/post-cruise travel planning' },
   { icon: '🚗', label: 'Port Transfers', desc: 'Welcome Pickups & Kiwitaxi widgets for airport and port transfers' },
   { icon: '📱', label: 'International eSIMs', desc: 'Airalo & GigSky — stay connected at every port without roaming charges' },
-  { icon: '🔒', label: 'Travel Security', desc: 'NordVPN — secure browsing on cruise ship Wi-Fi and hotel networks' },
+  { icon: '🔒', label: 'Travel Security', desc: 'ExpressVPN — secure browsing on cruise ship Wi-Fi and hotel networks' },
   { icon: '🛡️', label: 'Travel Insurance', desc: 'Travel Insured International — protect every dollar of your clients\' investment' },
 ]
 
