@@ -1,45 +1,29 @@
 'use client'
-import { useState, useEffect } from 'react'
-import { EMAILJS } from '@/lib/emailjs'
+import { useState } from 'react'
+import { submitInquiry } from '@/app/actions/inquiry'
+import { HONEYPOT_FIELD } from '@/lib/inquiry'
 
 interface Props {
-  agentEmail: string
+  agentSlug: string
   agentName: string
 }
 
-export default function AgentContactForm({ agentEmail, agentName }: Props) {
+export default function AgentContactForm({ agentSlug, agentName }: Props) {
   const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle')
-  const [loaded, setLoaded] = useState(false)
-
-  useEffect(() => {
-    import('@emailjs/browser').then(emailjs => {
-      emailjs.init({ publicKey: EMAILJS.publicKey })
-      setLoaded(true)
-    })
-  }, [])
+  const [error, setError] = useState<string | null>(null)
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    if (!loaded) return
-    const emailjs = await import('@emailjs/browser')
-    const fd = new FormData(e.currentTarget)
+    const form = e.currentTarget
     setStatus('sending')
-    try {
-      await emailjs.send(EMAILJS.serviceId, EMAILJS.templateId, {
-        to_email:    agentEmail,
-        from_name:   fd.get('name'),
-        reply_to:    fd.get('email'),
-        phone:       fd.get('phone') || 'Not provided',
-        message:     fd.get('message'),
-        travelers:   '',
-        destination: '',
-        travel_date: '',
-        budget:      '',
-      })
+    const result = await submitInquiry(new FormData(form))
+    if (result.ok) {
       setStatus('success')
-      ;(e.target as HTMLFormElement).reset()
-    } catch {
+      setError(null)
+      form.reset()
+    } else {
       setStatus('error')
+      setError(result.error)
     }
   }
 
@@ -54,6 +38,17 @@ export default function AgentContactForm({ agentEmail, agentName }: Props) {
         <p className="text-gray-500 mb-8">Ready to start planning? Send a message and I&apos;ll get back to you within 24 hours.</p>
 
         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <input type="hidden" name="agent" value={agentSlug} />
+          <input type="hidden" name="source" value="agent_page" />
+          {/* Honeypot — hidden from people, irresistible to bots. */}
+          <input
+            type="text"
+            name={HONEYPOT_FIELD}
+            tabIndex={-1}
+            autoComplete="off"
+            aria-hidden="true"
+            className="absolute -left-[9999px] h-0 w-0 opacity-0"
+          />
           <div>
             <label className={label}>Your Name *</label>
             <input name="name" required placeholder="Jane Smith" className={input} />
@@ -80,7 +75,7 @@ export default function AgentContactForm({ agentEmail, agentName }: Props) {
               {status === 'sending' ? 'Sending…' : 'Send Message'}
             </button>
             {status === 'success' && <p className="text-green-600 text-sm">✓ Message sent! I&apos;ll be in touch soon.</p>}
-            {status === 'error' && <p className="text-red-500 text-sm">Something went wrong — please try again.</p>}
+            {status === 'error' && <p className="text-red-500 text-sm">{error || 'Something went wrong — please try again.'}</p>}
           </div>
         </form>
       </div>

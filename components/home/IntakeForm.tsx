@@ -1,6 +1,7 @@
 'use client'
-import { useState, useEffect } from 'react'
-import { EMAILJS, AGENT_EMAILS } from '@/lib/emailjs'
+import { useState } from 'react'
+import { submitInquiry } from '@/app/actions/inquiry'
+import { HONEYPOT_FIELD } from '@/lib/inquiry'
 import type { IntakeAgent } from '@/lib/types'
 
 // The roster itself comes from the `agents` table via getIntakeAgents(), so
@@ -8,44 +9,25 @@ import type { IntakeAgent } from '@/lib/types'
 const NO_PREFERENCE: IntakeAgent = {
   slug: 'any',
   label: 'No preference — assign me an agent',
-  email: AGENT_EMAILS.any,
 }
 
 export default function IntakeForm({ agents }: { agents: IntakeAgent[] }) {
   const options = [NO_PREFERENCE, ...agents]
   const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle')
-  const [loaded, setLoaded] = useState(false)
-
-  useEffect(() => {
-    import('@emailjs/browser').then(emailjs => {
-      emailjs.init({ publicKey: EMAILJS.publicKey })
-      setLoaded(true)
-    })
-  }, [])
+  const [error, setError] = useState<string | null>(null)
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    if (!loaded) return
-    const emailjs = await import('@emailjs/browser')
-    const fd = new FormData(e.currentTarget)
-    const agent = fd.get('agent') as string
+    const form = e.currentTarget
     setStatus('sending')
-    try {
-      await emailjs.send(EMAILJS.serviceId, EMAILJS.templateId, {
-        to_email:    options.find(o => o.slug === agent)?.email || NO_PREFERENCE.email,
-        from_name:   fd.get('name'),
-        reply_to:    fd.get('email'),
-        phone:       fd.get('phone') || 'Not provided',
-        travelers:   fd.get('travelers') || 'Not specified',
-        destination: fd.get('destination') || 'Not specified',
-        travel_date: fd.get('date') || 'Not specified',
-        budget:      fd.get('budget') || 'Not specified',
-        message:     fd.get('message') || 'No message',
-      })
+    const result = await submitInquiry(new FormData(form))
+    if (result.ok) {
       setStatus('success')
-      ;(e.target as HTMLFormElement).reset()
-    } catch {
+      setError(null)
+      form.reset()
+    } else {
       setStatus('error')
+      setError(result.error)
     }
   }
 
@@ -55,12 +37,22 @@ export default function IntakeForm({ agents }: { agents: IntakeAgent[] }) {
   return (
     <section className="bg-navy py-24 px-[5%]" id="contact">
       <div className="max-w-3xl mx-auto text-center mb-12">
-        <p className="text-xs font-bold tracking-[0.2em] uppercase text-gold mb-3">Let's Get Started</p>
+        <p className="text-xs font-bold tracking-[0.2em] uppercase text-gold mb-3">Let&apos;s Get Started</p>
         <h2 className="text-3xl md:text-4xl text-white mb-4">Plan Your Dream Trip</h2>
         <p className="text-white/70 text-base">Tell us about your travel dreams and an agent will be in touch within 24 hours.</p>
       </div>
 
       <form onSubmit={handleSubmit} className="max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-5">
+        <input type="hidden" name="source" value="intake" />
+        {/* Honeypot — hidden from people, irresistible to bots. */}
+        <input
+          type="text"
+          name={HONEYPOT_FIELD}
+          tabIndex={-1}
+          autoComplete="off"
+          aria-hidden="true"
+          className="absolute -left-[9999px] h-0 w-0 opacity-0"
+        />
         <div>
           <label className={label}>Your Name *</label>
           <input name="name" required placeholder="Jane Smith" className={input} />
@@ -83,7 +75,7 @@ export default function IntakeForm({ agents }: { agents: IntakeAgent[] }) {
         </div>
         <div>
           <label className={label}>Approximate Travel Dates</label>
-          <input name="date" placeholder="March 2026 or flexible" className={input} />
+          <input name="travel_date" placeholder="March 2026 or flexible" className={input} />
         </div>
         <div>
           <label className={label}>Budget Range</label>
@@ -114,7 +106,7 @@ export default function IntakeForm({ agents }: { agents: IntakeAgent[] }) {
             <p className="text-green-400 text-sm">✓ Sent! Your agent will be in touch shortly.</p>
           )}
           {status === 'error' && (
-            <p className="text-red-400 text-sm">Something went wrong — please try again or email us directly.</p>
+            <p className="text-red-400 text-sm">{error || 'Something went wrong — please try again or email us directly.'}</p>
           )}
         </div>
       </form>

@@ -12,11 +12,16 @@ export interface Agent {
   created_at: string
 }
 
-/** One option in the intake form's preferred-agent dropdown. */
+/**
+ * One option in the intake form's preferred-agent dropdown.
+ *
+ * Deliberately has no email field: the dropdown is rendered in the browser, so
+ * anything here ends up in public page source. The recipient is resolved from
+ * the slug inside submitInquiry() instead.
+ */
 export interface IntakeAgent {
   slug: string
   label: string
-  email: string
 }
 
 export interface AgentProfile {
@@ -173,6 +178,27 @@ export interface PortDetail {
   highlights: string[]
 }
 
+/** A submission from the public intake or per-agent contact form. */
+export interface Inquiry {
+  id: string
+  created_at: string
+  agent_id: string | null
+  agent_slug: string
+  recipient_email: string
+  name: string
+  email: string
+  phone: string | null
+  travelers: string | null
+  destination: string | null
+  travel_date: string | null
+  budget: string | null
+  message: string | null
+  source: 'intake' | 'agent_page'
+  email_status: 'pending' | 'sent' | 'failed'
+  email_error: string | null
+  provider_id: string | null
+}
+
 // Joined type used in portal
 export interface AgentWithProfile extends Agent {
   agent_profiles: AgentProfile | null
@@ -191,6 +217,7 @@ export type Database = {
       gallery: { Row: GalleryItem; Insert: Omit<GalleryItem, 'id' | 'created_at'>; Update: Partial<GalleryItem> }
       quotes: { Row: Quote; Insert: Omit<Quote, 'id' | 'created_at'>; Update: Partial<Quote> }
       clients: { Row: Client; Insert: Omit<Client, 'id' | 'created_at'>; Update: Partial<Client> }
+      inquiries: { Row: Inquiry; Insert: Omit<Inquiry, 'id' | 'created_at'>; Update: Partial<Inquiry> }
     }
   }
 }

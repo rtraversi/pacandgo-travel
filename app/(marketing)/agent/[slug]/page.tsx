@@ -4,7 +4,6 @@ import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import AgentContactForm from '@/components/agent/AgentContactForm'
 import { formatDate, formatPrice, initials } from '@/lib/utils'
-import { AGENT_EMAILS } from '@/lib/emailjs'
 import { richTextToSafeHtml } from '@/lib/richText.server'
 import { blogCardHref } from '@/lib/blog'
 import type { Agent, AgentProfile, Deal, Trip, Review, GalleryItem, BlogPost, Highlight } from '@/lib/types'
@@ -50,7 +49,6 @@ export default async function AgentProfilePage({ params }: Props) {
   const blog = (blogRes.data || []) as BlogPost[]
   const highlights = (profile?.highlights || []) as Highlight[]
   const bioHtml = richTextToSafeHtml(profile?.bio)
-  const agentEmail = AGENT_EMAILS[slug] || agent.email || AGENT_EMAILS.any
 
   return (
     <>
@@ -277,7 +275,7 @@ export default async function AgentProfilePage({ params }: Props) {
       )}
 
       {/* Contact */}
-      <AgentContactForm agentEmail={agentEmail} agentName={agent.full_name} />
+      <AgentContactForm agentSlug={slug} agentName={agent.full_name} />
     </>
   )
 }

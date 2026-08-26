@@ -1,11 +1,9 @@
-export const EMAILJS = {
-  publicKey:  'z27LB5a5i1Xtgpt3q',
-  serviceId:  'service_qouu00u',
-  templateId: 'template_6ablo1d',
-}
-
 // Maps agent slug → public contact email. Only needed when it differs from the
 // agent's login email in Supabase; unlisted agents fall back to their DB email.
+//
+// Server-only. These addresses must never be sent to the browser — the recipient
+// of an inquiry is resolved inside the server action from the submitted slug, so
+// the client never sees or supplies an address.
 export const AGENT_EMAILS: Record<string, string> = {
   alan:     'pacandgoalan@gmail.com',
   aniska:   'pacandgoanissa@gmail.com',
@@ -25,3 +23,9 @@ export const AGENT_EMAILS: Record<string, string> = {
   sue:      'pacandgosue@gmail.com',
   any:      'pacandgopatty@gmail.com',
 }
+
+/** Inbox that receives inquiries when no specific agent was requested. */
+export const HOUSE_EMAIL = AGENT_EMAILS.any
+
+/** Address inquiry notifications are sent from. Replies go to the customer via reply_to. */
+export const FROM_EMAIL = 'PAC and GO Travel <inquiries@pacandgotravel.com>'
