@@ -123,17 +123,58 @@ export interface ClientInfo {
   loyalty_number: string | null
 }
 
+export interface LoyaltyEntry {
+  program: string
+  number: string
+  tier?: string | null
+}
+
+export interface ClientPreferences {
+  cabin?: string | null
+  dining?: string | null
+  accessibility?: string | null
+  dietary?: string | null
+  travel_style?: string | null
+}
+
 export interface Client {
   id: string
   agent_id: string
   household_id: string | null
   full_name: string
+  preferred_name: string | null
   email: string | null
   phone: string | null
   address: string | null
+  /** ISO date (YYYY-MM-DD) */
   dob: string | null
-  loyalty_number: string | null
+  /** ISO date (YYYY-MM-DD) */
+  anniversary: string | null
+  citizenship: string | null
+  /** ISO date (YYYY-MM-DD). Only the expiry is stored, never the passport number. */
+  passport_expiry: string | null
+  emergency_contact_name: string | null
+  emergency_contact_phone: string | null
+  loyalty: LoyaltyEntry[]
+  preferences: ClientPreferences
+  tags: string[]
   notes: string | null
+  created_at: string
+  updated_at: string
+}
+
+export type WishStatus = 'open' | 'booked' | 'dropped'
+
+export interface ClientWish {
+  id: string
+  agent_id: string
+  client_id: string
+  destination: string
+  trip_type: string | null
+  timeframe: string | null
+  budget: string | null
+  notes: string | null
+  status: WishStatus
   created_at: string
 }
 
@@ -216,7 +257,8 @@ export type Database = {
       reviews: { Row: Review; Insert: Omit<Review, 'id' | 'created_at'>; Update: Partial<Review> }
       gallery: { Row: GalleryItem; Insert: Omit<GalleryItem, 'id' | 'created_at'>; Update: Partial<GalleryItem> }
       quotes: { Row: Quote; Insert: Omit<Quote, 'id' | 'created_at'>; Update: Partial<Quote> }
-      clients: { Row: Client; Insert: Omit<Client, 'id' | 'created_at'>; Update: Partial<Client> }
+      clients: { Row: Client; Insert: Omit<Client, 'id' | 'created_at' | 'updated_at'>; Update: Partial<Client> }
+      client_wishes: { Row: ClientWish; Insert: Omit<ClientWish, 'id' | 'created_at'>; Update: Partial<ClientWish> }
       inquiries: { Row: Inquiry; Insert: Omit<Inquiry, 'id' | 'created_at'>; Update: Partial<Inquiry> }
     }
   }

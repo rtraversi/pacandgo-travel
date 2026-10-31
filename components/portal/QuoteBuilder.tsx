@@ -40,6 +40,23 @@ function formatDate(dateStr: string | null) {
 const inputCls = 'w-full bg-white/5 border border-white/10 rounded-lg px-3.5 py-2.5 text-white text-sm placeholder-white/20 focus:outline-none focus:border-gold/50 transition'
 const labelCls = 'block text-xs text-white/45 mb-1.5'
 
+/** Client birthdays are stored as YYYY-MM-DD; quotes show MM/DD/YYYY. */
+function isoToUsDate(iso: string | null): string {
+  if (!iso) return ''
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso)
+  return m ? `${m[2]}/${m[3]}/${m[1]}` : iso
+}
+
+/** Pick the loyalty number for the quote's cruise line, falling back to the first one on file. */
+function pickLoyalty(client: Client, line: string): string {
+  const list = client.loyalty ?? []
+  if (list.length === 0) return ''
+  const brand = line.trim().split(/\s+/)[0]?.toLowerCase()
+  const match = brand ? list.find(l => l.program.toLowerCase().includes(brand)) : undefined
+  if (match) return match.number
+  return list.length === 1 && !line ? list[0].number : `${list[0].number} (${list[0].program})`
+}
+
 export default function QuoteBuilder({ quotes: initial, agent, profile, clients }: Props) {
   const [quotes, setQuotes] = useState<Quote[]>(initial)
   const [view, setView] = useState<View>('list')
@@ -204,8 +221,8 @@ export default function QuoteBuilder({ quotes: initial, agent, profile, clients 
     setCustomerEmail(client.email ?? '')
     setClientPhone(client.phone ?? '')
     setClientAddress(client.address ?? '')
-    setClientDob(client.dob ?? '')
-    setClientLoyalty(client.loyalty_number ?? '')
+    setClientDob(isoToUsDate(client.dob))
+    setClientLoyalty(pickLoyalty(client, line))
     setAdditionalGuestIds([])
     setClientSearch('')
     setShowClientDropdown(false)
@@ -228,13 +245,16 @@ export default function QuoteBuilder({ quotes: initial, agent, profile, clients 
     if (!newClientName.trim()) return
     setCreatingClient(true)
     try {
-      const result = await saveClient({
-        full_name: newClientName.trim(), email: null, phone: null, address: null, dob: null, loyalty_number: null, notes: null,
-      })
+      const blank = {
+        full_name: newClientName.trim(), preferred_name: null, email: null, phone: null, address: null,
+        dob: null, anniversary: null, citizenship: null, passport_expiry: null,
+        emergency_contact_name: null, emergency_contact_phone: null,
+        loyalty: [], preferences: {}, tags: [], notes: null,
+      }
+      const result = await saveClient(blank)
+      const now = new Date().toISOString()
       const created: Client = {
-        id: result.id, agent_id: agent.id, household_id: null,
-        full_name: newClientName.trim(), email: null, phone: null, address: null, dob: null, loyalty_number: null, notes: null,
-        created_at: new Date().toISOString(),
+        ...blank, id: result.id, agent_id: agent.id, household_id: null, created_at: now, updated_at: now,
       }
       setOptimisticClients(list => [...list, created])
       selectClient(created)
