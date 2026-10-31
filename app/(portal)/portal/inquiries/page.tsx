@@ -56,7 +56,7 @@ export default async function InquiriesPage() {
     email_status: r.email_status,
     email_error: r.email_error,
     recipient_email: r.recipient_email,
-    agent_name: r.agents?.full_name ?? (r.agent_slug === 'any' ? 'No preference' : r.agent_slug),
+    agent_name: r.agent_slug === 'any' ? 'No preference' : (r.agents?.full_name ?? r.agent_slug),
   }))
 
   return (

@@ -27,5 +27,8 @@ export const AGENT_EMAILS: Record<string, string> = {
 /** Inbox that receives inquiries when no specific agent was requested. */
 export const HOUSE_EMAIL = AGENT_EMAILS.any
 
+/** Agent whose portal lists inquiries when no specific agent was requested (owner of HOUSE_EMAIL). */
+export const HOUSE_AGENT_SLUG = 'patty'
+
 /** Address inquiry notifications are sent from. Replies go to the customer via reply_to. */
 export const FROM_EMAIL = 'PAC and GO Travel <inquiries@pacandgotravel.com>'

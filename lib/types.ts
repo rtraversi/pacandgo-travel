@@ -1,3 +1,5 @@
+import type { TripType } from '@/lib/tripTypes'
+
 export type AgentTier = 'agent' | 'agent_plus'
 export type ReviewStatus = 'pending' | 'approved' | 'denied'
 export type MediaType = 'photo' | 'video'
@@ -50,6 +52,7 @@ export interface Highlight {
 export interface Deal {
   id: string
   agent_id: string
+  trip_type: TripType
   title: string | null
   description: string | null
   line: string | null
@@ -66,6 +69,7 @@ export interface Deal {
 export interface Trip {
   id: string
   agent_id: string
+  trip_type: TripType
   title: string | null
   description: string | null
   line: string | null

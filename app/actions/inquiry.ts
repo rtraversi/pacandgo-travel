@@ -1,7 +1,7 @@
 'use server'
 
 import { createAdminClient } from '@/lib/supabase/admin'
-import { AGENT_EMAILS, HOUSE_EMAIL, FROM_EMAIL } from '@/lib/agentEmails'
+import { AGENT_EMAILS, HOUSE_EMAIL, HOUSE_AGENT_SLUG, FROM_EMAIL } from '@/lib/agentEmails'
 import { HONEYPOT_FIELD, type InquiryState } from '@/lib/inquiry'
 
 const LIMITS: Record<string, number> = {
@@ -59,7 +59,12 @@ export async function submitInquiry(formData: FormData): Promise<InquiryState> {
   let agentName = 'the team'
   let recipient = HOUSE_EMAIL
 
-  if (slug !== 'any') {
+  if (slug === 'any') {
+    // Keep agent_slug 'any' so it still reads as a general inquiry, but attach it
+    // to the house agent so it shows in their portal, not just the admin view.
+    const { data } = await admin.from('agents').select('id').eq('slug', HOUSE_AGENT_SLUG).maybeSingle()
+    if (data) agentId = data.id as string
+  } else {
     const { data } = await admin
       .from('agents').select('id, full_name, email').eq('slug', slug).single()
     if (data) {

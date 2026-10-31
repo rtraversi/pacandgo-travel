@@ -7,6 +7,16 @@ import { formatDate, formatPrice, initials } from '@/lib/utils'
 import { richTextToSafeHtml } from '@/lib/richText.server'
 import { blogCardHref } from '@/lib/blog'
 import type { Agent, AgentProfile, Deal, Trip, Review, GalleryItem, BlogPost, Highlight } from '@/lib/types'
+import { TRIP_TYPE_CONFIG, tripTypeOf } from '@/lib/tripTypes'
+/** Small gold line above a deal/trip title: type (if not a cruise), supplier, and for trips the ship/tour/property. */
+function itemEyebrow(item: { trip_type?: string | null; line: string | null; ship: string | null }, withProduct: boolean) {
+  const type = tripTypeOf(item)
+  return [
+    type !== 'cruise' ? TRIP_TYPE_CONFIG[type].label : null,
+    item.line,
+    withProduct ? item.ship : null,
+  ].filter(Boolean).join(' · ')
+}
 
 type PageAgent = Agent & { agent_profiles: AgentProfile | null }
 
@@ -134,7 +144,7 @@ export default async function AgentProfilePage({ params }: Props) {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {deals.map(deal => (
                 <div key={deal.id} className="bg-white rounded-xl p-6 border border-light shadow-sm hover:shadow-md transition-shadow">
-                  <div className="text-xs font-bold uppercase tracking-wider text-gold mb-2">{deal.line}</div>
+                  <div className="text-xs font-bold uppercase tracking-wider text-gold mb-2">{itemEyebrow(deal, false)}</div>
                   <h3 className="text-navy font-bold text-lg mb-1">{deal.title || deal.ship}</h3>
                   {deal.description && <p className="text-gray-500 text-sm mb-4 line-clamp-3">{deal.description}</p>}
                   <div className="flex items-center justify-between mt-auto pt-3 border-t border-light">
@@ -159,7 +169,7 @@ export default async function AgentProfilePage({ params }: Props) {
               {trips.map(trip => (
                 <div key={trip.id} className="border border-light rounded-xl p-6 flex flex-col md:flex-row md:items-center gap-4 hover:shadow-md transition-shadow">
                   <div className="flex-1">
-                    <div className="text-xs font-bold uppercase tracking-wider text-gold mb-1">{trip.line} — {trip.ship}</div>
+                    <div className="text-xs font-bold uppercase tracking-wider text-gold mb-1">{itemEyebrow(trip, true)}</div>
                     <h3 className="text-navy font-bold text-lg">{trip.title || trip.ship}</h3>
                     {trip.description && <p className="text-gray-500 text-sm mt-1 line-clamp-2">{trip.description}</p>}
                     {trip.ports && <p className="text-xs text-gray-400 mt-2">📍 {trip.ports}</p>}

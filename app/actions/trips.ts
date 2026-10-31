@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { cleanCruiseForm } from '@/lib/cruiseForm'
 import type { CruiseFormData } from './deals'
 
 async function getAgentId(supabase: Awaited<ReturnType<typeof createClient>>) {
@@ -12,9 +13,10 @@ async function getAgentId(supabase: Awaited<ReturnType<typeof createClient>>) {
   return res.data.id as string
 }
 
-export async function saveTrip(data: CruiseFormData, id?: string) {
+export async function saveTrip(input: CruiseFormData, id?: string) {
   const supabase = await createClient()
   const agentId = await getAgentId(supabase)
+  const data = cleanCruiseForm(input)
 
   let error
   if (id) {

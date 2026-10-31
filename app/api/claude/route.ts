@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
+import { TRIP_TYPE_CONFIG, isTripType, type TripType } from '@/lib/tripTypes'
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
@@ -10,15 +11,21 @@ export async function POST(request: Request) {
   if (type === 'enrich') {
     const { line, ship, ports, dateFrom } = body
     if (!line && !ship) return NextResponse.json({ error: 'Line or ship required' }, { status: 400 })
+    const tripType: TripType = isTripType(body.tripType) ? body.tripType : 'cruise'
+    const cfg = TRIP_TYPE_CONFIG[tripType]
 
     const message = await anthropic.messages.create({
       model: 'claude-sonnet-4-6',
       max_tokens: 512,
       messages: [{
         role: 'user',
-        content: `Write a short travel deal title and 2-3 sentence description for a cruise travel agent website. Return ONLY JSON, no markdown.
+        content: `Write a short title and 2-3 sentence description of this trip for a travel agent's website. Return ONLY JSON, no markdown.
 
-Cruise: ${line ?? ''} ${ship ?? ''}${ports ? `, ports: ${ports}` : ''}${dateFrom ? `, departing ${dateFrom}` : ''}
+Trip type: ${cfg.label}
+${cfg.supplier}: ${line ?? ''}
+${cfg.product}: ${ship ?? ''}${ports ? `
+${cfg.places}: ${ports}` : ''}${dateFrom ? `
+Starts: ${dateFrom}` : ''}
 
 Format: {"title":"...","description":"..."}`,
       }],

@@ -2,8 +2,12 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { cleanCruiseForm } from '@/lib/cruiseForm'
+import type { TripType } from '@/lib/tripTypes'
 
 export type CruiseFormData = {
+  /** Optional so AI-parsed deals (always cruises) can omit it; saved as 'cruise' then. */
+  trip_type?: TripType
   title: string | null
   description: string | null
   line: string | null
@@ -24,9 +28,10 @@ async function getAgentId(supabase: Awaited<ReturnType<typeof createClient>>) {
   return res.data.id as string
 }
 
-export async function saveDeal(data: CruiseFormData, id?: string) {
+export async function saveDeal(input: CruiseFormData, id?: string) {
   const supabase = await createClient()
   const agentId = await getAgentId(supabase)
+  const data = cleanCruiseForm(input)
 
   let error
   if (id) {

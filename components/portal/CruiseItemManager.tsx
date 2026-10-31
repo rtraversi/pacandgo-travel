@@ -1,11 +1,13 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { formatDate, formatPrice, CRUISE_LINES } from '@/lib/utils'
+import { formatDate, formatPrice } from '@/lib/utils'
+import { TRIP_TYPES, TRIP_TYPE_CONFIG, tripTypeOf, type TripType } from '@/lib/tripTypes'
 import type { CruiseFormData } from '@/app/actions/deals'
 
 type CruiseItem = {
   id: string
+  trip_type?: string | null
   title: string | null
   description: string | null
   line: string | null
@@ -27,7 +29,7 @@ interface Props {
 }
 
 const EMPTY: CruiseFormData = {
-  title: null, description: null, line: null, ship: null,
+  trip_type: 'cruise', title: null, description: null, line: null, ship: null,
   date_from: null, date_to: null, ports: null, price: null, spots: null, active: true,
 }
 
@@ -50,7 +52,7 @@ export default function CruiseItemManager({ label, items, onSave, onDelete, onTo
   function openEdit(item: CruiseItem) {
     setEditing(item)
     setForm({
-      title: item.title, description: item.description, line: item.line,
+      trip_type: tripTypeOf(item), title: item.title, description: item.description, line: item.line,
       ship: item.ship, date_from: item.date_from, date_to: item.date_to,
       ports: item.ports, price: item.price, spots: item.spots, active: item.active,
     })
@@ -68,7 +70,7 @@ export default function CruiseItemManager({ label, items, onSave, onDelete, onTo
     const res = await fetch('/api/claude', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'enrich', line: form.line, ship: form.ship, ports: form.ports, dateFrom: form.date_from }),
+      body: JSON.stringify({ type: 'enrich', tripType: form.trip_type ?? 'cruise', line: form.line, ship: form.ship, ports: form.ports, dateFrom: form.date_from }),
     })
     const data = await res.json()
     if (data.title) setForm(f => ({ ...f, title: data.title, description: data.description }))
@@ -122,6 +124,8 @@ export default function CruiseItemManager({ label, items, onSave, onDelete, onTo
   }
 
   if (view === 'form') {
+    const tripType: TripType = form.trip_type ?? 'cruise'
+    const cfg = TRIP_TYPE_CONFIG[tripType]
     return (
       <div>
         <div className="flex items-center gap-3 mb-6">
@@ -130,19 +134,34 @@ export default function CruiseItemManager({ label, items, onSave, onDelete, onTo
         </div>
 
         <div className="bg-white/5 border border-white/10 rounded-xl p-6 space-y-4 max-w-2xl">
-          <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs text-white/45 mb-1.5">Trip Type</label>
+            <div className="flex flex-wrap gap-2">
+              {TRIP_TYPES.map(t => (
+                <button key={t} type="button" onClick={() => set('trip_type', t)}
+                  className={`px-3 py-1.5 rounded-full text-xs border transition ${
+                    tripType === t ? 'bg-gold text-navy border-gold font-semibold' : 'border-white/15 text-white/60 hover:border-white/35'
+                  }`}>
+                  {TRIP_TYPE_CONFIG[t].label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <datalist id={`suppliers-${tripType}`}>
+            {cfg.suggestions.map(l => <option key={l} value={l} />)}
+          </datalist>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs text-white/45 mb-1.5">Cruise Line</label>
-              <select value={form.line ?? ''} onChange={e => set('line', e.target.value || null)}
-                className="w-full bg-navy border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-gold/50 transition">
-                <option value="">Select a cruise line…</option>
-                {CRUISE_LINES.map(l => <option key={l} value={l}>{l}</option>)}
-              </select>
+              <label className="block text-xs text-white/45 mb-1.5">{cfg.supplier}</label>
+              <input list={`suppliers-${tripType}`} value={form.line ?? ''} onChange={e => set('line', e.target.value || null)}
+                placeholder={cfg.supplierPlaceholder}
+                className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm placeholder-white/20 focus:outline-none focus:border-gold/50 transition" />
             </div>
             <div>
-              <label className="block text-xs text-white/45 mb-1.5">Ship</label>
+              <label className="block text-xs text-white/45 mb-1.5">{cfg.product}</label>
               <input value={form.ship ?? ''} onChange={e => set('ship', e.target.value)}
-                placeholder="e.g. Wonder of the Seas"
+                placeholder={cfg.productPlaceholder}
                 className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm placeholder-white/20 focus:outline-none focus:border-gold/50 transition" />
             </div>
           </div>
@@ -151,7 +170,7 @@ export default function CruiseItemManager({ label, items, onSave, onDelete, onTo
             <div className="flex-1">
               <label className="block text-xs text-white/45 mb-1.5">Title</label>
               <input value={form.title ?? ''} onChange={e => set('title', e.target.value)}
-                placeholder="Deal title…"
+                placeholder={`${label} title…`}
                 className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm placeholder-white/20 focus:outline-none focus:border-gold/50 transition" />
             </div>
             <button onClick={handleEnrich} disabled={aiLoading || (!form.line && !form.ship)}
@@ -181,9 +200,9 @@ export default function CruiseItemManager({ label, items, onSave, onDelete, onTo
           </div>
 
           <div>
-            <label className="block text-xs text-white/45 mb-1.5">Ports of Call</label>
+            <label className="block text-xs text-white/45 mb-1.5">{cfg.places}</label>
             <input value={form.ports ?? ''} onChange={e => set('ports', e.target.value)}
-              placeholder="e.g. Nassau, Cozumel, Grand Cayman"
+              placeholder={cfg.placesPlaceholder}
               className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm placeholder-white/20 focus:outline-none focus:border-gold/50 transition" />
           </div>
 
@@ -268,7 +287,10 @@ export default function CruiseItemManager({ label, items, onSave, onDelete, onTo
               <div className="flex-1 min-w-0">
                 <p className="text-white font-medium text-sm truncate">{item.title || item.ship || '—'}</p>
                 <p className="text-white/40 text-xs mt-0.5">
-                  {[item.line, item.ship].filter(Boolean).join(' · ')}
+                  {[
+                    tripTypeOf(item) !== 'cruise' ? TRIP_TYPE_CONFIG[tripTypeOf(item)].label : null,
+                    item.line, item.ship,
+                  ].filter(Boolean).join(' · ')}
                   {item.date_from ? ` · ${formatDate(item.date_from)}` : ''}
                 </p>
               </div>
