@@ -1,0 +1,162 @@
+{
+  "name": "Royal Caribbean Daily Offers Digest",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "id": "734a34d5-e626-4330-bac9-17c3f4d1342c",
+      "name": "Daily 8am Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://creative.rccl.com/Sales/Royal/Promotions/Snapshot_of_Current_Offers.pdf",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "ba1ae7b2-342b-4f04-9acd-b5c2460eaa04",
+      "name": "Download Offers PDF",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        224,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {
+          "joinPages": true
+        }
+      },
+      "id": "6fe5bd24-3f94-42e2-9599-50a864e82c9c",
+      "name": "Extract PDF Text",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        448,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst text = $input.first().json.text || '';\nconst today = new Date();\ntoday.setHours(0, 0, 0, 0);\nconst FLASH_DAYS = 7;\nconst todayStr = today.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });\n\n// Agent-only offers — excluded entirely\nconst AGENT_ONLY_OFFERS = [\n  'Booked & Elevated',\n  'Booked & Celebrated'\n];\n\n// Agent-only keywords — used to filter individual bullet segments\nconst AGENT_KEYWORDS = [\n  'bonus commission',\n  'travel agent',\n  'travel advisor',\n  'travel partner',\n  'accredited',\n  'arc,',\n  'iatan',\n  'clia',\n  'commission'\n];\n\nconst KNOWN_OFFERS = [\n  'BOGO60',\n  'Kids Sail Free',\n  'Free 3rd & 4th Guests',\n  'Summer Cyber Sale',\n  'Summer Shorts Kicker',\n  'Ovation of the Seas',\n  'Up to $250 Off Flights',\n  'Early Booking Bonus',\n  'Last Minute Cruises'\n];\n\nconst BW_LABEL = 'Booking Window:';\nconst allOffers = [];\n\nfor (let i = 0; i < KNOWN_OFFERS.length; i++) {\n  const offerName = KNOWN_OFFERS[i];\n  const nameIdx = text.indexOf(offerName);\n  if (nameIdx === -1) continue;\n\n  const bwIdx = text.indexOf(BW_LABEL, nameIdx);\n  if (bwIdx === -1) continue;\n\n  let valid = true;\n  for (let j = 0; j < KNOWN_OFFERS.length; j++) {\n    if (j === i) continue;\n    const other = text.indexOf(KNOWN_OFFERS[j], nameIdx + offerName.length);\n    if (other !== -1 && other < bwIdx) { valid = false; break; }\n  }\n  if (!valid) continue;\n\n  const bwStart = bwIdx + BW_LABEL.length;\n  const nextBullet = text.indexOf('•', bwStart);\n  let bwText = nextBullet !== -1 ? text.substring(bwStart, nextBullet).trim() : text.substring(bwStart, bwStart + 150).trim();\n\n  let endDateStr = bwText;\n  const enDashIdx = bwText.indexOf('–');\n  const emDashIdx = bwText.indexOf('—');\n  const dashIdx = enDashIdx !== -1 ? enDashIdx : emDashIdx;\n  if (dashIdx !== -1) endDateStr = bwText.substring(dashIdx + 1).trim();\n\n  const endDate = new Date(endDateStr);\n  const days = isNaN(endDate.getTime()) ? null : Math.ceil((endDate.getTime() - today.getTime()) / 86400000);\n\n  allOffers.push({ name: offerName, bookingWindow: bwText, endDate: endDateStr, days: days });\n}\n\nconst flashItems = allOffers.filter(function(o) { return o.days !== null && o.days >= 0 && o.days <= FLASH_DAYS; });\n\n// Build display text — strip agent-only offers and agent-only bullet segments\nfunction isAgentOnlySegment(seg) {\n  const lower = seg.toLowerCase();\n  for (let k = 0; k < AGENT_KEYWORDS.length; k++) {\n    if (lower.indexOf(AGENT_KEYWORDS[k]) !== -1) return true;\n  }\n  return false;\n}\n\nfunction isAgentOnlyOfferBlock(seg) {\n  const lower = seg.toLowerCase();\n  for (let k = 0; k < AGENT_ONLY_OFFERS.length; k++) {\n    if (lower.indexOf(AGENT_ONLY_OFFERS[k].toLowerCase()) !== -1) return true;\n  }\n  return false;\n}\n\nlet displayText = text;\nconst termsIdx = displayText.indexOf('Terms & Conditions');\nif (termsIdx !== -1) displayText = displayText.substring(0, termsIdx);\n\nconst rawParts = displayText.split('•');\n\n// Filter out agent-only offer blocks and agent-only bullet segments\nlet inAgentBlock = false;\nconst filteredParts = [];\nfor (let i = 0; i < rawParts.length; i++) {\n  const seg = rawParts[i];\n  if (isAgentOnlyOfferBlock(seg)) {\n    inAgentBlock = true;\n    continue;\n  }\n  let startsConsumerOffer = false;\n  for (let k = 0; k < KNOWN_OFFERS.length; k++) {\n    if (seg.indexOf(KNOWN_OFFERS[k]) !== -1) { startsConsumerOffer = true; break; }\n  }\n  if (startsConsumerOffer) inAgentBlock = false;\n\n  if (inAgentBlock) continue;\n  if (isAgentOnlySegment(seg)) continue;\n\n  filteredParts.push(seg);\n}\n\nlet formattedHtml = filteredParts[0] || '';\nfor (let i = 1; i < filteredParts.length; i++) {\n  formattedHtml += '<br><b style=\"color:#003087\">&#9658;</b>&nbsp;' + filteredParts[i];\n}\n\nlet emailHtml = '<html><body style=\"font-family:Arial,sans-serif;max-width:680px;margin:0 auto;color:#333;padding:0;\">';\nemailHtml += '<div style=\"background:#003087;padding:20px 24px;\">';\nemailHtml += '<h1 style=\"color:white;margin:0;font-size:22px;\">Royal Caribbean — Daily Offers</h1>';\nemailHtml += '<p style=\"color:#a0c0e8;margin:4px 0 0;font-size:14px;\">' + todayStr + '</p>';\nemailHtml += '</div><div style=\"padding:20px 24px;\">';\n\nif (flashItems.length > 0) {\n  emailHtml += '<div style=\"background:#fff0f0;border:2px solid #c00;border-radius:6px;padding:16px;margin-bottom:20px;\">';\n  emailHtml += '<h2 style=\"color:#c00;margin:0 0 10px;font-size:16px;\">&#9889; Flash Sale Alert — Book Fast!</h2>';\n  for (let j = 0; j < flashItems.length; j++) {\n    const item = flashItems[j];\n    emailHtml += '<div style=\"padding:8px 0;border-bottom:1px solid #f8cccc;\">';\n    emailHtml += '<strong style=\"color:#c00;\">' + item.name + '</strong><br>';\n    emailHtml += '<span style=\"font-size:13px;\">Closes: ' + item.endDate + ' — <b>' + item.days + ' day' + (item.days === 1 ? '' : 's') + ' left!</b></span>';\n    emailHtml += '</div>';\n  }\n  emailHtml += '</div>';\n}\n\nemailHtml += '<h2 style=\"color:#003087;font-size:16px;border-bottom:2px solid #003087;padding-bottom:6px;\">Current Offers</h2>';\nfor (let j = 0; j < allOffers.length; j++) {\n  const offer = allOffers[j];\n  const days = offer.days;\n  let urgencyStyle = '';\n  let urgencyText = '';\n  if (days !== null && days >= 0) {\n    if (days <= FLASH_DAYS) {\n      urgencyStyle = 'color:#c00;font-weight:bold;';\n      urgencyText = '&#9889; ' + days + ' day' + (days === 1 ? '' : 's') + ' left!';\n    } else if (days <= 14) {\n      urgencyStyle = 'color:#e67e00;';\n      urgencyText = days + ' days left';\n    } else {\n      urgencyStyle = 'color:#2d6a2d;';\n      urgencyText = days + ' days left';\n    }\n  }\n  const isFlash = days !== null && days >= 0 && days <= FLASH_DAYS;\n  const borderColor = isFlash ? '#c00' : '#003087';\n  emailHtml += '<div style=\"border-left:4px solid ' + borderColor + ';padding:10px 14px;margin:8px 0;background:#f8faff;border-radius:3px;\">';\n  emailHtml += '<table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\"><tr>';\n  emailHtml += '<td><strong style=\"color:#003087;\">' + offer.name + '</strong></td>';\n  if (urgencyText) emailHtml += '<td align=\"right\" style=\"' + urgencyStyle + 'font-size:12px;white-space:nowrap;\">' + urgencyText + '</td>';\n  emailHtml += '</tr></table>';\n  if (offer.bookingWindow) emailHtml += '<div style=\"font-size:12px;color:#666;margin-top:4px;\">&#128197; ' + offer.bookingWindow + '</div>';\n  emailHtml += '</div>';\n}\n\nemailHtml += '<details style=\"margin-top:16px;\">';\nemailHtml += '<summary style=\"cursor:pointer;color:#003087;font-weight:bold;padding:8px 0;\">&#128196; View Full Offer Details</summary>';\nemailHtml += '<div style=\"background:#f8faff;padding:14px;font-size:13px;line-height:2;border-radius:4px;margin-top:6px;\">' + formattedHtml + '</div>';\nemailHtml += '</details>';\nemailHtml += '<p style=\"margin-top:20px;padding-top:12px;border-top:1px solid #eee;font-size:12px;color:#999;\">';\nemailHtml += 'Source: <a href=\"https://loyaltoyoualways.com/offers/\" style=\"color:#003087;\">Loyal To You Always</a>';\nemailHtml += ' &nbsp;|&nbsp; <a href=\"https://creative.rccl.com/Sales/Royal/Promotions/Snapshot_of_Current_Offers.pdf\" style=\"color:#003087;\">View Full PDF</a>';\nemailHtml += '</p></div></body></html>';\n\nconst subject = flashItems.length > 0\n  ? '⚡ Flash Sale: ' + flashItems.map(function(f) { return f.name; }).join(' & ') + ' — ' + todayStr\n  : 'Royal Caribbean Daily Digest — ' + todayStr;\n\nreturn [{ json: { subject: subject, emailHtml: emailHtml } }];\n"
+      },
+      "id": "7e5fae92-77fd-4bf6-b547-535e9b586743",
+      "name": "Parse Offers & Build Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        0
+      ],
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "sendTo": "pacandgorob@gmail.com",
+        "subject": "={{ $json.subject }}",
+        "message": "={{ $json.emailHtml }}",
+        "options": {
+          "appendAttribution": false,
+          "senderName": "RC Offers Monitor"
+        }
+      },
+      "id": "44695298-43a8-43a7-bda5-7abef244cf13",
+      "name": "Send Daily Digest",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        896,
+        0
+      ],
+      "webhookId": "ed4d35ba-ea89-45cc-82b3-737a62e09586",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "dPEB966zz1evAX6E",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Daily 8am Trigger": {
+      "main": [
+        [
+          {
+            "node": "Download Offers PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Offers PDF": {
+      "main": [
+        [
+          {
+            "node": "Extract PDF Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract PDF Text": {
+      "main": [
+        [
+          {
+            "node": "Parse Offers & Build Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Offers & Build Email": {
+      "main": [
+        [
+          {
+            "node": "Send Daily Digest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true
+  },
+  "versionId": "d45c6bed-197d-4423-9415-0b954635ca03",
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp",
+    "instanceId": "47b506dd4b697e1f41bfff4707ac74311d91ebaa785dd9f9d5c5d19eeaf75f92"
+  },
+  "nodeGroups": [],
+  "id": "WUFxn1IlvOH5dFHH",
+  "tags": []
+}
