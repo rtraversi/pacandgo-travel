@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
+import { rejectUnlessAgent } from '@/lib/apiAuth'
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
@@ -38,6 +39,9 @@ For each deal return a JSON object with exactly these fields:
 Return ONLY a valid JSON array. No markdown fences, no explanation. If no consumer deals found, return [].`
 
 export async function POST(request: Request) {
+  const denied = await rejectUnlessAgent()
+  if (denied) return denied
+
   const { content } = await request.json()
   if (!content?.trim()) return NextResponse.json({ error: 'No content provided' }, { status: 400 })
 

@@ -1,10 +1,14 @@
 import { NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
+import { rejectUnlessAgent } from '@/lib/apiAuth'
 import { TRIP_TYPE_CONFIG, isTripType, type TripType } from '@/lib/tripTypes'
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
 export async function POST(request: Request) {
+  const denied = await rejectUnlessAgent()
+  if (denied) return denied
+
   const body = await request.json()
   const { type = 'highlights' } = body
 

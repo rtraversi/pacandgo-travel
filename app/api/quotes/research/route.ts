@@ -1,9 +1,13 @@
 import { NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
+import { rejectUnlessAgent } from '@/lib/apiAuth'
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
 export async function POST(request: Request) {
+  const denied = await rejectUnlessAgent()
+  if (denied) return denied
+
   const body = await request.json()
   const { line, ship, start_date, nights, room_category } = body
 

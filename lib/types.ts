@@ -182,6 +182,39 @@ export interface ClientWish {
   created_at: string
 }
 
+export type BookingStatus = 'hold' | 'booked' | 'paid_in_full' | 'completed' | 'cancelled'
+export type InsuranceStatus = 'unknown' | 'offered' | 'purchased' | 'declined'
+
+export interface Booking {
+  id: string
+  agent_id: string
+  client_id: string | null
+  traveler_ids: string[]
+  quote_id: string | null
+  trip_type: TripType
+  supplier: string | null
+  product: string | null
+  title: string | null
+  confirmation_number: string | null
+  /** ISO date (YYYY-MM-DD) */
+  depart_date: string | null
+  /** ISO date (YYYY-MM-DD) */
+  return_date: string | null
+  status: BookingStatus
+  total_price: number | null
+  amount_paid: number
+  /** ISO date. For holds: when the hold lapses without a deposit. */
+  deposit_due: string | null
+  /** ISO date */
+  final_payment_due: string | null
+  insurance_status: InsuranceStatus
+  commission_amount: number | null
+  commission_received: boolean
+  notes: string | null
+  created_at: string
+  updated_at: string
+}
+
 export interface Quote {
   id: string
   agent_id: string
@@ -263,6 +296,7 @@ export type Database = {
       quotes: { Row: Quote; Insert: Omit<Quote, 'id' | 'created_at'>; Update: Partial<Quote> }
       clients: { Row: Client; Insert: Omit<Client, 'id' | 'created_at' | 'updated_at'>; Update: Partial<Client> }
       client_wishes: { Row: ClientWish; Insert: Omit<ClientWish, 'id' | 'created_at'>; Update: Partial<ClientWish> }
+      bookings: { Row: Booking; Insert: Omit<Booking, 'id' | 'created_at' | 'updated_at'>; Update: Partial<Booking> }
       inquiries: { Row: Inquiry; Insert: Omit<Inquiry, 'id' | 'created_at'>; Update: Partial<Inquiry> }
     }
   }

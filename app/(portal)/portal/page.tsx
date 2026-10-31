@@ -4,7 +4,10 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { agentProfileUrl } from '@/lib/utils'
-import type { Agent, AgentProfile } from '@/lib/types'
+import type { Agent, AgentProfile, Booking } from '@/lib/types'
+import NeedsAttention from '@/components/portal/NeedsAttention'
+import { buildAttention, type AttentionGroup } from '@/lib/attention'
+import { todayISO } from '@/lib/dates'
 
 export const metadata: Metadata = { title: 'Dashboard — Agent Portal' }
 
@@ -37,6 +40,8 @@ export default async function PortalDashboardPage() {
   const isAdmin = user.id === ADMIN_USER_ID
   let stats: { label: string; value: number; href: string; alert: boolean }[] = []
   let failedEmails = 0
+  let attention: AttentionGroup[] = []
+  let hasBookings = false
   if (isPlus) {
     // Admins are accountable for every agent's mail, so their failure count spans
     // the whole roster; everyone else sees only their own.
@@ -44,7 +49,7 @@ export default async function PortalDashboardPage() {
       ? createAdminClient().from('inquiries').select('id', { count: 'exact', head: true }).eq('email_status', 'failed')
       : supabase.from('inquiries').select('id', { count: 'exact', head: true }).eq('agent_id', agent.id).eq('email_status', 'failed')
 
-    const [dealsRes, tripsRes, reviewsRes, galleryRes, inquiriesRes, failedRes] = await Promise.all([
+    const [dealsRes, tripsRes, reviewsRes, galleryRes, inquiriesRes, failedRes, bookingsRes, clientsRes] = await Promise.all([
       supabase.from('deals').select('id', { count: 'exact', head: true }).eq('agent_id', agent.id).eq('active', true),
       supabase.from('trips').select('id', { count: 'exact', head: true }).eq('agent_id', agent.id).eq('active', true),
       supabase.from('reviews').select('id', { count: 'exact', head: true }).eq('agent_id', agent.id).eq('status', 'pending'),
@@ -53,7 +58,12 @@ export default async function PortalDashboardPage() {
         ? createAdminClient().from('inquiries').select('id', { count: 'exact', head: true })
         : supabase.from('inquiries').select('id', { count: 'exact', head: true }).eq('agent_id', agent.id),
       failedQuery,
+      (supabase as any).from('bookings').select('*').eq('agent_id', agent.id).neq('status', 'cancelled'),
+      (supabase as any).from('clients').select('id, full_name, preferred_name, passport_expiry, dob, anniversary').eq('agent_id', agent.id),
     ])
+    const bookings = (bookingsRes.data ?? []) as Booking[]
+    hasBookings = bookings.length > 0
+    attention = buildAttention(bookings, clientsRes.data ?? [], todayISO())
     failedEmails = failedRes.count ?? 0
     stats = [
       { label: 'Active Deals', value: dealsRes.count ?? 0, href: '/portal/deals', alert: false },
@@ -121,6 +131,9 @@ export default async function PortalDashboardPage() {
           </div>
         </div>
       )}
+
+      {/* Agent+ to-do list from bookings and client profiles */}
+      {isPlus && <NeedsAttention groups={attention} hasBookings={hasBookings} />}
 
       {/* Agent+ stat grid */}
       {isPlus && (
