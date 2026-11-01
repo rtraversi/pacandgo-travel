@@ -1,4 +1,5 @@
 import { Document, Page, View, Text, Image, StyleSheet } from '@react-pdf/renderer'
+import { cloudinarySized } from '@/lib/utils'
 import type { Quote, Agent, AgentProfile } from '@/lib/types'
 
 const NAVY       = '#081a2e'
@@ -122,7 +123,7 @@ export default function QuotePDFDocument({ quote, agent, profile, logoUrl }: Pro
           </View>
           <View style={s.hRight}>
             {profile?.photo_url ? (
-              <Image src={profile.photo_url} style={s.photo} />
+              <Image src={cloudinarySized(profile.photo_url, 200)} style={s.photo} />
             ) : null}
             <Text style={s.agentName}>{agent.full_name}</Text>
             <Text style={s.agentInfo}>{agent.email}</Text>

@@ -62,25 +62,39 @@ export default async function AgentProfilePage({ params }: Props) {
 
   return (
     <>
-      {/* Hero */}
+      {/* Hero — agent's own background if set, otherwise the home page beach */}
       <section className="relative min-h-[70vh] flex items-end pb-16 px-[5%] overflow-hidden bg-navy">
-        {profile?.photo_url && (
-          <>
-            <Image src={profile.photo_url} alt={agent.full_name} fill className="object-cover object-top opacity-40" />
-            <div className="absolute inset-0 bg-gradient-to-t from-navy via-navy/70 to-transparent" />
-          </>
-        )}
-        <div className="relative z-10 max-w-3xl">
-          {agent.tier === 'agent_plus' && (
-            <span className="inline-block bg-gold text-navy text-[0.7rem] font-bold uppercase tracking-widest px-3 py-1 rounded mb-4">
-              Agent+
-            </span>
-          )}
-          <h1 className="text-[clamp(2.5rem,5vw,4rem)] text-white leading-[1.1] mb-3">{agent.full_name}</h1>
-          {profile?.tagline && <p className="text-xl text-gold italic">{profile.tagline}</p>}
-          <a href="#contact" className="mt-6 inline-block bg-gold text-navy font-bold uppercase tracking-wider text-sm px-8 py-3.5 rounded hover:bg-gold-hover transition-colors no-underline">
-            Book with Me
-          </a>
+        <Image
+          src={profile?.hero_url || '/images/beach.jpg'}
+          alt=""
+          fill
+          priority
+          className="object-cover"
+          style={{ objectPosition: 'center 40%' }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-navy via-navy/60 to-navy/30" />
+        <div className="relative z-10 max-w-5xl flex flex-col md:flex-row md:items-end gap-6 md:gap-10">
+          <div className="w-40 h-40 md:w-56 md:h-56 shrink-0 rounded-full overflow-hidden border-4 border-gold shadow-2xl bg-navy relative">
+            {profile?.photo_url ? (
+              <Image src={profile.photo_url} alt={agent.full_name} fill sizes="(min-width: 768px) 224px, 160px" className="object-cover object-top" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-gold text-5xl md:text-6xl font-bold">
+                {initials(agent.full_name)}
+              </div>
+            )}
+          </div>
+          <div className="max-w-3xl">
+            {agent.tier === 'agent_plus' && (
+              <span className="inline-block bg-gold text-navy text-[0.7rem] font-bold uppercase tracking-widest px-3 py-1 rounded mb-4">
+                Agent+
+              </span>
+            )}
+            <h1 className="text-[clamp(2.5rem,5vw,4rem)] text-white leading-[1.1] mb-3">{agent.full_name}</h1>
+            {profile?.tagline && <p className="text-xl text-gold italic">{profile.tagline}</p>}
+            <a href="#contact" className="mt-6 inline-block bg-gold text-navy font-bold uppercase tracking-wider text-sm px-8 py-3.5 rounded hover:bg-gold-hover transition-colors no-underline">
+              Book with Me
+            </a>
+          </div>
         </div>
       </section>
 
@@ -115,11 +129,6 @@ export default async function AgentProfilePage({ params }: Props) {
               )}
             </div>
             <div>
-              {!profile?.photo_url && (
-                <div className="w-full aspect-square rounded-xl bg-light flex items-center justify-center text-6xl font-bold text-navy mb-6">
-                  {initials(agent.full_name)}
-                </div>
-              )}
               {profile?.specialties && profile.specialties.length > 0 && (
                 <>
                   <h4 className="text-xs font-bold uppercase tracking-widest text-navy mb-3">Specialties</h4>

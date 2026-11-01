@@ -5,6 +5,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { revalidatePath } from 'next/cache'
 import { registerAgentSubdomain, normalizeSlug, validateSlug, type SubdomainResult } from '@/lib/netlify'
 import { sanitizeRichText } from '@/lib/richText.server'
+import { cleanHeroUrl } from '@/lib/utils'
 import type { AgentTier, Highlight } from '@/lib/types'
 
 const ADMIN_USER_ID = '552d2159-35e8-440f-b1f5-cd649ff16885'
@@ -92,6 +93,7 @@ export async function addAgent(data: {
 
 export async function saveAgentProfile(agentId: string, data: {
   photo_url: string | null
+  hero_url: string | null
   tagline: string | null
   bio: string | null
   specialties: string[]
@@ -112,7 +114,7 @@ export async function saveAgentProfile(agentId: string, data: {
     .maybeSingle()
 
   // Same scrub as the agent-facing save — this path writes the same column.
-  const payload = { ...data, bio: sanitizeRichText(data.bio) }
+  const payload = { ...data, hero_url: cleanHeroUrl(data.hero_url), bio: sanitizeRichText(data.bio) }
 
   const { error } = existingRes.data
     ? await admin.from('agent_profiles').update(payload).eq('agent_id', agentId)

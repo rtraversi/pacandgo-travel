@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { logout } from '@/app/actions/auth'
+import { cloudinarySized } from '@/lib/utils'
 import type { Agent, AgentProfile } from '@/lib/types'
 import {
   LayoutDashboard, User, Tag, Plane, BookOpen,
@@ -52,7 +53,7 @@ export default function PortalSidebar({ agent }: Props) {
         <div className="flex items-center gap-2.5">
           {agent.agent_profiles?.photo_url ? (
             <img
-              src={agent.agent_profiles.photo_url}
+              src={cloudinarySized(agent.agent_profiles.photo_url, 96)}
               alt={agent.full_name}
               className="w-7 h-7 rounded-full object-cover shrink-0"
             />

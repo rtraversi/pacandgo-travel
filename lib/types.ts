@@ -30,6 +30,8 @@ export interface AgentProfile {
   id: string
   agent_id: string
   photo_url: string | null
+  /** Custom background for the public page hero. Null → the home page beach image. */
+  hero_url: string | null
   tagline: string | null
   bio: string | null
   specialties: string[]

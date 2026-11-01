@@ -3,10 +3,12 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { sanitizeRichText } from '@/lib/richText.server'
+import { cleanHeroUrl } from '@/lib/utils'
 import type { Highlight } from '@/lib/types'
 
 export async function saveProfile(data: {
   photo_url: string | null
+  hero_url: string | null
   tagline: string | null
   bio: string | null
   specialties: string[]
@@ -28,6 +30,7 @@ export async function saveProfile(data: {
 
   const profileData = {
     photo_url: data.photo_url,
+    hero_url: cleanHeroUrl(data.hero_url),
     tagline: data.tagline,
     // Bios render as HTML on the public site — never store unscrubbed markup.
     bio: sanitizeRichText(data.bio),

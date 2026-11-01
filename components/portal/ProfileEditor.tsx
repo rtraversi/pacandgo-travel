@@ -5,6 +5,7 @@ import RichTextEditor from './RichTextEditor'
 import { isBlankHtml, isLikelyHtml, plainTextToHtml } from '@/lib/richText'
 import { saveProfile } from '@/app/actions/profile'
 import { saveAgentProfile } from '@/app/actions/admin'
+import { cloudinarySized } from '@/lib/utils'
 import type { AgentProfile, Highlight } from '@/lib/types'
 
 const CLOUD = 'dh811jlgd'
@@ -24,6 +25,7 @@ export default function ProfileEditor({ agentName, agentSlug, profile, agentId }
   const [saveError, setSaveError] = useState<string | null>(null)
 
   const [photoUrl, setPhotoUrl] = useState(profile?.photo_url ?? '')
+  const [heroUrl, setHeroUrl] = useState(profile?.hero_url ?? '')
   const [tagline, setTagline] = useState(profile?.tagline ?? '')
   // Bios are stored as HTML now; ones written before the rich-text editor are
   // plain text, so convert them on the way in.
@@ -41,8 +43,29 @@ export default function ProfileEditor({ agentName, agentSlug, profile, agentId }
 
   const [uploading, setUploading] = useState(false)
   const [photoError, setPhotoError] = useState<string | null>(null)
+  const [heroUploading, setHeroUploading] = useState(false)
+  const [heroError, setHeroError] = useState<string | null>(null)
   const [aiLoading, setAiLoading] = useState(false)
   const [aiError, setAiError] = useState<string | null>(null)
+
+  /** Uploads to Cloudinary and returns the URL, or throws with a message to show. */
+  async function uploadImage(file: File): Promise<string> {
+    const fd = new FormData()
+    fd.append('file', file)
+    fd.append('upload_preset', PRESET)
+    let json: { secure_url?: string; error?: { message?: string } }
+    try {
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD}/image/upload`, {
+        method: 'POST',
+        body: fd,
+      })
+      json = await res.json()
+    } catch {
+      throw new Error('Upload failed — check your connection and try again.')
+    }
+    if (!json.secure_url) throw new Error(json.error?.message || 'Upload failed — try a different image.')
+    return json.secure_url
+  }
 
   async function handlePhoto(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
@@ -50,23 +73,27 @@ export default function ProfileEditor({ agentName, agentSlug, profile, agentId }
     setUploading(true)
     setPhotoError(null)
     try {
-      const fd = new FormData()
-      fd.append('file', file)
-      fd.append('upload_preset', PRESET)
-      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD}/image/upload`, {
-        method: 'POST',
-        body: fd,
-      })
-      const json = await res.json()
-      if (json.secure_url) {
-        setPhotoUrl(json.secure_url)
-      } else {
-        setPhotoError(json.error?.message || 'Upload failed — try a different image.')
-      }
-    } catch {
-      setPhotoError('Upload failed — check your connection and try again.')
+      // Store a web-sized copy, not the phone original.
+      setPhotoUrl(cloudinarySized(await uploadImage(file), 800))
+    } catch (err) {
+      setPhotoError(err instanceof Error ? err.message : 'Upload failed.')
     } finally {
       setUploading(false)
+      e.target.value = ''
+    }
+  }
+
+  async function handleHero(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setHeroUploading(true)
+    setHeroError(null)
+    try {
+      setHeroUrl(cloudinarySized(await uploadImage(file), 2400))
+    } catch (err) {
+      setHeroError(err instanceof Error ? err.message : 'Upload failed.')
+    } finally {
+      setHeroUploading(false)
       e.target.value = ''
     }
   }
@@ -112,6 +139,7 @@ export default function ProfileEditor({ agentName, agentSlug, profile, agentId }
       try {
         const payload = {
           photo_url: photoUrl || null,
+          hero_url: heroUrl || null,
           tagline: tagline || null,
           bio: isBlankHtml(bio) ? null : bio,
           specialties,
@@ -177,6 +205,55 @@ export default function ProfileEditor({ agentName, agentSlug, profile, agentId }
             </div>
           </div>
         </div>
+      </section>
+
+      {/* Page background */}
+      <section className="bg-white/5 border border-white/10 rounded-xl p-6">
+        <h2 className="text-[0.65rem] font-bold tracking-[0.18em] uppercase text-white/45 mb-1">Page Background</h2>
+        <p className="text-white/30 text-xs mb-5">
+          The wide image behind your name at the top of your public page. A landscape photo works best.
+        </p>
+        <div className="relative w-full aspect-[16/6] rounded-lg overflow-hidden border border-white/10 bg-navy">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={heroUrl || '/images/beach.jpg'}
+            alt="Page background preview"
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{ objectPosition: 'center 40%' }}
+          />
+          <div className="absolute inset-0 bg-navy/60" />
+          <div className="relative h-full flex items-center gap-4 px-6">
+            <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-gold bg-navy shrink-0">
+              {photoUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={photoUrl} alt="" className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-gold text-sm font-bold">{initials}</div>
+              )}
+            </div>
+            <p className="text-white text-lg font-semibold">{agentName}</p>
+          </div>
+          {!heroUrl && (
+            <span className="absolute top-2 right-2 text-[0.6rem] uppercase tracking-widest bg-black/40 text-white/70 px-2 py-0.5 rounded">
+              Default
+            </span>
+          )}
+        </div>
+        <div className="flex items-center gap-4 mt-3">
+          <label>
+            <span className={`text-xs cursor-pointer transition ${heroUploading ? 'text-white/30' : 'text-gold hover:text-gold-hover'}`}>
+              {heroUploading ? 'Uploading…' : heroUrl ? 'Change background' : 'Upload background'}
+            </span>
+            <input type="file" accept="image/*" onChange={handleHero} disabled={heroUploading} className="hidden" />
+          </label>
+          {heroUrl && !heroUploading && (
+            <button onClick={() => setHeroUrl('')} className="text-xs text-white/35 hover:text-white/70 transition">
+              Use default
+            </button>
+          )}
+        </div>
+        {heroError && <p className="text-red-400 text-xs mt-2">{heroError}</p>}
+        <p className="text-white/25 text-xs mt-2">Click Save Profile below to publish the change.</p>
       </section>
 
       {/* Bio */}

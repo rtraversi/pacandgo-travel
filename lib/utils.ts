@@ -63,3 +63,27 @@ export function formatPrice(price: number | null): string {
 export function initials(name: string): string {
   return name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase()
 }
+
+/**
+ * Hero backgrounds render through next/image, which throws on hosts not listed
+ * in next.config.ts. Only accept our own Cloudinary uploads so a bad URL can't
+ * take an agent's page down. Returns null for anything else.
+ */
+export function cleanHeroUrl(url: string | null | undefined): string | null {
+  const v = (url ?? '').trim()
+  return /^https:\/\/res\.cloudinary\.com\//.test(v) ? v : null
+}
+
+/**
+ * Asks Cloudinary for a copy of an uploaded image no wider than `width`, as a
+ * compressed JPG. Agent photos are often multi-MB PNGs straight off a phone;
+ * this turns a 2.8 MB original into ~120 KB at 800px or ~4 KB at avatar size.
+ *
+ * Replaces any sizing this helper added earlier, so it's safe to call on a
+ * URL that was already sized at upload. Non-Cloudinary URLs pass through.
+ */
+export function cloudinarySized(url: string, width: number): string {
+  const m = url.match(/^(https:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/)(c_limit,w_\d+,q_auto,f_jpg\/)?(.+)$/)
+  if (!m) return url
+  return `${m[1]}c_limit,w_${width},q_auto,f_jpg/${m[3]}`
+}
